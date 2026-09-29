@@ -1,5 +1,5 @@
 "use client";
-import { Download, KeyRound, LogOut, Store } from "lucide-react";
+import { Download, LogOut, Store } from "lucide-react";
 import { useEffect, useState } from "react";
 import { api, ApiError, NetworkError } from "@/lib/client/api";
 import { money, parseMajor } from "@/lib/client/money";
@@ -18,10 +18,7 @@ export function ActivityScreen() {
       <h1 className="text-[22px] font-medium tracking-tight text-ink">{m.activity.title}</h1>
       {pending > 0 && (
         <div className="mt-4">
-          <Notice>
-            <strong className="block">{m.activity.pendingTitle}</strong>
-            {m.activity.pendingHint}
-          </Notice>
+          <Notice>{m.activity.pendingHint}</Notice>
         </div>
       )}
       <div className="mt-4 flex gap-2" role="tablist">
@@ -31,7 +28,7 @@ export function ActivityScreen() {
             role="tab"
             aria-selected={filter === f}
             onClick={() => setFilter(f)}
-            className={`h-11 rounded-full px-5 text-sm font-medium ${filter === f ? "bg-ink text-paper" : "bg-card text-muted"}`}
+            className={`h-11 rounded-full px-5 text-sm font-medium ${filter === f ? "bg-brand text-white" : "bg-card text-muted"}`}
           >
             {m.activity[f]}
           </button>
@@ -123,7 +120,6 @@ export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSi
             {u.merchant ? t(m.profile.merchantOn, { name: u.merchant.name }) : m.profile.merchantOff}
           </button>,
         )}
-        <p className="py-3 text-sm text-muted">{t(m.profile.provider, { name: snapshot.partner.name })}</p>
       </Card>
       {snapshot.partner.sandbox && <Notice tone="warn">{m.profile.sandbox}</Notice>}
 
@@ -136,7 +132,7 @@ export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSi
                 key={l}
                 onClick={() => void switchLocale(l)}
                 aria-pressed={locale === l}
-                className={`h-11 rounded-full px-5 text-sm font-medium ${locale === l ? "bg-ink text-paper" : "bg-card-2 text-ink"}`}
+                className={`h-11 rounded-full px-5 text-sm font-medium ${locale === l ? "bg-brand text-white" : "bg-card-2 text-ink"}`}
               >
                 {l === "en" ? "English" : "Français"}
               </button>
@@ -151,7 +147,7 @@ export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSi
                 key={v}
                 onClick={() => applyTheme(v)}
                 aria-pressed={theme === v}
-                className={`h-11 rounded-full px-5 text-sm font-medium ${theme === v ? "bg-ink text-paper" : "bg-card-2 text-ink"}`}
+                className={`h-11 rounded-full px-5 text-sm font-medium ${theme === v ? "bg-brand text-white" : "bg-card-2 text-ink"}`}
               >
                 {m.profile.theme[v]}
               </button>
@@ -160,20 +156,11 @@ export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSi
         </div>
       </Card>
 
-      <Card className="space-y-3">
-        <div className="flex items-start gap-3">
-          <KeyRound className="mt-0.5 h-5 w-5 text-ink" />
-          <div>
-            <p className="font-medium text-ink">{m.profile.device}</p>
-            <p className="text-sm text-muted">{m.profile.deviceHint}</p>
-          </div>
-        </div>
-        {install && (
-          <Button variant="secondary" className="w-full" onClick={() => void install.prompt()}>
-            <Download className="h-4 w-4" /> {m.profile.install}
-          </Button>
-        )}
-      </Card>
+      {install && (
+        <Button variant="secondary" className="w-full" onClick={() => void install.prompt()}>
+          <Download className="h-4 w-4" /> {m.profile.install}
+        </Button>
+      )}
 
       {pending > 0 && <Notice tone="warn">{t(m.profile.signOutWarn, { n: pending })}</Notice>}
       <Button variant="danger" className="w-full" onClick={onSignOut}>
@@ -255,14 +242,14 @@ export function AddSheet({ open, onClose, toast, onLoadVault }: { open: boolean;
           {snapshot.partner.sandbox && (
             <button
               onClick={() => setMode("topup")}
-              className={`h-11 rounded-full px-5 text-sm font-medium ${mode === "topup" ? "bg-ink text-paper" : "bg-card text-ink"}`}
+              className={`h-11 rounded-full px-5 text-sm font-medium ${mode === "topup" ? "bg-brand text-white" : "bg-card text-ink"}`}
             >
               {m.add.topUp}
             </button>
           )}
           <button
             onClick={() => setMode("send")}
-            className={`h-11 rounded-full px-5 text-sm font-medium ${mode === "send" ? "bg-ink text-paper" : "bg-card text-ink"}`}
+            className={`h-11 rounded-full px-5 text-sm font-medium ${mode === "send" ? "bg-brand text-white" : "bg-card text-ink"}`}
           >
             {m.add.send}
           </button>

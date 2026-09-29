@@ -67,6 +67,11 @@
 }
 
 @theme inline {
+  --color-brand: var(--pv-brand);
+  --color-brand-soft: var(--pv-brand-soft);
+  --color-accent: var(--pv-accent);
+  --color-accent-soft: var(--pv-accent-soft);
+  --color-accent-text: var(--pv-accent-text);
   --color-green: var(--pv-green);
   --color-green-strong: var(--pv-green-strong);
   --color-green-soft: var(--pv-green-soft);
@@ -123,6 +128,11 @@ body {
 
 /* Wallet: monochrome surfaces, black primary, soft grey cards, blue status pills. Scoped so the site keeps its palette. */
 .pv-wallet {
+  --pv-brand: #14365a;
+  --pv-brand-soft: #e8eef5;
+  --pv-accent: #046b4f;
+  --pv-accent-soft: #e2f2ec;
+  --pv-accent-text: #046b4f;
   --pv-paper: #ffffff;
   --pv-card: #f4f4f5;
   --pv-card-2: #ffffff;
@@ -145,6 +155,11 @@ body {
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .pv-wallet {
+    --pv-brand: #173c62;
+    --pv-brand-soft: #16283a;
+    --pv-accent: #0a8a64;
+    --pv-accent-soft: #12302a;
+    --pv-accent-text: #4cc79c;
     --pv-paper: #0b0b0c;
     --pv-card: #18181b;
     --pv-card-2: #232327;
@@ -164,6 +179,11 @@ body {
 }
 
 :root[data-theme="dark"] .pv-wallet {
+  --pv-brand: #173c62;
+  --pv-brand-soft: #16283a;
+  --pv-accent: #0a8a64;
+  --pv-accent-soft: #12302a;
+  --pv-accent-text: #4cc79c;
   --pv-paper: #0b0b0c;
   --pv-card: #18181b;
   --pv-card-2: #232327;
@@ -182,5 +202,5 @@ body {
 }
 
 .pv-wallet :focus-visible {
-  outline-color: var(--pv-ink);
+  outline-color: var(--pv-accent);
 }

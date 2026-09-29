@@ -92,7 +92,7 @@ export function WalletApp() {
       <div className="grid min-h-dvh place-items-center px-4 text-center">
         <div className="space-y-4">
           <p className="text-muted">{m.common.genericError}</p>
-          <button className="h-12 rounded-full bg-ink px-6 font-medium text-paper" onClick={reboot}>
+          <button className="h-12 rounded-full bg-accent px-6 font-medium text-white" onClick={reboot}>
             {m.common.retry}
           </button>
         </div>

@@ -52,34 +52,25 @@ export function VaultScreen({ toast }: { toast: (s: string) => void }) {
 
   return (
     <div className="space-y-4 px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-6">
-      <header>
-        <h1 className="text-[22px] font-medium tracking-tight text-ink">{m.vault.title}</h1>
-        <p className="mt-1 text-muted">{m.vault.subtitle}</p>
-      </header>
+      <h1 className="text-[22px] font-medium tracking-tight text-ink">{m.vault.title}</h1>
 
       {vault ? (
-        <Card className="rounded-[28px] bg-ink text-paper">
+        <section className="rounded-[28px] bg-brand p-5 text-white">
           <p className="text-sm opacity-70">{m.vault.remaining}</p>
           <p className="tabular mt-2 text-[34px] leading-none font-medium tracking-tight">{f(vault.remaining)}</p>
-          <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-paper/20" aria-hidden>
-            <div className="flex h-full">
-              <span className="bg-paper" style={{ width: `${(vault.fundedRemaining / vault.cap) * 100}%` }} />
-              <span className="bg-paper/50" style={{ width: `${(vault.creditRemaining / vault.cap) * 100}%` }} />
-            </div>
+          <div className="mt-5 flex h-1.5 overflow-hidden rounded-full bg-white/20" aria-hidden>
+            <span className="bg-white" style={{ width: `${(vault.fundedRemaining / vault.cap) * 100}%` }} />
+            <span className="bg-[#2fb386]" style={{ width: `${(vault.creditRemaining / vault.cap) * 100}%` }} />
           </div>
-          <dl className="mt-4 grid grid-cols-3 gap-2 text-sm">
+          <dl className="mt-4 space-y-2 text-sm">
             <Stat label={m.vault.funded} value={f(vault.fundedRemaining)} />
-            <Stat label={m.vault.overdraft} value={f(vault.creditRemaining)} />
-            <Stat label={m.vault.spent} value={f(vault.spent)} />
+            {vault.creditRemaining > 0 && <Stat label={m.vault.overdraft} value={f(vault.creditRemaining)} />}
+            <Stat label={m.home.expiresLabel} value={shortDate(vault.expiresAt, locale)} />
           </dl>
-          <p className="mt-4 text-xs opacity-70">
-            {t(m.vault.payments, { n: vaultState?.seq ?? 0 })} · {t(m.vault.expires, { date: shortDate(vault.expiresAt, locale) })}
-          </p>
-          <Button variant="secondary" className="mt-6 w-full bg-paper text-ink hover:bg-paper" onClick={() => setPinFor("cashout")}>
+          <Button variant="secondary" className="mt-6 w-full bg-white text-brand hover:bg-white" onClick={() => setPinFor("cashout")}>
             <LogOut className="h-4 w-4" /> {m.vault.cashOut}
           </Button>
-          <p className="mt-2 text-center text-xs opacity-70">{m.vault.cashOutHint}</p>
-        </Card>
+        </section>
       ) : activeElsewhere ? (
         <Notice tone="warn">{m.vault.otherDevice}</Notice>
       ) : (
@@ -90,7 +81,7 @@ export function VaultScreen({ toast }: { toast: (s: string) => void }) {
       {snapshot.user.kycTier === "tier0" && <KycPanel toast={toast} />}
 
       <Sheet open={pinFor === "cashout"} onClose={() => setPinFor(null)} title={m.vault.cashOut}>
-        <PinPad title={m.pin.enter} hint={m.vault.cashOutHint} error={pinError} busy={busy} onSubmit={(p) => void cashOut(p)} />
+        <PinPad title={m.pin.enter} error={pinError} busy={busy} onSubmit={(p) => void cashOut(p)} />
       </Sheet>
     </div>
   );
@@ -98,9 +89,9 @@ export function VaultScreen({ toast }: { toast: (s: string) => void }) {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <dt className="text-xs opacity-70">{label}</dt>
-      <dd className="tabular mt-0.5 font-medium">{value}</dd>
+    <div className="flex items-center justify-between gap-4">
+      <dt className="opacity-70">{label}</dt>
+      <dd className="tabular font-medium">{value}</dd>
     </div>
   );
 }
@@ -141,34 +132,25 @@ function LoadVault({ toast }: { toast: (s: string) => void }) {
     }
   };
 
-  const unavailable = m.vault.overdraftUnavailable as Record<string, string>;
   return (
     <Card>
       <form onSubmit={load} className="space-y-4">
-        <div>
-          <h2 className="text-[17px] font-medium text-ink">{m.vault.loadTitle}</h2>
-          <p className="mt-1 text-sm text-muted">{m.vault.loadHint}</p>
-        </div>
+        <h2 className="text-[17px] font-medium text-ink">{m.vault.loadTitle}</h2>
         <Field
           label={m.vault.fundedAmount}
           inputMode="decimal"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          hint={`${t(m.vault.maxFunded, { amount: money(snapshot.limits.maxFunded, cur, locale) })} · ${t(m.vault.walletBalance, {
-            amount: money(snapshot.balances.wallet, cur, locale),
-          })}`}
+          hint={t(m.vault.maxFunded, { amount: money(maxFunded, cur, locale) })}
           error={funded > maxFunded ? m.pay.errors.over_cap : null}
         />
-        {creditAvail > 0 ? (
+        {creditAvail > 0 && (
           <label className="flex items-center justify-between gap-3 rounded-[20px] bg-card-2 px-4 py-3.5">
-            <span>
-              <span className="block font-medium text-ink">{m.vault.addOverdraft}</span>
-              <span className="text-sm text-muted">{t(m.vault.overdraftAvailable, { amount: money(creditAvail, cur, locale) })}</span>
+            <span className="font-medium text-ink">
+              {m.vault.addOverdraft} <span className="font-normal text-muted">· {money(creditAvail, cur, locale)}</span>
             </span>
-            <input type="checkbox" className="h-6 w-6 accent-[var(--pv-ink)]" checked={credit} onChange={(e) => setCredit(e.target.checked)} />
+            <input type="checkbox" className="h-6 w-6 accent-[var(--pv-accent)]" checked={credit} onChange={(e) => setCredit(e.target.checked)} />
           </label>
-        ) : (
-          <p className="text-sm text-muted">{unavailable[snapshot.credit.reason] ?? unavailable.ok}</p>
         )}
         {error && <Notice tone="danger">{error}</Notice>}
         <Button type="submit" className="w-full" loading={busy} disabled={(funded <= 0 && !credit) || funded > maxFunded}>
@@ -269,14 +251,13 @@ function KycPanel({ toast }: { toast: (s: string) => void }) {
           <ShieldCheck className="h-5 w-5 text-ink" />
           <h2 className="text-[17px] font-medium text-ink">{m.vault.kycTitle}</h2>
         </div>
-        <p className="text-sm text-muted">{m.vault.kycHint}</p>
         <Select label={m.vault.idType} value={idType} onChange={(e) => setIdType(e.target.value)}>
           {snapshot.limits.idSystems.map((s) => (
             <option key={s}>{s}</option>
           ))}
         </Select>
         <Field label={m.vault.idNumber} required value={idNumber} onChange={(e) => setIdNumber(e.target.value)} error={error} />
-        <Button type="submit" variant="secondary" className="w-full" loading={busy}>
+        <Button type="submit" className="w-full" loading={busy}>
           <BadgeCheck className="h-4 w-4" /> {m.vault.verify}
         </Button>
       </form>

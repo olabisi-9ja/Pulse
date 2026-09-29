@@ -25,7 +25,7 @@ export function BottomNav({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void 
             <button
               key={id}
               aria-current="page"
-              className="flex h-14 items-center gap-2 rounded-full bg-ink px-5 text-sm font-medium text-paper"
+              className="flex h-14 items-center gap-2 rounded-full bg-brand px-5 text-sm font-medium text-white"
             >
               <Icon className="h-5 w-5" aria-hidden />
               {label}
@@ -149,7 +149,7 @@ export function Initials({ name }: { name: string }) {
     .map((p) => p[0]?.toUpperCase())
     .join("");
   return (
-    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink text-base font-medium text-paper" aria-hidden>
+    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand text-base font-medium text-white" aria-hidden>
       {initials || <ShieldCheck className="h-5 w-5" />}
     </span>
   );

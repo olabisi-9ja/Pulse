@@ -13,7 +13,7 @@ export function Button({
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; loading?: boolean }) {
   const styles: Record<Variant, string> = {
-    primary: "bg-ink text-paper hover:opacity-90",
+    primary: "bg-accent text-white hover:opacity-90",
     secondary: "bg-card text-ink hover:bg-line",
     ghost: "text-ink hover:bg-card",
     danger: "bg-danger-soft text-danger hover:opacity-90",
@@ -48,7 +48,7 @@ export function Field({
         {...rest}
         aria-invalid={!!error}
         aria-describedby={hint || error ? `${id}-d` : undefined}
-        className="h-14 w-full rounded-full border border-line bg-paper px-5 text-base text-ink outline-none placeholder:text-muted focus:border-ink"
+        className="h-14 w-full rounded-full border border-line bg-paper px-5 text-base text-ink outline-none placeholder:text-muted focus:border-accent"
       />
       {(hint || error) && (
         <p id={`${id}-d`} className={`mt-2 px-1 text-[13px] ${error ? "text-danger" : "text-muted"}`}>
@@ -74,7 +74,7 @@ export function Select({
       <select
         id={id}
         {...rest}
-        className="h-14 w-full appearance-none rounded-full border border-line bg-paper px-5 text-base text-ink outline-none focus:border-ink"
+        className="h-14 w-full appearance-none rounded-full border border-line bg-paper px-5 text-base text-ink outline-none focus:border-accent"
       >
         {children}
       </select>
@@ -89,7 +89,7 @@ export function Card({ className = "", children }: { className?: string; childre
 
 export function Notice({ tone = "info", children }: { tone?: "info" | "warn" | "danger" | "success"; children: ReactNode }) {
   const tones = {
-    info: "bg-navy-soft text-navy",
+    info: "bg-brand-soft text-ink",
     warn: "bg-warn-soft text-warn",
     danger: "bg-danger-soft text-danger",
     success: "bg-green-soft text-green",
@@ -180,7 +180,7 @@ export function Toast({ message, onDone }: { message: string | null; onDone: () 
       {message && (
         <motion.div
           role="status"
-          className="fixed inset-x-4 top-[max(1rem,env(safe-area-inset-top))] z-[60] mx-auto max-w-sm rounded-full bg-ink px-5 py-3 text-center text-sm font-medium text-paper shadow-[var(--pv-shadow)]"
+          className="fixed inset-x-4 top-[max(1rem,env(safe-area-inset-top))] z-[60] mx-auto max-w-sm rounded-full bg-brand px-5 py-3 text-center text-sm font-medium text-white shadow-[var(--pv-shadow)]"
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -20, opacity: 0 }}
@@ -195,8 +195,8 @@ export function Toast({ message, onDone }: { message: string | null; onDone: () 
 /** Small status pill, like "In transit" in a tracking app. */
 export function StatusPill({ tone = "info", children }: { tone?: "info" | "success" | "danger" | "muted"; children: ReactNode }) {
   const tones = {
-    info: "bg-navy-soft text-navy",
-    success: "bg-green-soft text-green",
+    info: "bg-accent-soft text-accent-text",
+    success: "bg-accent-soft text-accent-text",
     danger: "bg-danger-soft text-danger",
     muted: "bg-paper text-muted",
   };

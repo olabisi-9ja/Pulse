@@ -50,7 +50,7 @@ export function PinPad({
         {Array.from({ length }).map((_, i) => (
           <span
             key={i}
-            className={`h-3.5 w-3.5 rounded-full transition ${i < pin.length ? "bg-ink" : "bg-line"}`}
+            className={`h-3.5 w-3.5 rounded-full transition ${i < pin.length ? "bg-accent" : "bg-line"}`}
           />
         ))}
       </div>

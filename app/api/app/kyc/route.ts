@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ServiceError } from "@/lib/server/allowances";
 import { requireAppUser } from "@/lib/server/auth";
+import { rateLimit } from "@/lib/server/ratelimit";
 import { db } from "@/lib/server/db";
 import { handle, json, parseBody } from "@/lib/server/http";
 import { submitKyc } from "@/lib/server/identity";
@@ -9,6 +10,7 @@ const Body = z.object({ idType: z.string().min(2).max(20), idNumber: z.string().
 
 export const POST = handle(async (req: Request) => {
   const user = await requireAppUser();
+  await rateLimit(`kyc:${user.id}`, 10, 3600);
   const body = await parseBody(req, Body);
   try {
     const tier = await db().begin((tx) => submitKyc(tx, user.id, body.idType, body.idNumber));

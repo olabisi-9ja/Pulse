@@ -89,8 +89,17 @@ const site = {
     about: "About",
     contact: "Contact",
     docs: "Docs",
-    rights: "© 2026 PayVault",
+    rights: "© {year} PayVault",
+    privacy: "Privacy",
+    terms: "Terms",
     status: "Early stage. Country data is at concept status.",
+  },
+
+  notFound: {
+    eyebrow: "404",
+    title: "This page isn't here.",
+    body: "The link may be old or mistyped. Everything else still works, with or without signal.",
+    home: "Back to home",
   },
 
   common: {

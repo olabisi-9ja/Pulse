@@ -91,8 +91,17 @@ const site: SiteMessages = {
     about: "À propos",
     contact: "Contact",
     docs: "Docs",
-    rights: "© 2026 PayVault",
+    rights: "© {year} PayVault",
+    privacy: "Confidentialité",
+    terms: "Conditions",
     status: "Stade précoce. Les données pays sont au stade concept.",
+  },
+
+  notFound: {
+    eyebrow: "404",
+    title: "Cette page n'existe pas.",
+    body: "Le lien est peut-être ancien ou mal saisi. Tout le reste fonctionne, avec ou sans réseau.",
+    home: "Retour à l'accueil",
   },
 
   common: {

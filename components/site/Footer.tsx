@@ -67,7 +67,15 @@ export function Footer({ locale, t }: { locale: Locale; t: SiteMessages }) {
           </div>
         </div>
         <div className="mt-12 flex flex-col gap-2 border-t border-line pt-6 text-xs text-muted sm:flex-row sm:justify-between">
-          <p>{f.rights}</p>
+          <p className="flex flex-wrap gap-x-4 gap-y-1">
+            <span>{f.rights.replace("{year}", String(new Date().getFullYear()))}</span>
+            <Link href={`/${locale}/privacy`} className="hover:text-green hover:underline">
+              {f.privacy}
+            </Link>
+            <Link href={`/${locale}/terms`} className="hover:text-green hover:underline">
+              {f.terms}
+            </Link>
+          </p>
           <p>{f.status}</p>
         </div>
       </Container>

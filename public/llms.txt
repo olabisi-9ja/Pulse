@@ -1,0 +1,24 @@
+# PayVault
+
+> Payment infrastructure for unreliable networks. PayVault lets licensed partners (banks, mobile money operators, fintechs, PSPs) offer payments that work with no network: a pre-funded offline vault plus an optional offline overdraft, settled automatically when a device reconnects. PayVault is a technology provider. It is not a bank or a wallet and never holds customer funds. Available in English and French.
+
+Offline double-spending is bounded by vault limits, detected at settlement through hash-chain fork detection, and recovered from the KYC-verified holder, with a risk pool as backstop. It is not claimed to be impossible.
+
+## Product
+- [Product](https://payvault-phi.vercel.app/en/product): the two layers, reliability and guaranteed offline acceptance
+- [How it works](https://payvault-phi.vercel.app/en/how-it-works): allowance lifecycle and the two-scan payment flow
+- [Pay later](https://payvault-phi.vercel.app/en/pay-later): the offline overdraft and how it is repaid
+- [Pricing](https://payvault-phi.vercel.app/en/pricing): integration, platform, usage and support
+- [Security](https://payvault-phi.vercel.app/en/security): threat model and custody
+
+## Developers
+- [Docs](https://payvault-phi.vercel.app/en/docs): overview
+- [Quickstart](https://payvault-phi.vercel.app/en/docs/quickstart)
+- [Protocol](https://payvault-phi.vercel.app/en/docs/protocol): ECDSA P-256 signatures, fixed binary encoding, base45 QR
+- [API reference](https://payvault-phi.vercel.app/en/docs/api)
+- [Webhooks](https://payvault-phi.vercel.app/en/docs/webhooks)
+
+## Optional
+- [Coverage](https://payvault-phi.vercel.app/en/coverage): 15 country packs, concept stage
+- [About](https://payvault-phi.vercel.app/en/about)
+- [Contact](https://payvault-phi.vercel.app/en/contact): request a pilot

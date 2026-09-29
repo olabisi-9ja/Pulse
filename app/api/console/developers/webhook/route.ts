@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ServiceError } from "@/lib/server/allowances";
 import { requirePartnerRole } from "@/lib/server/auth";
 import { db } from "@/lib/server/db";
+import { isPrivateHost } from "@/lib/server/events";
 import { handle, json, parseBody } from "@/lib/server/http";
 
 const Body = z.object({
@@ -22,7 +23,7 @@ function validUrl(raw: string): string {
   if (u.protocol !== "https:" && !(u.protocol === "http:" && local && process.env.NODE_ENV !== "production")) {
     throw new ServiceError("invalid_request", "url: must use https");
   }
-  if (local && process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === "production" && isPrivateHost(u.hostname)) {
     throw new ServiceError("invalid_request", "url: must be publicly reachable");
   }
   return u.toString();

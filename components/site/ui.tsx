@@ -53,12 +53,12 @@ export function HeadlinePill({ className = "" }: { className?: string }) {
 /**
  * Headline with the brand pill. One rule everywhere: the last two words drop to
  * their own line and the pill opens that line ("No signal. / ▬ Still paid.").
- * Single-word titles stay plain.
+ * Titles under three words stay plain.
  */
 export function Pilled({ text }: { text: string }) {
   const words = text.trim().split(/\s+/);
-  if (words.length < 2) return <>{text}</>;
-  const tail = words.length > 2 ? 2 : 1;
+  if (words.length < 3) return <>{text}</>;
+  const tail = 2;
   return (
     <>
       {words.slice(0, -tail).join(" ")}

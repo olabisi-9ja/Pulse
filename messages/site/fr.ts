@@ -567,6 +567,7 @@ const site: SiteMessages = {
       lead: "Les Country Packs décrivent les règles de chaque marché sous forme de données : devise, plafonds, niveaux KYC, rails et protection des données. Cette page est générée à partir de ces packs.",
     },
     stats: { countries: "Pays", currencies: "Devises", regions: "Régions", concept: "Au stade concept" },
+    explorer: { all: "Toutes", hint: "Choisissez un pays ou une région" },
     regions: {
       west: "Afrique de l'Ouest",
       east: "Afrique de l'Est",

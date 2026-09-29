@@ -565,6 +565,7 @@ const site = {
       lead: "Country Packs hold the rules of each market as data: currency, limits, KYC tiers, rails and data protection. This page is generated from those packs.",
     },
     stats: { countries: "Countries", currencies: "Currencies", regions: "Regions", concept: "At concept status" },
+    explorer: { all: "All", hint: "Choose a country or a region" },
     regions: {
       west: "West Africa",
       east: "East Africa",

@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
-import { REGIONS, SUPPORTED_CURRENCIES, countryPacks } from "@payvault/countries";
-import { CountryCard } from "@/components/site/CountryCard";
+import { REGIONS, countryPacks, formatMinor } from "@payvault/countries";
+import { CoverageExplorer, type ExplorerCountry } from "@/components/site/CoverageExplorer";
 import { siteMetadata } from "@/components/site/meta";
-import { Card, CheckList, CtaBand, PageHero, Section, SectionHeading } from "@/components/site/ui";
+import { CheckList, CtaBand, PageHero, Section, SectionHeading } from "@/components/site/ui";
 import { isLocale } from "@/lib/i18n";
 import { getSiteMessages } from "@/messages/site";
 
@@ -22,46 +22,52 @@ export default async function CoveragePage({ params }: PageProps<"/[locale]/cove
       .filter((c) => c.region === region)
       .sort((a, b) => a.name[locale].localeCompare(b.name[locale], locale)),
   })).filter((g) => g.packs.length > 0);
-  const conceptCount = countryPacks.filter((c) => c.status === "concept").length;
 
-  const stats: [number, string][] = [
-    [countryPacks.length, p.stats.countries],
-    [SUPPORTED_CURRENCIES.length, p.stats.currencies],
-    [groups.length, p.stats.regions],
-    [conceptCount, p.stats.concept],
-  ];
+  const countries: ExplorerCountry[] = groups.flatMap((g) =>
+    g.packs.map((pack) => ({
+      code: pack.code,
+      name: pack.name[locale],
+      region: pack.region,
+      bloc: pack.bloc ?? undefined,
+      currencyCode: pack.currency.code,
+      currencyName: pack.currency.name[locale],
+      perPayment: formatMinor(pack.offlineLimits.perTransaction, pack.currency.code, locale),
+      cap: formatMinor(pack.offlineLimits.allowanceCap, pack.currency.code, locale),
+      rails: pack.rails.domestic.map((r) => r.name),
+      papss: pack.rails.crossBorder.includes("papss"),
+      authority: pack.dataProtection.authority,
+      residency: p.card.residency[pack.dataProtection.residency],
+      status: p.status[pack.status],
+      concept: pack.status === "concept",
+    })),
+  );
 
   return (
     <>
       <PageHero eyebrow={p.hero.eyebrow} title={p.hero.title} lead={p.hero.lead} />
 
-      <Section>
-        <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          {stats.map(([n, label]) => (
-            <Card key={label} className="p-5 sm:p-6">
-              <dd className="tabular font-display text-4xl font-medium text-green">{n}</dd>
-              <dt className="mt-1 text-sm font-semibold text-muted">{label}</dt>
-            </Card>
-          ))}
-        </dl>
-        <div className="mt-6 rounded-3xl border border-line bg-warn-soft p-6">
-          <h2 className="font-display text-lg font-medium text-warn">{p.notice.title}</h2>
-          <p className="mt-2 text-sm leading-relaxed text-ink sm:text-base">{p.notice.body}</p>
-        </div>
+      <Section labelledBy="explore">
+        <h2 id="explore" className="sr-only">
+          {p.explorer.hint}
+        </h2>
+        <CoverageExplorer
+          countries={countries}
+          regions={groups.map((g) => g.region)}
+          labels={{
+            all: p.explorer.all,
+            hint: p.explorer.hint,
+            regions: p.regions,
+            perPayment: p.card.perTransaction,
+            cap: p.card.allowanceCap,
+            rails: p.card.rails,
+            papss: p.card.papssYes,
+            dataLaw: p.card.dataLaw,
+          }}
+        />
+        <p className="mt-12 max-w-3xl border-l-2 border-warn pl-4 text-sm leading-relaxed text-muted">{p.notice.body}</p>
       </Section>
 
-      {groups.map((g, gi) => (
-        <Section key={g.region} tone={gi % 2 === 0 ? "card" : "paper"} labelledBy={`region-${g.region}`} className="py-12! sm:py-16!">
-          <SectionHeading id={`region-${g.region}`} title={p.regions[g.region]} />
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {g.packs.map((pack) => (
-              <CountryCard key={pack.code} pack={pack} locale={locale} t={p} />
-            ))}
-          </div>
-        </Section>
-      ))}
-
-      <Section labelledBy="what">
+      <Section tone="card" labelledBy="what">
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
           <SectionHeading id="what" title={p.what.title} />
           <CheckList items={p.what.items} />

@@ -25,6 +25,7 @@ import { notFound } from "next/navigation";
 import { SUPPORTED_CURRENCIES, listCountries } from "@payvault/countries";
 import { FlowDiagram } from "@/components/site/FlowDiagram";
 import { TwoLayers } from "@/components/site/TwoLayers";
+import { HeroHand } from "@/components/site/HeroHand";
 import { PhoneMockup } from "@/components/site/PhoneMockup";
 import { Reveal } from "@/components/site/Reveal";
 import { siteMetadata } from "@/components/site/meta";
@@ -88,9 +89,12 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               <p className="mt-6 max-w-xl border-l-2 border-green pl-4 text-sm leading-relaxed text-muted">{h.hero.fine}</p>
             </Reveal>
           </div>
-          <Reveal onMount delay={0.2}>
-            <PhoneMockup t={t.mock} />
-          </Reveal>
+          <div className="relative">
+            <HeroHand className="absolute -bottom-16 left-1/2 h-[42rem] w-[40rem] -translate-x-1/2" />
+            <Reveal onMount delay={0.2} className="relative">
+              <PhoneMockup t={t.mock} />
+            </Reveal>
+          </div>
         </Container>
       </section>
 

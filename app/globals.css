@@ -129,6 +129,10 @@ body {
   --pv-green-strong: #4cc79c;
   --pv-green-soft: #0f3a2c;
   --pv-on-accent: #06140f;
+  --pv-warn: #e7b35a;
+  --pv-warn-soft: #33260f;
+  --pv-danger: #f07a64;
+  --pv-danger-soft: #3a1a15;
   background: var(--pv-paper);
   color: var(--pv-ink);
 }
@@ -147,6 +151,10 @@ body {
     --pv-green-strong: #035a42;
     --pv-green-soft: #e3f1ec;
     --pv-on-accent: #ffffff;
+    --pv-warn: #a86a12;
+    --pv-warn-soft: #fbf1df;
+    --pv-danger: #c2412d;
+    --pv-danger-soft: #fbe9e5;
   }
 }
 
@@ -163,6 +171,10 @@ body {
   --pv-green-strong: #035a42;
   --pv-green-soft: #e3f1ec;
   --pv-on-accent: #ffffff;
+  --pv-warn: #a86a12;
+  --pv-warn-soft: #fbf1df;
+  --pv-danger: #c2412d;
+  --pv-danger-soft: #fbe9e5;
 }
 
 .tabular {

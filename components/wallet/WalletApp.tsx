@@ -30,7 +30,6 @@ export function WalletApp() {
   const [userId, setUserId] = useState<string | null>(null);
 
   const boot = useCallback(async () => {
-    setPhase("boot");
     try {
       const snap = await api<AppSnapshot>("/api/app/me");
       const uid = snap.user.id;
@@ -63,11 +62,18 @@ export function WalletApp() {
   }, []);
 
   useEffect(() => {
+    // boot() only sets state after awaiting the network, so this cannot cascade renders.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void boot();
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {
       navigator.serviceWorker.register("/sw.js").catch(() => {});
     }
   }, [boot]);
+
+  const reboot = () => {
+    setPhase("boot");
+    void boot();
+  };
 
   if (phase === "boot")
     return (
@@ -78,15 +84,15 @@ export function WalletApp() {
         </div>
       </div>
     );
-  if (phase === "signin") return <SignIn next={`/${locale}/app`} onSignedIn={() => void boot()} />;
-  if (phase === "onboarding") return <Onboarding onDone={() => void boot()} />;
+  if (phase === "signin") return <SignIn next={`/${locale}/app`} onSignedIn={reboot} />;
+  if (phase === "onboarding") return <Onboarding onDone={reboot} />;
   if (phase === "pin") return <CreatePin userId={userId!} onDone={() => setPhase("ready")} />;
   if (phase === "error")
     return (
       <div className="grid min-h-dvh place-items-center px-4 text-center">
         <div className="space-y-4">
           <p className="text-muted">{m.common.genericError}</p>
-          <button className="font-semibold text-green" onClick={() => void boot()}>
+          <button className="font-semibold text-green" onClick={reboot}>
             {m.common.retry}
           </button>
         </div>

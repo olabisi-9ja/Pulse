@@ -56,19 +56,30 @@ export function ActivityScreen() {
 }
 
 type InstallEvent = Event & { prompt: () => Promise<void> };
+type Theme = "system" | "light" | "dark";
+
+function readTheme(): Theme {
+  try {
+    return (localStorage.getItem("pv_theme") as Theme | null) ?? "system";
+  } catch {
+    return "system";
+  }
+}
+
+function setLocaleCookie(l: "en" | "fr") {
+  document.cookie = `pv_locale=${l}; path=/; max-age=31536000; samesite=lax`;
+}
 
 export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSignOut: () => void }) {
   const { m, t } = useI18n();
   const snapshot = useApp((s) => s.snapshot);
   const pending = useApp((s) => s.outbox.filter((i) => i.status === "pending").length);
-  const [theme, setTheme] = useState<"system" | "light" | "dark">("system");
+  // Only rendered client-side after the wallet boots, so reading storage here is safe.
+  const [theme, setTheme] = useState<Theme>(readTheme);
   const [install, setInstall] = useState<InstallEvent | null>(null);
   const [merchantOpen, setMerchantOpen] = useState(false);
 
   useEffect(() => {
-    try {
-      setTheme((localStorage.getItem("pv_theme") as typeof theme) ?? "system");
-    } catch {}
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setInstall(e as InstallEvent);
@@ -87,7 +98,7 @@ export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSi
   };
 
   const switchLocale = async (l: "en" | "fr") => {
-    document.cookie = `pv_locale=${l}; path=/; max-age=31536000; samesite=lax`;
+    setLocaleCookie(l);
     await api("/api/app/profile", { locale: l }).catch(() => {});
     window.location.assign(`/${l}/app`);
   };

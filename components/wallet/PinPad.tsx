@@ -19,10 +19,12 @@ export function PinPad({
   onSubmit: (pin: string) => void;
 }) {
   const [pin, setPin] = useState("");
-
-  useEffect(() => {
+  // Clear the entry whenever a new error arrives (state adjusted during render).
+  const [seenError, setSeenError] = useState(error);
+  if (error !== seenError) {
+    setSeenError(error);
     if (error) setPin("");
-  }, [error]);
+  }
 
   const press = (d: string) => {
     if (busy) return;

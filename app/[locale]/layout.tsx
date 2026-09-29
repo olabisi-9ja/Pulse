@@ -33,6 +33,14 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[lo
   if (!isLocale(locale)) notFound();
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        <script
+          // Applies the saved theme before paint to avoid a flash.
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem("pv_theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="min-h-dvh">{children}</body>
     </html>
   );

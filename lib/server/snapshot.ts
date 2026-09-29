@@ -5,7 +5,7 @@ import { toBase64Url, toHex } from "@payvault/protocol";
 import { allowancesForUser, revocationsSince } from "./allowances";
 import { creditSummary, loansForUser } from "./credit";
 import type { Db } from "./db";
-import type { AppUser } from "./identity";
+import { type AppUser, partnerById } from "./identity";
 import { publicIssuerKeys } from "./issuer";
 import { maxFunded } from "./policy";
 import { activity, balances } from "./money";
@@ -20,7 +20,8 @@ export async function networkSnapshot(tx: Db, since = new Date(Date.now() - 30 *
 
 export async function appSnapshot(tx: Db, user: AppUser) {
   const pack = getCountryPack(user.country)!;
-  const [bal, credit, allowances, loans, feed, network] = await Promise.all([
+  const [partner, bal, credit, allowances, loans, feed, network] = await Promise.all([
+    partnerById(tx, user.partner_id),
     balances(tx, user),
     creditSummary(tx, user),
     allowancesForUser(tx, user.id, 10),
@@ -38,6 +39,12 @@ export async function appSnapshot(tx: Db, user: AppUser) {
       locale: user.locale,
       kycTier: user.kyc_tier,
       merchant: user.merchant_id ? { id: toHex(user.merchant_id), name: user.merchant_name ?? "" } : null,
+    },
+    partner: {
+      name: partner?.name ?? "",
+      sandbox: partner?.kind === "sandbox",
+      creditFeeBps: partner?.credit_fee_bps ?? 0,
+      creditTermDays: partner?.credit_term_days ?? 14,
     },
     limits: {
       maxFunded: maxFunded(pack, user.kyc_tier),

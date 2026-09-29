@@ -1,16 +1,38 @@
 /* PayVault service worker: lets the wallet open and work with no network.
    Pages: network first, cached copy when offline. Static assets: cache first.
    API calls are never cached; the app queues them itself. */
-const VERSION = "pv-v1";
+const VERSION = "pv-v2";
 const SHELL = ["/en/app", "/fr/app", "/icon.svg", "/icon-192.png", "/manifest.webmanifest"];
 
+const STATIC = /\/_next\/static\/[^"'\s)]+/g;
+
+/** Caches each URL, ignoring failures so one missing file never blocks install. */
+async function cacheAll(cache, urls) {
+  await Promise.all([...new Set(urls)].map((u) => cache.add(new Request(u, { cache: "reload" })).catch(() => {})));
+}
+
+// Precache the shell pages and every script/style they reference, so the very
+// first offline launch works even if the worker installed after those loaded.
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(VERSION)
-      .then((c) => Promise.all(SHELL.map((u) => c.add(new Request(u, { cache: "reload" })).catch(() => {}))))
-      .then(() => self.skipWaiting()),
+    (async () => {
+      const cache = await caches.open(VERSION);
+      await cacheAll(cache, SHELL);
+      for (const page of ["/en/app", "/fr/app"]) {
+        const res = await cache.match(page);
+        if (res) await cacheAll(cache, (await res.text()).match(STATIC) ?? []);
+      }
+      await self.skipWaiting();
+    })(),
   );
+});
+
+// The app posts the static files it actually loaded (including lazy chunks).
+self.addEventListener("message", (event) => {
+  const data = event.data;
+  if (data?.type !== "cache" || !Array.isArray(data.urls)) return;
+  const urls = data.urls.filter((u) => typeof u === "string" && new URL(u, self.location.origin).pathname.startsWith("/_next/static/"));
+  event.waitUntil(caches.open(VERSION).then((c) => cacheAll(c, urls)));
 });
 
 self.addEventListener("activate", (event) => {

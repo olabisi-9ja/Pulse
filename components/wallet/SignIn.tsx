@@ -3,11 +3,11 @@ import { createBrowserClient } from "@supabase/ssr";
 import { Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import { LogoMark } from "@/components/brand/Logo";
-import { api, ApiError } from "@/lib/client/api";
+import { api, ApiError, NetworkError } from "@/lib/client/api";
 import { useI18n } from "./I18n";
 import { Button, Field, Notice } from "./ui";
 
-type Mode = "supabase" | "dev" | "unavailable" | null;
+type Mode = "supabase" | "dev" | "unavailable" | "offline" | null;
 
 function supabase() {
   return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!);
@@ -26,7 +26,7 @@ export function SignIn({ next, onSignedIn }: { next: string; onSignedIn?: () => 
   useEffect(() => {
     api<{ mode: Mode }>("/api/auth/config")
       .then((r) => setMode(r.mode))
-      .catch(() => setMode("unavailable"));
+      .catch((err) => setMode(err instanceof NetworkError ? "offline" : "unavailable"));
   }, []);
 
   const finish = () => {
@@ -78,7 +78,7 @@ export function SignIn({ next, onSignedIn }: { next: string; onSignedIn?: () => 
       <h1 className="text-[26px] font-medium tracking-tight text-ink">{m.auth.title}</h1>
       <p className="mt-2 text-muted">{m.auth.subtitle}</p>
       <div className="mt-8 space-y-4">
-        {offline && <Notice tone="warn">{m.auth.offline}</Notice>}
+        {(offline || mode === "offline") && <Notice tone="warn">{m.auth.offline}</Notice>}
         {mode === "unavailable" && <Notice tone="danger">{m.auth.unavailable}</Notice>}
         {mode === "dev" && <Notice>{m.auth.devMode}</Notice>}
         {step === "email" ? (
@@ -93,7 +93,7 @@ export function SignIn({ next, onSignedIn }: { next: string; onSignedIn?: () => 
               onChange={(e) => setEmail(e.target.value)}
               error={error}
             />
-            <Button type="submit" className="w-full" loading={busy} disabled={!mode || mode === "unavailable"}>
+            <Button type="submit" className="w-full" loading={busy} disabled={!mode || mode === "unavailable" || mode === "offline"}>
               <Mail className="h-4 w-4" /> {m.auth.sendCode}
             </Button>
           </form>

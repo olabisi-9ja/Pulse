@@ -66,7 +66,17 @@ export function WalletApp() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void boot();
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then(() => navigator.serviceWorker.ready)
+        .then((reg) => {
+          const urls = performance
+            .getEntriesByType("resource")
+            .map((e) => e.name)
+            .filter((u) => u.startsWith(`${location.origin}/_next/static/`));
+          reg.active?.postMessage({ type: "cache", urls });
+        })
+        .catch(() => {});
     }
   }, [boot]);
 

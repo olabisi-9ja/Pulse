@@ -31,9 +31,7 @@ export type ConsoleMessages = {
     results: string;
     none: string;
     never: string;
-    yes: string;
     you: string;
-    no: string;
     save: string;
     saving: string;
     cancel: string;
@@ -53,7 +51,6 @@ export type ConsoleMessages = {
     showOnce: string;
     open: string;
     definition: string;
-    noData: string;
     window: string;
     days: string;
     total: string;
@@ -362,9 +359,7 @@ const en: ConsoleMessages = {
     results: "{n} results",
     none: "None",
     never: "Never",
-    yes: "Yes",
     you: "You",
-    no: "No",
     save: "Save",
     saving: "Working…",
     cancel: "Cancel",
@@ -384,7 +379,6 @@ const en: ConsoleMessages = {
     showOnce: "Copy it now. For your security it is shown only once.",
     open: "Open",
     definition: "How it is measured",
-    noData: "No data yet",
     window: "Window",
     days: "{n} days",
     total: "Total",

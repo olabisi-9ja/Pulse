@@ -108,33 +108,13 @@ const site = {
     seeHow: "See how it works",
     readDocs: "Read the docs",
     seeCoverage: "See coverage",
-    illustrative: "Illustrative figures and screens.",
     partners: "Licensed partners",
     status: "Status",
     available: "Available",
-    planned: "Planned",
-    inPreview: "In preview",
   },
 
   mock: {
-    offline: "No signal",
-    greeting: "Offline Vault",
-    vaultNote: "Locked with your partner",
-    overdraft: "Overdraft available",
-    overdraftNote: "Extended by your partner",
-    pay: "Pay",
-    request: "Request",
-    recent: "Recent payments",
-    payments: [
-      { name: "Market stall", meta: "Signed offline, 09:12", amount: "-1,500" },
-      { name: "Bus fare", meta: "Signed offline, 07:40", amount: "-500" },
-      { name: "Pharmacy", meta: "Synced, yesterday", amount: "-3,200" },
-    ],
-    currency: "XOF",
-    vaultAmount: "18,000",
-    overdraftAmount: "4,000",
     caption: "Illustrative screen. Amounts are sample data.",
-    scanToPay: "Scan to pay",
     screen: {
       initials: "AK",
       hello: "Hello, Aminata",
@@ -216,7 +196,6 @@ const site = {
       tag: "Layer A",
       title: "Reliability layer",
       body: "Keeps every transaction safe through connectivity loss, whatever the payment method underneath.",
-      statesLabel: "Connectivity state machine",
       states: ["Online", "Degraded", "Offline", "Reconnecting", "Reconciling", "Settled"],
       points: [
         "Durable local queue on the device",
@@ -246,8 +225,6 @@ const site = {
       eyebrow: "Payment infrastructure for unreliable networks.",
       line1: "No signal.",
       line2: "Still paid.",
-      lead: "Payments and pay-later that don't wait for the network. PayVault is offline transaction infrastructure with controlled risk and automatic reconciliation, for PSPs, POS networks, banks and mobile money operators.",
-      fine: "Sold as a service to licensed partners. PayVault is not a bank or a wallet and never holds customer funds.",
       short: "Offline payments and pay-later for banks, PSPs and mobile money. Settled automatically when the signal returns.",
       stagePartners: "For partners",
       stagePartnersTitle: "Offline acceptance, settled into your own ledger.",
@@ -264,38 +241,10 @@ const site = {
       languages: "Languages across the app, docs and console",
       note: "Country packs are at concept status. Limits are illustrative, not regulatory approvals.",
     },
-    tagline: {
-      title: "Pay offline. Settle later. Lose nothing.",
-      items: [
-        {
-          title: "Pay offline",
-          body: "Payer and merchant exchange two QR codes. No server, no data, no waiting for a bar of signal.",
-        },
-        {
-          title: "Settle later",
-          body: "Payments queue safely on the device. Whichever device gets a connection first syncs for both.",
-        },
-        {
-          title: "Lose nothing",
-          body: "Merchants are guaranteed for payments that pass the offline checks. Fraud is detected and recovered.",
-        },
-      ],
-    },
-    problem: {
-      eyebrow: "The problem",
-      title: "Networks fail. Commerce does not stop.",
-      body: "Markets, buses, rural clinics and border posts keep trading when the signal drops. Today those sales are lost, delayed or done in cash that no one can trace. Partners lose transactions, and customers lose trust.",
-      points: [
-        { title: "Lost sales", body: "A customer with money in an account still cannot pay when the terminal cannot reach the server." },
-        { title: "Cash by default", body: "Cash is the offline fallback, and it is untraceable, risky to carry and outside your ecosystem." },
-        { title: "Short of a few coins", body: "The customer is a little short, the network is down, and the sale is gone. Pay later needs a live connection today." },
-      ],
-    },
     flowEyebrow: "How it works",
     payLater: {
       eyebrow: "Offline overdraft",
       title: "Pay later, even with no signal.",
-      body: "On top of the funded vault, your partner can extend a small credit line into the same allowance. Customers keep paying when their balance runs short, and the network stays out of it.",
       points: [
         "Funded value is spent first, then the overdraft.",
         "After sync, the overdraft becomes a short-term loan with a fee and a due date, for example 14 days.",
@@ -307,7 +256,6 @@ const site = {
     audience: {
       eyebrow: "Who it is for",
       title: "Built for the businesses that already run the payments.",
-      lead: "You own the customer, the brand, the licence and the funds. PayVault supplies the reliability and offline rails underneath.",
       items: [
         { title: "PSPs and POS networks", body: "Keep terminals transacting through outages and reconcile automatically when they reconnect." },
         { title: "Banks", body: "Offline acceptance for your merchants and app users, inside your own ledger." },
@@ -320,33 +268,12 @@ const site = {
     honest: {
       eyebrow: "Honest by design",
       title: "Offline double-spend is bounded, detected and recovered.",
-      body: "No system can fully prevent a cloned phone from spending twice while offline. We do not pretend otherwise. We make it hard, we cap the damage, and we always catch it.",
       items: [
         { title: "Bounded", body: "Limits, caps and expiry mean the most anyone can double-spend is their own allowance." },
         { title: "Detected", body: "A double-spend breaks the hash chain. At reconciliation it shows as a cryptographic fork, with both signed payments as proof." },
         { title: "Recovered", body: "The key is revoked, the merchant is still paid from a risk pool, and the loss is recovered from the KYC'd holder." },
       ],
       cta: "Read the security model",
-    },
-    surfaces: {
-      eyebrow: "Product",
-      title: "One protocol, four surfaces.",
-      items: [
-        { title: "Reference app", body: "A white-label wallet and merchant PWA that partners can ship or use as a template.", status: "Available" },
-        { title: "Partner Console", body: "Exposure, reconciliation, fork alerts and country configuration.", status: "Available" },
-        { title: "REST API and webhooks", body: "Issue allowances, sync payments, receive events.", status: "Available" },
-        { title: "SDKs", body: "Web now. Android, iOS and USSD/SIM planned.", status: "Web available" },
-      ],
-    },
-    coverage: {
-      eyebrow: "Coverage",
-      title: "Pan-African by configuration, not by rewrite.",
-      body: "Per-country rules live in data we call Country Packs: currency, limits, KYC tiers, rails and data protection. Adding a market is a configuration and partner task.",
-      countries: "countries configured",
-      currencies: "currencies",
-      regions: "regions",
-      note: "All packs are at concept status. Limits are illustrative and are not regulatory approvals.",
-      cta: "See coverage",
     },
     cta: {
       title: "No signal. Still paid.",
@@ -572,7 +499,6 @@ const site = {
       title: "Fifteen markets.|One set of rules each.",
       lead: "Currency, limits, KYC and rails per country, kept as data. All at concept stage.",
     },
-    stats: { countries: "Countries", currencies: "Currencies", regions: "Regions", concept: "At concept status" },
     explorer: { all: "All", hint: "Choose a country or a region" },
     regions: {
       west: "West Africa",
@@ -583,15 +509,11 @@ const site = {
     },
     status: { concept: "Concept", pilot_ready: "Pilot ready", live: "Live" },
     card: {
-      currency: "Currency",
       perTransaction: "Per payment",
       allowanceCap: "Allowance cap",
       rails: "Domestic rails",
-      centralBank: "Central bank",
       dataLaw: "Data protection",
-      papss: "PAPSS",
       papssYes: "Cross-border via PAPSS",
-      bloc: "Bloc",
       residency: { none: "No residency rule", preferred: "Local hosting preferred", required: "Local hosting required" },
     },
     notice: {

@@ -8,12 +8,8 @@ import type { ConsoleMessages } from "@/messages/console";
 
 export const inputCls =
   "min-h-10 w-full rounded-xl border border-line bg-card px-3 text-sm text-ink placeholder:text-muted focus:border-green disabled:opacity-60";
-export const btnPrimary =
-  "inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-green px-4 text-sm font-semibold text-on-accent hover:bg-green-strong disabled:opacity-60";
 export const btnSecondary =
   "inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-line bg-card px-4 text-sm font-semibold text-ink hover:bg-card-2 disabled:opacity-60";
-export const btnDanger =
-  "inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-danger/30 bg-danger-soft px-4 text-sm font-semibold text-danger hover:opacity-90 disabled:opacity-60";
 
 export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) {
   return (

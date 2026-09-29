@@ -1,5 +1,6 @@
 "use client";
 import { Download, LogOut, Store } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api, ApiError, NetworkError } from "@/lib/client/api";
 import { money, parseMajor } from "@/lib/client/money";
@@ -66,6 +67,7 @@ function setLocaleCookie(l: "en" | "fr") {
 
 export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSignOut: () => void }) {
   const { m, t } = useI18n();
+  const router = useRouter();
   const snapshot = useApp((s) => s.snapshot);
   const pending = useApp((s) => s.outbox.filter((i) => i.status === "pending").length);
   // Only rendered client-side after the wallet boots, so reading storage here is safe.
@@ -94,7 +96,7 @@ export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSi
   const switchLocale = async (l: "en" | "fr") => {
     setLocaleCookie(l);
     await api("/api/app/profile", { locale: l }).catch(() => {});
-    window.location.assign(`/${l}/app`);
+    router.push(`/${l}/app`);
   };
 
   if (!snapshot) return null;

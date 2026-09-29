@@ -5,7 +5,6 @@ import type { Money } from "./format";
 /** Every query here is scoped to one partner id; callers pass the id from getConsoleContext. */
 
 export const PAGE_SIZE = 25;
-export const HEX = /^[0-9a-f]+$/i;
 
 const sql = () => db();
 

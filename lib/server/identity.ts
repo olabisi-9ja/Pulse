@@ -1,6 +1,6 @@
 import "server-only";
 /** Partners, users, merchants and devices. */
-import { randomBytes, toHex } from "@payvault/protocol";
+import { randomBytes } from "@payvault/protocol";
 import { bytes, type Db } from "./db";
 import { packFor } from "./policy";
 
@@ -149,4 +149,3 @@ export async function deviceForUser(tx: Db, userId: string, deviceId: string): P
   return d && { ...d, public_key: bytes(d.public_key) };
 }
 
-export const merchantHex = (u: Pick<AppUser, "merchant_id">) => (u.merchant_id ? toHex(u.merchant_id) : null);

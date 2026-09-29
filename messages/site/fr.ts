@@ -110,33 +110,13 @@ const site: SiteMessages = {
     seeHow: "Voir comment ça marche",
     readDocs: "Lire la documentation",
     seeCoverage: "Voir la couverture",
-    illustrative: "Chiffres et écrans à titre d'illustration.",
     partners: "Partenaires agréés",
     status: "Statut",
     available: "Disponible",
-    planned: "Prévu",
-    inPreview: "En préversion",
   },
 
   mock: {
-    offline: "Pas de réseau",
-    greeting: "Coffre hors ligne",
-    vaultNote: "Bloqué chez votre partenaire",
-    overdraft: "Découvert disponible",
-    overdraftNote: "Accordé par votre partenaire",
-    pay: "Payer",
-    request: "Demander",
-    recent: "Paiements récents",
-    payments: [
-      { name: "Étal du marché", meta: "Signé hors ligne, 09:12", amount: "-1 500" },
-      { name: "Billet de bus", meta: "Signé hors ligne, 07:40", amount: "-500" },
-      { name: "Pharmacie", meta: "Synchronisé, hier", amount: "-3 200" },
-    ],
-    currency: "XOF",
-    vaultAmount: "18 000",
-    overdraftAmount: "4 000",
     caption: "Écran d'illustration. Les montants sont fictifs.",
-    scanToPay: "Scanner pour payer",
     screen: {
       initials: "AK",
       hello: "Bonjour, Aminata",
@@ -218,7 +198,6 @@ const site: SiteMessages = {
       tag: "Couche A",
       title: "Couche de fiabilité",
       body: "Protège chaque transaction pendant la perte de connectivité, quel que soit le moyen de paiement utilisé en dessous.",
-      statesLabel: "Machine à états de connectivité",
       states: ["En ligne", "Dégradé", "Hors ligne", "Reconnexion", "Rapprochement", "Réglé"],
       points: [
         "File locale durable sur l'appareil",
@@ -248,8 +227,6 @@ const site: SiteMessages = {
       eyebrow: "L'infrastructure de paiement pour les réseaux instables.",
       line1: "Pas de réseau.",
       line2: "Payé quand même.",
-      lead: "Des paiements et du paiement différé qui n'attendent pas le réseau. PayVault est une infrastructure de transactions hors ligne à risque maîtrisé et à rapprochement automatique, pour les PSP, les réseaux de TPE, les banques et les opérateurs de mobile money.",
-      fine: "Proposé en tant que service aux partenaires agréés. PayVault n'est ni une banque ni un portefeuille et ne détient jamais les fonds des clients.",
       short: "Paiements hors ligne et paiement différé pour banques, PSP et mobile money. Réglés automatiquement au retour du réseau.",
       stagePartners: "Pour les partenaires",
       stagePartnersTitle: "L'acceptation hors ligne, réglée dans votre propre grand livre.",
@@ -266,38 +243,10 @@ const site: SiteMessages = {
       languages: "Langues dans l'app, la documentation et la console",
       note: "Les packs pays sont au stade de concept. Les limites sont illustratives, pas des agréments réglementaires.",
     },
-    tagline: {
-      title: "Payez hors ligne. Réglez plus tard. Ne perdez rien.",
-      items: [
-        {
-          title: "Payez hors ligne",
-          body: "Le payeur et le commerçant échangent deux QR codes. Pas de serveur, pas de données, pas d'attente d'une barre de réseau.",
-        },
-        {
-          title: "Réglez plus tard",
-          body: "Les paiements attendent en sécurité dans l'appareil. Le premier appareil connecté synchronise pour les deux.",
-        },
-        {
-          title: "Ne perdez rien",
-          body: "Le commerçant est garanti pour tout paiement qui passe les contrôles hors ligne. La fraude est détectée et recouvrée.",
-        },
-      ],
-    },
-    problem: {
-      eyebrow: "Le problème",
-      title: "Les réseaux tombent. Le commerce ne s'arrête pas.",
-      body: "Marchés, bus, dispensaires ruraux et postes frontières continuent de travailler quand le signal disparaît. Aujourd'hui, ces ventes sont perdues, retardées, ou faites en espèces que personne ne peut tracer. Les partenaires perdent des transactions et les clients perdent confiance.",
-      points: [
-        { title: "Ventes perdues", body: "Un client qui a de l'argent sur son compte ne peut pas payer quand le terminal n'atteint pas le serveur." },
-        { title: "Les espèces par défaut", body: "Les espèces sont le plan B hors ligne : impossibles à tracer, risquées à transporter et hors de votre écosystème." },
-        { title: "Il manque quelques pièces", body: "Le client est un peu juste, le réseau est coupé et la vente s'envole. Aujourd'hui, le paiement différé exige une connexion." },
-      ],
-    },
     flowEyebrow: "Comment ça marche",
     payLater: {
       eyebrow: "Découvert hors ligne",
       title: "Payez plus tard, même sans réseau.",
-      body: "En plus du coffre provisionné, votre partenaire peut accorder une petite ligne de crédit dans la même allocation. Les clients continuent de payer quand leur solde est court, sans dépendre du réseau.",
       points: [
         "La valeur provisionnée est dépensée d'abord, puis le découvert.",
         "Après synchronisation, le découvert devient un prêt à court terme avec des frais et une échéance, par exemple 14 jours.",
@@ -309,7 +258,6 @@ const site: SiteMessages = {
     audience: {
       eyebrow: "Pour qui",
       title: "Conçu pour les entreprises qui font déjà tourner les paiements.",
-      lead: "Vous gardez le client, la marque, l'agrément et les fonds. PayVault fournit en dessous la fiabilité et les rails hors ligne.",
       items: [
         { title: "PSP et réseaux de TPE", body: "Gardez vos terminaux actifs pendant les coupures et rapprochez automatiquement au retour du réseau." },
         { title: "Banques", body: "L'acceptation hors ligne pour vos commerçants et vos utilisateurs d'application, dans votre propre grand livre." },
@@ -322,33 +270,12 @@ const site: SiteMessages = {
     honest: {
       eyebrow: "Honnête par conception",
       title: "Le double dépensement hors ligne est borné, détecté et recouvré.",
-      body: "Aucun système ne peut empêcher totalement un téléphone cloné de dépenser deux fois hors ligne. Nous ne prétendons pas le contraire. Nous le rendons difficile, nous plafonnons les dégâts et nous le détectons toujours.",
       items: [
         { title: "Borné", body: "Plafonds, limites et expiration : au pire, on ne peut doubler que sa propre allocation." },
         { title: "Détecté", body: "Un double dépensement casse la chaîne de hachage. Au rapprochement, il apparaît comme une bifurcation cryptographique, avec les deux paiements signés comme preuve." },
         { title: "Recouvré", body: "La clé est révoquée, le commerçant est quand même payé par un fonds de garantie, et la perte est recouvrée auprès du titulaire identifié (KYC)." },
       ],
       cta: "Lire le modèle de sécurité",
-    },
-    surfaces: {
-      eyebrow: "Produit",
-      title: "Un protocole, quatre interfaces.",
-      items: [
-        { title: "Application de référence", body: "Une PWA portefeuille et commerçant en marque blanche, que les partenaires peuvent déployer ou utiliser comme modèle.", status: "Disponible" },
-        { title: "Console partenaire", body: "Exposition, rapprochement, alertes de bifurcation et configuration pays.", status: "Disponible" },
-        { title: "API REST et webhooks", body: "Émettez des allocations, synchronisez les paiements, recevez des événements.", status: "Disponible" },
-        { title: "SDK", body: "Web dès maintenant. Android, iOS et USSD/SIM prévus.", status: "Web disponible" },
-      ],
-    },
-    coverage: {
-      eyebrow: "Couverture",
-      title: "Panafricain par configuration, pas par réécriture.",
-      body: "Les règles de chaque pays vivent dans des données que nous appelons Country Packs : devise, plafonds, niveaux KYC, rails et protection des données. Ouvrir un marché relève de la configuration et du partenariat.",
-      countries: "pays configurés",
-      currencies: "devises",
-      regions: "régions",
-      note: "Tous les packs sont au stade concept. Les plafonds sont illustratifs et ne constituent pas des autorisations réglementaires.",
-      cta: "Voir la couverture",
     },
     cta: {
       title: "Pas de réseau. Payé quand même.",
@@ -574,7 +501,6 @@ const site: SiteMessages = {
       title: "Quinze marchés.|Des règles pour chacun.",
       lead: "Devise, plafonds, KYC et rails par pays, sous forme de données. Tous au stade concept.",
     },
-    stats: { countries: "Pays", currencies: "Devises", regions: "Régions", concept: "Au stade concept" },
     explorer: { all: "Toutes", hint: "Choisissez un pays ou une région" },
     regions: {
       west: "Afrique de l'Ouest",
@@ -585,15 +511,11 @@ const site: SiteMessages = {
     },
     status: { concept: "Concept", pilot_ready: "Prêt pour pilote", live: "En production" },
     card: {
-      currency: "Devise",
       perTransaction: "Par paiement",
       allowanceCap: "Plafond d'allocation",
       rails: "Rails nationaux",
-      centralBank: "Banque centrale",
       dataLaw: "Protection des données",
-      papss: "PAPSS",
       papssYes: "Transfrontalier via PAPSS",
-      bloc: "Zone",
       residency: { none: "Pas d'obligation de localisation", preferred: "Hébergement local préféré", required: "Hébergement local obligatoire" },
     },
     notice: {

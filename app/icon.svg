@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 250" role="img" aria-label="PayVault">
+  <defs>
+    <mask id="pv-a" maskUnits="userSpaceOnUse" x="0" y="0" width="240" height="250">
+      <rect width="240" height="250" fill="#fff"/>
+      <path d="M72 172.4 L167.5 79.6" stroke="#000" stroke-width="30" fill="none"/>
+      <path d="M192 56 L181.4 94 L153.6 65.2 Z" stroke="#000" stroke-width="14" stroke-linejoin="round"/>
+    </mask>
+    <mask id="pv-b" maskUnits="userSpaceOnUse" x="0" y="0" width="240" height="250">
+      <rect width="240" height="250" fill="#fff"/>
+      <circle cx="120" cy="106" r="19"/>
+      <path d="M114 112 H126 L130 138 H110 Z" stroke="#000" stroke-width="14" stroke-linejoin="round"/>
+    </mask>
+  </defs>
+  <g mask="url(#pv-a)" fill="none">
+    <path d="M120 30 L200 52 V116 C200 168 168 198 120 220 C72 198 40 168 40 116 V52 Z" stroke="#046B4F" stroke-width="16"/>
+    <path d="M120 64 L168 77 V118 C168 151 149 173 120 188 C91 173 72 151 72 118 V77 Z" stroke="#14365A" stroke-width="16"/>
+  </g>
+  <g fill="#14365A">
+    <circle cx="120" cy="106" r="12"/>
+    <path d="M114 112 H126 L130 138 H110 Z"/>
+  </g>
+  <g mask="url(#pv-b)" fill="#046B4F">
+    <path d="M72 172.4 L167.5 79.6" stroke="#046B4F" stroke-width="16"/>
+    <path d="M192 56 L181.4 94 L153.6 65.2 Z"/>
+  </g>
+</svg>

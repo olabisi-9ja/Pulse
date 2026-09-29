@@ -27,7 +27,7 @@ export default async function SecurityPage({ params }: PageProps<"/[locale]/secu
             <Wallet className="h-7 w-7" />
           </IconBadge>
           <div>
-            <h2 id="custody" className="font-display text-3xl font-extrabold text-navy sm:text-4xl">
+            <h2 id="custody" className="font-display text-3xl font-medium text-navy sm:text-4xl">
               {p.custody.title}
             </h2>
             <p className="mt-4 max-w-3xl text-base leading-relaxed text-muted sm:text-lg">{p.custody.body}</p>
@@ -56,7 +56,7 @@ export default async function SecurityPage({ params }: PageProps<"/[locale]/secu
                 <IconBadge>
                   <Icon className="h-5 w-5" />
                 </IconBadge>
-                <h3 className="mt-4 font-display text-lg font-bold text-navy">{c.name}</h3>
+                <h3 className="mt-4 font-display text-lg font-medium text-navy">{c.name}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted">{c.body}</p>
               </Card>
             );
@@ -67,11 +67,11 @@ export default async function SecurityPage({ params }: PageProps<"/[locale]/secu
       <Section tone="card">
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
-            <h2 className="font-display text-2xl font-extrabold text-navy">{p.guarantee.title}</h2>
+            <h2 className="font-display text-2xl font-medium text-navy">{p.guarantee.title}</h2>
             <p className="mt-3 text-sm leading-relaxed text-muted sm:text-base">{p.guarantee.body}</p>
           </Card>
           <div className="rounded-3xl border border-line bg-warn-soft p-6 sm:p-7">
-            <h2 className="font-display text-2xl font-extrabold text-warn">{p.status.title}</h2>
+            <h2 className="font-display text-2xl font-medium text-warn">{p.status.title}</h2>
             <p className="mt-3 text-sm leading-relaxed text-ink sm:text-base">{p.status.body}</p>
           </div>
         </div>

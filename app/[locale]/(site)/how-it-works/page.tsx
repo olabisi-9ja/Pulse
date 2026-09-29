@@ -76,7 +76,7 @@ export default async function HowItWorksPage({ params }: PageProps<"/[locale]/ho
             <Card key={pt.title}>
               <div className="flex items-center gap-3">
                 <ShieldCheck className="h-6 w-6 text-green" aria-hidden />
-                <h3 className="font-display text-lg font-bold text-navy">{pt.title}</h3>
+                <h3 className="font-display text-lg font-medium text-navy">{pt.title}</h3>
               </div>
               <p className="mt-3 text-sm leading-relaxed text-muted">{pt.body}</p>
             </Card>

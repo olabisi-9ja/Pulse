@@ -15,11 +15,11 @@ export function ProtocolLayers({ t }: { t: SiteMessages["layers"] }) {
               l.n === 2 || l.n === 6 ? "bg-green-soft" : "bg-card"
             }`}
           >
-            <span className="tabular flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-navy font-display text-sm font-extrabold text-on-accent">
+            <span className="tabular flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-navy font-display text-sm font-medium text-on-accent">
               {l.n}
             </span>
             <div className="grid min-w-0 flex-1 gap-1 sm:grid-cols-[14rem_1fr] sm:gap-6">
-              <h3 className="font-display text-base font-bold text-navy">{l.name}</h3>
+              <h3 className="font-display text-base font-medium text-navy">{l.name}</h3>
               <p className="text-sm leading-relaxed text-muted">{l.body}</p>
             </div>
           </li>

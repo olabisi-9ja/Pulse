@@ -28,12 +28,12 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/conta
       <Container className="relative grid gap-10 py-12 sm:py-20 lg:grid-cols-[1fr_1.3fr] lg:gap-16">
         <header>
           <Eyebrow className="mb-5">{p.hero.eyebrow}</Eyebrow>
-          <h1 className="font-display text-4xl font-black uppercase leading-[1.02] text-navy text-balance sm:text-5xl">
+          <h1 className="font-display text-4xl font-medium leading-[1.02] text-navy text-balance sm:text-5xl">
             {p.hero.title}
           </h1>
           <p className="mt-6 text-base leading-relaxed text-muted sm:text-lg">{p.hero.lead}</p>
           <div className="mt-10">
-            <h2 className="font-display text-lg font-extrabold text-navy">{p.aside.title}</h2>
+            <h2 className="font-display text-lg font-medium text-navy">{p.aside.title}</h2>
             <ol className="mt-4 space-y-4">
               {p.aside.items.map((it, i) => {
                 const Icon = asideIcons[i];

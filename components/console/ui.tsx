@@ -19,7 +19,7 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div className="min-w-0">
-        <h1 className="font-display text-2xl font-bold text-ink sm:text-3xl">{title}</h1>
+        <h1 className="font-display text-2xl font-medium text-ink sm:text-3xl">{title}</h1>
         {subtitle && <p className="mt-1 max-w-2xl text-sm text-muted">{subtitle}</p>}
       </div>
       {actions}
@@ -48,7 +48,7 @@ export function Card({
       {(title || action) && (
         <header className="flex flex-wrap items-start justify-between gap-2 px-4 pt-4 sm:px-5">
           <div className="min-w-0">
-            {title && <h2 className="font-display text-base font-bold text-ink">{title}</h2>}
+            {title && <h2 className="font-display text-base font-medium text-ink">{title}</h2>}
             {hint && <p className="mt-0.5 text-xs text-muted">{hint}</p>}
           </div>
           {action}
@@ -63,7 +63,7 @@ export function Kpi({ label, hint, children }: { label: string; hint?: string; c
   return (
     <div className="rounded-2xl border border-line bg-card p-4 sm:p-5">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted">{label}</p>
-      <div className="tabular mt-2 font-display text-2xl font-bold text-ink">{children}</div>
+      <div className="tabular mt-2 font-display text-2xl font-medium text-ink">{children}</div>
       {hint && <p className="mt-1.5 text-xs text-muted">{hint}</p>}
     </div>
   );
@@ -115,7 +115,7 @@ export function Empty({ title, body, action }: { title: string; body?: string; a
       <span className="mb-3 grid h-11 w-11 place-items-center rounded-full bg-card-2 text-muted">
         <Inbox className="h-5 w-5" aria-hidden />
       </span>
-      <p className="font-display text-base font-bold text-ink">{title}</p>
+      <p className="font-display text-base font-medium text-ink">{title}</p>
       {body && <p className="mt-1 max-w-md text-sm text-muted">{body}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>

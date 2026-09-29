@@ -168,7 +168,7 @@ export function DocsShell({
                     <ChevronLeft className="h-4 w-4 shrink-0 text-muted" aria-hidden />
                     <span>
                       <span className="block text-xs font-semibold text-muted">{labels.prev}</span>
-                      <span className="font-display font-bold text-navy">{prev.title}</span>
+                      <span className="font-display font-medium text-navy">{prev.title}</span>
                     </span>
                   </Link>
                 ) : (
@@ -181,7 +181,7 @@ export function DocsShell({
                   >
                     <span>
                       <span className="block text-xs font-semibold text-muted">{labels.next}</span>
-                      <span className="font-display font-bold text-navy">{next.title}</span>
+                      <span className="font-display font-medium text-navy">{next.title}</span>
                     </span>
                     <ChevronRight className="h-4 w-4 shrink-0 text-muted" aria-hidden />
                   </Link>

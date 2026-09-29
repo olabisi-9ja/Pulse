@@ -12,7 +12,7 @@ export function FlowDiagram({ t, eyebrow }: { t: SiteMessages["flow"]; eyebrow?:
     <div>
       <div className="max-w-3xl">
         {eyebrow && <Eyebrow className="mb-4">{eyebrow}</Eyebrow>}
-        <h2 className="font-display text-3xl font-extrabold leading-[1.1] text-navy text-balance sm:text-4xl lg:text-[2.75rem]">
+        <h2 className="font-display text-3xl font-medium leading-[1.1] text-navy text-balance sm:text-4xl lg:text-[2.75rem]">
           {t.title}
         </h2>
         <p className="mt-4 text-base leading-relaxed text-muted sm:text-lg">{t.lead}</p>

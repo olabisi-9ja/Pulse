@@ -246,6 +246,15 @@ const site = {
       line2: "Still paid.",
       lead: "Payments and pay-later that don't wait for the network. PayVault is offline transaction infrastructure with controlled risk and automatic reconciliation, for PSPs, POS networks, banks and mobile money operators.",
       fine: "Sold as a service to licensed partners. PayVault is not a bank or a wallet and never holds customer funds.",
+      short: "Offline payments and pay-later for banks, PSPs and mobile money. Settled automatically when the signal returns.",
+    },
+    numbers: {
+      title: "Offline, by the numbers.",
+      packs: "Country packs configured, from Senegal to Kenya",
+      bytes: "One signed payment. It fits in a single QR code.",
+      bars: "Bars of signal needed at the till",
+      languages: "Languages across the app, docs and console",
+      note: "Country packs are at concept status. Limits are illustrative, not regulatory approvals.",
     },
     tagline: {
       title: "Pay offline. Settle later. Lose nothing.",

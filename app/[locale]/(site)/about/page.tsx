@@ -27,7 +27,7 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
           {p.principles.items.map((it) => (
             <Card key={it.title}>
-              <h3 className="font-display text-lg font-bold text-navy">{it.title}</h3>
+              <h3 className="font-display text-lg font-medium text-navy">{it.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted sm:text-base">{it.body}</p>
             </Card>
           ))}
@@ -36,7 +36,7 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
 
       <Section labelledBy="status">
         <div className="rounded-3xl border border-line bg-warn-soft p-6 sm:p-8">
-          <h2 id="status" className="font-display text-2xl font-extrabold text-warn">
+          <h2 id="status" className="font-display text-2xl font-medium text-warn">
             {p.status.title}
           </h2>
           <p className="mt-3 max-w-3xl text-base leading-relaxed text-ink">{p.status.body}</p>

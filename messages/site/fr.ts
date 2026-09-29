@@ -248,6 +248,15 @@ const site: SiteMessages = {
       line2: "Payé quand même.",
       lead: "Des paiements et du paiement différé qui n'attendent pas le réseau. PayVault est une infrastructure de transactions hors ligne à risque maîtrisé et à rapprochement automatique, pour les PSP, les réseaux de TPE, les banques et les opérateurs de mobile money.",
       fine: "Proposé en tant que service aux partenaires agréés. PayVault n'est ni une banque ni un portefeuille et ne détient jamais les fonds des clients.",
+      short: "Paiements hors ligne et paiement différé pour banques, PSP et mobile money. Réglés automatiquement au retour du réseau.",
+    },
+    numbers: {
+      title: "Le hors-ligne en chiffres.",
+      packs: "Packs pays configurés, du Sénégal au Kenya",
+      bytes: "Un paiement signé. Il tient dans un seul QR code.",
+      bars: "Barres de réseau nécessaires à la caisse",
+      languages: "Langues dans l'app, la documentation et la console",
+      note: "Les packs pays sont au stade de concept. Les limites sont illustratives, pas des agréments réglementaires.",
     },
     tagline: {
       title: "Payez hors ligne. Réglez plus tard. Ne perdez rien.",

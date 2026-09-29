@@ -28,7 +28,7 @@ export default async function OverviewPage(props: PageProps<"/[locale]/console">
       <PageHeader title={t.overview.title} subtitle={`${ctx.membership.partnerName} · ${t.overview.subtitle}`} />
       {fresh && (
         <div className="mb-6 rounded-2xl border border-line bg-green-soft p-5">
-          <h2 className="font-display text-lg font-bold text-ink">{t.overview.emptyTitle}</h2>
+          <h2 className="font-display text-lg font-medium text-ink">{t.overview.emptyTitle}</h2>
           <p className="mt-1 max-w-2xl text-sm text-muted">{t.overview.emptyBody}</p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link href={ctx.href("/developers")} className={btnSecondary}>

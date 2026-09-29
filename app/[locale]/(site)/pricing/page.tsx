@@ -30,10 +30,10 @@ export default async function PricingPage({ params }: PageProps<"/[locale]/prici
                 className={`flex flex-col rounded-3xl border p-6 sm:p-8 ${featured ? "border-green bg-card ring-2 ring-green" : "border-line bg-card"}`}
               >
                 <div className="flex items-center justify-between gap-3">
-                  <h2 className="font-display text-2xl font-extrabold text-navy">{plan.name}</h2>
+                  <h2 className="font-display text-2xl font-medium text-navy">{plan.name}</h2>
                   {featured && <Pill>{plan.featured}</Pill>}
                 </div>
-                <p className="mt-4 font-display text-xl font-extrabold text-green">{plan.price}</p>
+                <p className="mt-4 font-display text-xl font-medium text-green">{plan.price}</p>
                 <p className="text-sm text-muted">{plan.note}</p>
                 <p className="mt-4 text-sm leading-relaxed text-ink">{plan.body}</p>
                 <ul className="mt-6 flex-1 space-y-3">
@@ -73,7 +73,7 @@ export default async function PricingPage({ params }: PageProps<"/[locale]/prici
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           {p.faq.items.map((f) => (
             <Card key={f.q}>
-              <h3 className="font-display text-base font-bold text-navy">{f.q}</h3>
+              <h3 className="font-display text-base font-medium text-navy">{f.q}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">{f.a}</p>
             </Card>
           ))}

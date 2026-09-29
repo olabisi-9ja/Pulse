@@ -44,7 +44,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
                   </IconBadge>
                   <Pill tone="green">{s.status}</Pill>
                 </div>
-                <h2 className="mt-4 font-display text-2xl font-extrabold text-navy">{s.title}</h2>
+                <h2 className="mt-4 font-display text-2xl font-medium text-navy">{s.title}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted sm:text-base">{s.body}</p>
                 <CheckList items={s.bullets} className="mt-5" />
               </Card>
@@ -57,11 +57,11 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
         <SectionHeading id="custody" eyebrow={p.nonCustodial.eyebrow} title={p.nonCustodial.title} lead={p.nonCustodial.body} />
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           <Card>
-            <h3 className="font-display text-xl font-extrabold text-navy">{p.nonCustodial.partnerTitle}</h3>
+            <h3 className="font-display text-xl font-medium text-navy">{p.nonCustodial.partnerTitle}</h3>
             <CheckList items={p.nonCustodial.partner} className="mt-4" />
           </Card>
           <Card>
-            <h3 className="font-display text-xl font-extrabold text-green">{p.nonCustodial.payvaultTitle}</h3>
+            <h3 className="font-display text-xl font-medium text-green">{p.nonCustodial.payvaultTitle}</h3>
             <CheckList items={p.nonCustodial.payvault} className="mt-4" />
           </Card>
         </div>

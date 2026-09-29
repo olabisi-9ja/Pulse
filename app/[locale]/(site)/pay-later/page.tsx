@@ -46,7 +46,7 @@ export default async function PayLaterPage({ params }: PageProps<"/[locale]/pay-
                     className={`flex flex-col gap-1 px-6 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6 ${last ? "rounded-b-3xl bg-green-soft" : ""}`}
                   >
                     <dt className={`text-sm ${last ? "font-bold text-green" : "text-muted"}`}>{r.label}</dt>
-                    <dd className={`tabular font-display font-extrabold text-navy ${last ? "text-base sm:max-w-[60%] sm:text-right" : "text-lg"}`}>
+                    <dd className={`tabular font-display font-medium text-navy ${last ? "text-base sm:max-w-[60%] sm:text-right" : "text-lg"}`}>
                       {r.value}
                     </dd>
                   </div>
@@ -67,7 +67,7 @@ export default async function PayLaterPage({ params }: PageProps<"/[locale]/pay-
                 <IconBadge>
                   <Icon className="h-5 w-5" />
                 </IconBadge>
-                <h3 className="mt-4 font-display text-lg font-bold text-navy">{it.title}</h3>
+                <h3 className="mt-4 font-display text-lg font-medium text-navy">{it.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted">{it.body}</p>
               </Card>
             );
@@ -87,7 +87,7 @@ export default async function PayLaterPage({ params }: PageProps<"/[locale]/pay-
 
       <Section labelledBy="lender">
         <div className="rounded-3xl border border-green bg-green-soft p-6 sm:p-8">
-          <h2 id="lender" className="font-display text-2xl font-extrabold text-navy">
+          <h2 id="lender" className="font-display text-2xl font-medium text-navy">
             {p.lender.title}
           </h2>
           <p className="mt-3 max-w-3xl text-base leading-relaxed text-ink">{p.lender.body}</p>

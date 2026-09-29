@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { LogoMark } from "@/components/brand/Logo";
 
 export function Container({ children, className = "" }: { children: ReactNode; className?: string }) {
@@ -24,7 +24,7 @@ export function Section({
     <section
       id={id}
       aria-labelledby={labelledBy}
-      className={`py-14 sm:py-20 ${tone === "card" ? "border-y border-line bg-card-2" : ""} ${className}`}
+      className={`py-20 sm:py-28 ${tone === "card" ? "pv-invert" : ""} ${className}`}
     >
       <Container>{children}</Container>
     </section>
@@ -33,10 +33,40 @@ export function Section({
 
 export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <p className={`flex items-center gap-3 text-xs font-bold uppercase tracking-[0.18em] text-green ${className}`}>
-      <span aria-hidden className="h-px w-8 bg-green" />
+    <p className={`flex items-center gap-2.5 text-sm font-medium text-muted ${className}`}>
+      <span aria-hidden className="h-2 w-2 rounded-full bg-green" />
       {children}
     </p>
+  );
+}
+
+/** The brand pill, set inline in a headline like a word. */
+export function HeadlinePill({ className = "" }: { className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={`mx-[0.12em] inline-block h-[0.66em] w-[1.55em] -translate-y-[0.04em] rounded-full bg-green align-middle ${className}`}
+    />
+  );
+}
+
+/**
+ * Headline with the brand pill. One rule everywhere: the last two words drop to
+ * their own line and the pill opens that line ("No signal. / ▬ Still paid.").
+ * Single-word titles stay plain.
+ */
+export function Pilled({ text }: { text: string }) {
+  const words = text.trim().split(/\s+/);
+  if (words.length < 2) return <>{text}</>;
+  const tail = words.length > 2 ? 2 : 1;
+  return (
+    <>
+      {words.slice(0, -tail).join(" ")}
+      <span className="block">
+        <HeadlinePill className="ml-0 mr-[0.2em]" />
+        {words.slice(-tail).join(" ")}
+      </span>
+    </>
   );
 }
 
@@ -54,28 +84,26 @@ export function SectionHeading({
   className?: string;
 }) {
   return (
-    <div className={`max-w-3xl ${className}`}>
-      {eyebrow && <Eyebrow className="mb-4">{eyebrow}</Eyebrow>}
-      <h2
-        id={id}
-        className="font-display text-3xl font-extrabold leading-[1.1] text-navy text-balance sm:text-4xl lg:text-[2.75rem]"
-      >
-        {title}
+    <div className={`max-w-4xl ${className}`}>
+      {eyebrow && <Eyebrow className="mb-6">{eyebrow}</Eyebrow>}
+      <h2 id={id} className="font-display text-[clamp(2.4rem,6vw,4.5rem)] font-medium leading-[0.98] text-navy text-balance">
+        <Pilled text={title} />
       </h2>
-      {lead && <p className="mt-4 text-base leading-relaxed text-muted sm:text-lg">{lead}</p>}
+      {lead && <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">{lead}</p>}
     </div>
   );
 }
 
 const buttonBase =
-  "inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-bold transition-colors";
+  "group inline-flex min-h-12 items-center justify-center gap-3 rounded-full py-1.5 pl-6 text-sm font-medium transition-colors";
 const buttonTones = {
   primary: "bg-green text-on-accent hover:bg-green-strong",
-  secondary: "border border-line bg-card text-navy hover:bg-card-2",
+  secondary: "border border-line bg-paper text-ink hover:border-ink",
   inverse: "bg-on-accent text-navy hover:opacity-90",
   outlineInverse: "border border-on-accent/40 text-on-accent hover:bg-on-accent/10",
 } as const;
 
+/** Pill button; `arrow` adds the circled arrow that nudges on hover. */
 export function ButtonLink({
   href,
   children,
@@ -90,15 +118,19 @@ export function ButtonLink({
   className?: string;
 }) {
   return (
-    <Link href={href} className={`${buttonBase} ${buttonTones[tone]} ${className}`}>
+    <Link href={href} className={`${buttonBase} ${arrow ? "pr-1.5" : "pr-6"} ${buttonTones[tone]} ${className}`}>
       {children}
-      {arrow && <ArrowRight className="h-4 w-4" aria-hidden />}
+      {arrow && (
+        <span aria-hidden className="grid h-9 w-9 place-items-center rounded-full border border-current/25">
+          <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+        </span>
+      )}
     </Link>
   );
 }
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`rounded-3xl border border-line bg-card p-6 sm:p-7 ${className}`}>{children}</div>;
+  return <div className={`rounded-[1.75rem] rounded-br-[4.5rem] bg-card p-6 sm:p-8 ${className}`}>{children}</div>;
 }
 
 export function IconBadge({ children, className = "" }: { children: ReactNode; className?: string }) {
@@ -149,15 +181,15 @@ export function Watermark({ className = "" }: { className?: string }) {
 /** Interior page hero: eyebrow, uppercase heading, lead. Renders the page's only h1. */
 export function PageHero({ eyebrow, title, lead, children }: { eyebrow: string; title: string; lead: string; children?: ReactNode }) {
   return (
-    <header className="relative overflow-hidden border-b border-line">
-      <Watermark className="-right-16 -top-10 h-[26rem] w-[25rem] sm:right-0 sm:h-[32rem] sm:w-[31rem]" />
-      <Container className="relative pb-14 pt-12 sm:pb-20 sm:pt-20">
-        <Eyebrow className="mb-5">{eyebrow}</Eyebrow>
-        <h1 className="max-w-4xl font-display text-4xl font-black uppercase leading-[1.02] text-navy text-balance sm:text-5xl lg:text-6xl">
-          {title}
+    <header className="pv-invert relative overflow-hidden">
+      <Watermark className="-right-16 -top-10 h-[26rem] w-[25rem] opacity-[0.08] sm:right-0 sm:h-[32rem] sm:w-[31rem]" />
+      <Container className="relative pb-20 pt-16 sm:pb-28 sm:pt-24">
+        <Eyebrow className="mb-8">{eyebrow}</Eyebrow>
+        <h1 className="max-w-5xl font-display text-[clamp(2.75rem,8vw,6rem)] font-medium leading-[0.95] text-navy text-balance">
+          <Pilled text={title} />
         </h1>
-        <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">{lead}</p>
-        {children && <div className="mt-8 flex flex-wrap gap-3">{children}</div>}
+        <p className="mt-8 max-w-xl text-base leading-relaxed text-muted sm:text-lg">{lead}</p>
+        {children && <div className="mt-10 flex flex-wrap gap-3">{children}</div>}
       </Container>
     </header>
   );
@@ -177,10 +209,12 @@ export function CtaBand({
   return (
     <section className="py-14 sm:py-20">
       <Container>
-        <div className="relative overflow-hidden rounded-[2rem] bg-navy p-8 text-on-accent sm:p-14">
+        <div className="relative overflow-hidden rounded-[2rem] rounded-br-[7rem] bg-[#14365a] p-8 text-white sm:p-16">
           <Watermark className="-right-10 -top-6 h-72 w-72 opacity-[0.1]" />
           <div className="relative max-w-2xl">
-            <h2 className="font-display text-3xl font-extrabold leading-tight text-balance sm:text-4xl">{title}</h2>
+            <h2 className="font-display text-[clamp(2.2rem,5vw,3.75rem)] font-medium leading-[0.98] text-balance">
+              <Pilled text={title} />
+            </h2>
             <p className="mt-4 text-base leading-relaxed opacity-85 sm:text-lg">{body}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <ButtonLink href={primary.href} tone="inverse" arrow>

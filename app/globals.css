@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "@fontsource-variable/inter";
 @import "@fontsource-variable/montserrat";
+@import "@fontsource-variable/inter-tight";
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
@@ -10,12 +11,12 @@
   --pv-green-soft: #e3f1ec;
   --pv-navy: #14365a;
   --pv-navy-soft: #e7edf4;
-  --pv-paper: #f4f3ef;
+  --pv-paper: #ffffff;
   --pv-card: #ffffff;
-  --pv-card-2: #f7f7f4;
+  --pv-card-2: #f4f6f8;
   --pv-ink: #10161d;
   --pv-muted: #66707a;
-  --pv-line: #e4e3de;
+  --pv-line: #e3e7ec;
   --pv-danger: #c2412d;
   --pv-danger-soft: #fbe9e5;
   --pv-warn: #a86a12;
@@ -89,7 +90,8 @@
   --color-warn-soft: var(--pv-warn-soft);
   --color-on-accent: var(--pv-on-accent);
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Montserrat Variable", "Inter Variable", ui-sans-serif, sans-serif;
+  --font-display: "Inter Tight Variable", "Inter Variable", ui-sans-serif, sans-serif;
+  --font-brand: "Montserrat Variable", "Inter Variable", ui-sans-serif, sans-serif;
 }
 
 html {
@@ -105,7 +107,62 @@ body {
 
 .font-display {
   font-family: var(--font-display);
+  letter-spacing: -0.035em;
+}
+
+.font-brand {
+  font-family: var(--font-brand);
   letter-spacing: -0.01em;
+}
+
+/* Inverted section: deep brand navy in light mode, light in dark mode. Content keeps its token classes. */
+.pv-invert {
+  --pv-paper: #0b1726;
+  --pv-card: #11233a;
+  --pv-card-2: #0e1e32;
+  --pv-ink: #eef3f7;
+  --pv-muted: #9db0c4;
+  --pv-line: #1f3552;
+  --pv-navy: #ffffff;
+  --pv-navy-soft: #16304d;
+  --pv-green: #2fb386;
+  --pv-green-strong: #4cc79c;
+  --pv-green-soft: #0f3a2c;
+  --pv-on-accent: #06140f;
+  background: var(--pv-paper);
+  color: var(--pv-ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .pv-invert {
+    --pv-paper: #f4f6f8;
+    --pv-card: #ffffff;
+    --pv-card-2: #eef1f4;
+    --pv-ink: #0b1726;
+    --pv-muted: #5b6b7c;
+    --pv-line: #dde3ea;
+    --pv-navy: #14365a;
+    --pv-navy-soft: #e7edf4;
+    --pv-green: #046b4f;
+    --pv-green-strong: #035a42;
+    --pv-green-soft: #e3f1ec;
+    --pv-on-accent: #ffffff;
+  }
+}
+
+:root[data-theme="dark"] .pv-invert {
+  --pv-paper: #f4f6f8;
+  --pv-card: #ffffff;
+  --pv-card-2: #eef1f4;
+  --pv-ink: #0b1726;
+  --pv-muted: #5b6b7c;
+  --pv-line: #dde3ea;
+  --pv-navy: #14365a;
+  --pv-navy-soft: #e7edf4;
+  --pv-green: #046b4f;
+  --pv-green-strong: #035a42;
+  --pv-green-soft: #e3f1ec;
+  --pv-on-accent: #ffffff;
 }
 
 .tabular {

@@ -44,12 +44,12 @@ export function Logo({ className = "", tagline = false }: { className?: string; 
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <LogoMark className={tagline ? "h-10 w-10" : "h-8 w-8"} title="" />
       <span className="flex flex-col leading-none">
-        <span className="font-display text-[1.15rem] tracking-tight text-navy">
+        <span className="font-brand text-[1.15rem] tracking-tight text-navy">
           <span className="font-extrabold">PAY</span>
           <span className="font-medium">VAULT</span>
         </span>
         {tagline && (
-          <span className="mt-1 font-display text-[0.55rem] font-semibold tracking-[0.2em] text-navy">
+          <span className="mt-1 font-brand text-[0.55rem] font-semibold tracking-[0.2em] text-navy">
             SECURE FINTECH
           </span>
         )}

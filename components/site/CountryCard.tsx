@@ -12,7 +12,7 @@ export function CountryCard({ pack, locale, t }: { pack: CountryPack; locale: Lo
     <article className="flex flex-col rounded-3xl border border-line bg-card p-5">
       <header className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="font-display text-lg font-extrabold text-navy">{pack.name[locale]}</h3>
+          <h3 className="font-display text-lg font-medium text-navy">{pack.name[locale]}</h3>
           <p className="mt-0.5 text-xs text-muted">
             <span className="tabular font-semibold">{pack.code}</span>
             {pack.bloc && <> · {pack.bloc}</>}

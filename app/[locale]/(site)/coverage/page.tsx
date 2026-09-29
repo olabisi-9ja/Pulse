@@ -39,13 +39,13 @@ export default async function CoveragePage({ params }: PageProps<"/[locale]/cove
         <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {stats.map(([n, label]) => (
             <Card key={label} className="p-5 sm:p-6">
-              <dd className="tabular font-display text-4xl font-black text-green">{n}</dd>
+              <dd className="tabular font-display text-4xl font-medium text-green">{n}</dd>
               <dt className="mt-1 text-sm font-semibold text-muted">{label}</dt>
             </Card>
           ))}
         </dl>
         <div className="mt-6 rounded-3xl border border-line bg-warn-soft p-6">
-          <h2 className="font-display text-lg font-extrabold text-warn">{p.notice.title}</h2>
+          <h2 className="font-display text-lg font-medium text-warn">{p.notice.title}</h2>
           <p className="mt-2 text-sm leading-relaxed text-ink sm:text-base">{p.notice.body}</p>
         </div>
       </Section>

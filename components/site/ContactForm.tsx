@@ -66,7 +66,7 @@ export function ContactForm({
     return (
       <div role="status" className="rounded-3xl border border-line bg-card p-8 text-center sm:p-12">
         <CheckCircle2 className="mx-auto h-12 w-12 text-green" aria-hidden />
-        <h2 className="mt-4 font-display text-2xl font-extrabold text-navy">{t.successTitle}</h2>
+        <h2 className="mt-4 font-display text-2xl font-medium text-navy">{t.successTitle}</h2>
         <p className="mt-2 text-muted">{t.successBody}</p>
         <button
           type="button"

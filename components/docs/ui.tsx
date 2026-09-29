@@ -32,7 +32,7 @@ export function PageHeader({ eyebrow, title, lead }: { eyebrow: string; title: s
   return (
     <header className="mb-8 border-b border-line pb-8">
       <p className="text-xs font-bold uppercase tracking-[0.14em] text-green">{eyebrow}</p>
-      <h1 className="font-display mt-3 text-3xl font-extrabold leading-tight text-navy sm:text-4xl">{title}</h1>
+      <h1 className="font-display mt-3 text-3xl font-medium leading-tight text-navy sm:text-4xl">{title}</h1>
       <p className="mt-4 max-w-[72ch] text-lg leading-relaxed text-muted">
         <Rich text={lead} />
       </p>
@@ -54,7 +54,7 @@ export function EnglishOnly({ text }: { text: string }) {
 
 export function H2({ id, children }: { id: string; children: ReactNode }) {
   return (
-    <h2 id={id} className="font-display mt-12 scroll-mt-24 text-2xl font-bold text-navy first:mt-0">
+    <h2 id={id} className="font-display mt-12 scroll-mt-24 text-2xl font-medium text-navy first:mt-0">
       <a href={`#${id}`} className="hover:underline">
         {children}
       </a>
@@ -64,7 +64,7 @@ export function H2({ id, children }: { id: string; children: ReactNode }) {
 
 export function H3({ id, children }: { id?: string; children: ReactNode }) {
   return (
-    <h3 id={id} className="font-display mt-8 scroll-mt-24 text-lg font-bold text-ink">
+    <h3 id={id} className="font-display mt-8 scroll-mt-24 text-lg font-medium text-ink">
       {children}
     </h3>
   );
@@ -230,7 +230,7 @@ export function CardLink({ href, title, body }: { href: string; title: string; b
       href={href}
       className="block rounded-2xl border border-line bg-card p-4 transition-colors hover:bg-card-2"
     >
-      <span className="font-display block text-base font-bold text-navy">{title}</span>
+      <span className="font-display block text-base font-medium text-navy">{title}</span>
       <span className="mt-1 block text-sm text-muted">{body}</span>
     </Link>
   );

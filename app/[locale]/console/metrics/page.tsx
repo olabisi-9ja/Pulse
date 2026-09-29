@@ -132,7 +132,7 @@ export default async function MetricsPage(props: PageProps<"/[locale]/console/me
             <ul className="space-y-1">
               {d.loss.map((l) => (
                 <li key={l.currency} className="flex flex-wrap items-baseline justify-between gap-2">
-                  <span className={`tabular ${l.volume ? "text-2xl" : ""} font-display font-bold text-ink`}>
+                  <span className={`tabular ${l.volume ? "text-2xl" : ""} font-display font-medium text-ink`}>
                     {l.volume ? pct(l.loss / l.volume, locale) : "–"}
                   </span>
                   <span className="tabular text-xs text-muted">

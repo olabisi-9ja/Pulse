@@ -30,7 +30,7 @@ export default async function UseCasesPage({ params }: PageProps<"/[locale]/use-
                   <IconBadge>
                     <Icon className="h-5 w-5" />
                   </IconBadge>
-                  <h2 className="font-display text-xl font-extrabold text-navy">{c.title}</h2>
+                  <h2 className="font-display text-xl font-medium text-navy">{c.title}</h2>
                 </div>
                 <dl className="mt-5 space-y-4 text-sm leading-relaxed sm:text-base">
                   <div>

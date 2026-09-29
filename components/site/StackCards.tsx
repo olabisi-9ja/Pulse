@@ -49,7 +49,7 @@ function StackCard({ item, i, n, progress }: { item: StackItem; i: number; n: nu
           {item.tag && (
             <span className="w-fit rounded-full bg-white/12 px-3 py-1 text-xs font-semibold tracking-wide text-white/85">{item.tag}</span>
           )}
-          <h3 className="font-display text-2xl font-extrabold leading-tight text-balance sm:text-[2rem]">{item.title}</h3>
+          <h3 className="font-display text-2xl font-medium leading-tight text-balance sm:text-[2rem]">{item.title}</h3>
           <p className="max-w-md text-[0.95rem] leading-relaxed text-white/75 sm:text-base">{item.body}</p>
         </div>
         <div className="relative flex min-h-[15rem] items-center justify-center bg-black/15 p-6 sm:p-10" aria-hidden>

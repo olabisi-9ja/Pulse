@@ -24,14 +24,14 @@ export function LegalPage({ locale, kind }: { locale: Locale; kind: Kind }) {
   return (
     <Container className="py-14 sm:py-20">
       <article className="mx-auto max-w-2xl">
-        <h1 className="font-display text-4xl font-extrabold tracking-tight text-navy sm:text-5xl">{doc.title}</h1>
+        <h1 className="font-display text-4xl font-medium tracking-tight text-navy sm:text-5xl">{doc.title}</h1>
         <p className="mt-3 text-sm text-muted">
           {t.updatedLabel}: {doc.updated}
         </p>
         <p className="mt-6 rounded-2xl border border-line bg-warn-soft px-4 py-3 text-sm text-warn">{t.draft}</p>
         {doc.sections.map((s) => (
           <section key={s.title} className="mt-10">
-            <h2 className="font-display text-xl font-bold text-navy">{s.title}</h2>
+            <h2 className="font-display text-xl font-medium text-navy">{s.title}</h2>
             {s.paras?.map((p) => (
               <p key={p} className="mt-3 leading-relaxed text-ink">
                 {p}

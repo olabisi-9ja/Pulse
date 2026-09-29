@@ -86,7 +86,7 @@ export default async function DevelopersPage({ params }: PageProps<"/[locale]/de
                 <IconBadge>
                   <Icon className="h-5 w-5" />
                 </IconBadge>
-                <h2 className="mt-4 font-display text-lg font-bold text-navy">{s.title}</h2>
+                <h2 className="mt-4 font-display text-lg font-medium text-navy">{s.title}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted">{s.body}</p>
               </Card>
             );

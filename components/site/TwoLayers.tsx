@@ -16,7 +16,7 @@ export function TwoLayers({ t, headingId }: { t: SiteMessages["twoLayers"]; head
             </span>
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-green">{a.tag}</p>
-              <h3 className="font-display text-xl font-extrabold text-navy">{a.title}</h3>
+              <h3 className="font-display text-xl font-medium text-navy">{a.title}</h3>
             </div>
           </div>
           <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">{a.body}</p>
@@ -50,7 +50,7 @@ export function TwoLayers({ t, headingId }: { t: SiteMessages["twoLayers"]; head
             </span>
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-green">{b.tag}</p>
-              <h3 className="font-display text-xl font-extrabold text-navy">{b.title}</h3>
+              <h3 className="font-display text-xl font-medium text-navy">{b.title}</h3>
             </div>
           </div>
           <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">{b.body}</p>

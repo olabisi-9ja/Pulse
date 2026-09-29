@@ -57,7 +57,9 @@ Last updated: 2026-09-29. Branch: `claude/hopeful-volta-m5q6kl` (repo `olabisi-9
 - Console reviewed: every mutation checks the partner role and every query is scoped by `partner_id`. Webhook URLs now reject private, loopback and link-local hosts, and delivery doesn't follow redirects.
 - Docs: added the missing Security page. The site developers page samples now match the real API. Removed overclaims from the site's security copy (CBOR, "audited libraries", attestation and biometric described as current). Partner issuance now returns 400 `unsupported_country` / `over_limit` instead of 500.
 - Local Postgres on Windows: the `embedded-postgres` npm package, kept outside the repo, on port 54329.
-- QA progress: dev sign-in, onboarding, PIN, top-up all work in the browser. The rest of the flow (KYC → vault with overdraft → offline pay → sync → loan → repay) is still to do.
+- Full QA walkthrough passed in the browser, with two "phones" (`localhost` and `127.0.0.1`; `allowedDevOrigins` covers the second): sign-in → onboarding → PIN → top-up → KYC → vault with overdraft → cash out → offline pay (request and payment codes passed via the scanner's paste fallback) → sync from both sides settles once → loan → repay, after which the credit limit rose.
+- Wallet redesign: follows the owner's inspiration (a tracking-app layout) in the brand colours (navy #14365A surfaces, green #046B4F actions), with a wallet-scoped palette in `globals.css` (`.pv-wallet`). Copy trimmed hard. No sync or connectivity UI is shown to users; sync is automatic. Owner feedback: keep text minimal and hide internals.
+- PWA: the service worker precaches both locale shells and every chunk they reference. A production offline launch of `/app` was verified with the server stopped. Not yet tested: installing on a real Android/iOS device.
 
 ## Next steps
 1. ~~Run `pnpm lint` and `pnpm build`; fix any errors.~~ Done.

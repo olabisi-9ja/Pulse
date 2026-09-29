@@ -6,6 +6,7 @@ import { siteMetadata } from "@/components/site/meta";
 import { StackCards } from "@/components/site/StackCards";
 import { ButtonLink, Card, CtaBand, PageHero, Section, SectionHeading, TwoColTable } from "@/components/site/ui";
 import { isLocale } from "@/lib/i18n";
+import { photos } from "@/lib/photos";
 import { getSiteMessages } from "@/messages/site";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/how-it-works">) {
@@ -20,7 +21,7 @@ export default async function HowItWorksPage({ params }: PageProps<"/[locale]/ho
 
   return (
     <>
-      <PageHero eyebrow={p.hero.eyebrow} title={p.hero.title} lead={p.hero.lead}>
+      <PageHero title={p.hero.title} lead={p.hero.lead} photos={[photos.trader, photos.agent]}>
         <ButtonLink href={`/${locale}/contact`} arrow>
           {t.common.requestPilot}
         </ButtonLink>

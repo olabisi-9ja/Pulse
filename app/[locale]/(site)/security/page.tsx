@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { siteMetadata } from "@/components/site/meta";
 import { Card, CtaBand, IconBadge, PageHero, Section, SectionHeading, TwoColTable } from "@/components/site/ui";
 import { isLocale } from "@/lib/i18n";
+import { photos } from "@/lib/photos";
 import { getSiteMessages } from "@/messages/site";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/security">) {
@@ -19,7 +20,7 @@ export default async function SecurityPage({ params }: PageProps<"/[locale]/secu
 
   return (
     <>
-      <PageHero eyebrow={p.hero.eyebrow} title={p.hero.title} lead={p.hero.lead} />
+      <PageHero title={p.hero.title} lead={p.hero.lead} photos={[photos.agent, photos.bank]} />
 
       <Section labelledBy="custody">
         <div className="grid items-start gap-8 lg:grid-cols-[auto_1fr] lg:gap-12">

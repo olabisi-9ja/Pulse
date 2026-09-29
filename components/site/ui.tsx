@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { LogoMark } from "@/components/brand/Logo";
+import type { Photo } from "@/lib/photos";
+import { HeroShapes } from "./HeroShapes";
 
 export function Container({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <div className={`mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 ${className}`}>{children}</div>;
@@ -178,18 +180,33 @@ export function Watermark({ className = "" }: { className?: string }) {
   );
 }
 
-/** Interior page hero: eyebrow, uppercase heading, lead. Renders the page's only h1. */
-export function PageHero({ eyebrow, title, lead, children }: { eyebrow: string; title: string; lead: string; children?: ReactNode }) {
+/**
+ * Interior page hero, matching the homepage: a two-line headline ("First line.|Second line.",
+ * the second in green), one line of lead, actions, then the photo and shape row.
+ */
+export function PageHero({
+  title,
+  lead,
+  children,
+  photos,
+}: {
+  eyebrow?: string;
+  title: string;
+  lead: string;
+  children?: ReactNode;
+  photos?: [Photo | null, Photo | null];
+}) {
+  const [first, second] = title.split("|");
   return (
-    <header className="pv-invert relative overflow-hidden">
-      <Watermark className="-right-16 -top-10 h-[26rem] w-[25rem] opacity-[0.08] sm:right-0 sm:h-[32rem] sm:w-[31rem]" />
-      <Container className="relative pb-20 pt-16 sm:pb-28 sm:pt-24">
-        <Eyebrow className="mb-8">{eyebrow}</Eyebrow>
-        <h1 className="max-w-5xl font-display text-[clamp(2.75rem,8vw,6rem)] font-medium leading-[0.95] text-navy text-balance">
-          <Pilled text={title} />
+    <header className="relative overflow-hidden bg-paper">
+      <Container className="pb-16 pt-12 sm:pb-20 sm:pt-16">
+        <h1 className="max-w-5xl font-display text-[clamp(2.75rem,8.5vw,6.5rem)] font-semibold leading-[0.92] tracking-[-0.045em] text-navy">
+          <span className="block">{first}</span>
+          {second && <span className="block text-green">{second}</span>}
         </h1>
-        <p className="mt-8 max-w-xl text-base leading-relaxed text-muted sm:text-lg">{lead}</p>
-        {children && <div className="mt-10 flex flex-wrap gap-3">{children}</div>}
+        <p className="mt-7 max-w-lg text-base leading-relaxed text-muted sm:text-lg">{lead}</p>
+        {children && <div className="mt-8 flex flex-wrap gap-3">{children}</div>}
+        {photos && <HeroShapes left={photos[0]} right={photos[1]} />}
       </Container>
     </header>
   );

@@ -4,6 +4,7 @@ import { siteMetadata } from "@/components/site/meta";
 import { StackCards } from "@/components/site/StackCards";
 import { ButtonLink, Card, CheckList, CtaBand, IconBadge, PageHero, Section, SectionHeading } from "@/components/site/ui";
 import { isLocale } from "@/lib/i18n";
+import { photos } from "@/lib/photos";
 import { getSiteMessages } from "@/messages/site";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/pay-later">) {
@@ -20,7 +21,7 @@ export default async function PayLaterPage({ params }: PageProps<"/[locale]/pay-
 
   return (
     <>
-      <PageHero eyebrow={p.hero.eyebrow} title={p.hero.title} lead={p.hero.lead}>
+      <PageHero title={p.hero.title} lead={p.hero.lead} photos={[photos.stall, photos.trader]}>
         <ButtonLink href={`/${locale}/contact`} arrow>
           {t.common.requestPilot}
         </ButtonLink>

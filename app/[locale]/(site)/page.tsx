@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Check, Plus } from "lucide-react";
 import { notFound } from "next/navigation";
 import { listCountries } from "@payvault/countries";
 import { FlowDiagram } from "@/components/site/FlowDiagram";
@@ -77,12 +77,25 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
                 </div>
               </div>
             </article>
-            <article className="relative flex min-h-[26rem] flex-col overflow-hidden rounded-[2rem] rounded-br-[6rem] bg-[#e8eef5] p-7 text-[#0b1726] sm:p-10 lg:col-span-5">
-              <span className="inline-flex w-fit rounded-full bg-[#14365a]/10 px-3.5 py-1.5 text-xs font-medium">{h.hero.stageCustomers}</span>
-              <h2 className="mt-5 max-w-xs font-display text-3xl font-medium leading-[1.05] sm:text-4xl">{h.hero.stageCustomersTitle}</h2>
-              <div aria-hidden className="pointer-events-none mt-8 flex flex-1 items-end justify-center">
-                <div className="w-[17.5rem]">
+            <article className="relative flex min-h-[26rem] flex-col overflow-hidden rounded-[2rem] rounded-br-[6rem] bg-gradient-to-br from-[#eef3fa] to-[#d6e3f3] p-7 text-[#0b1726] sm:p-10 lg:col-span-5">
+              <span aria-hidden className="absolute -bottom-40 -right-28 h-96 w-96 rounded-full bg-[#b9cde8]" />
+              <span className="relative inline-flex w-fit rounded-full bg-[#14365a]/10 px-3.5 py-1.5 text-xs font-medium">{h.hero.stageCustomers}</span>
+              <h2 className="relative mt-5 max-w-xs font-display text-3xl font-medium leading-[1.05] sm:text-4xl">{h.hero.stageCustomersTitle}</h2>
+              <div aria-hidden className="pointer-events-none relative mt-8 flex flex-1 items-end justify-center [perspective:1400px]">
+                <div className="w-[16rem] [transform:rotateX(10deg)_rotateY(-20deg)_rotateZ(-7deg)] drop-shadow-[0_40px_40px_rgb(20_54_90/0.35)]">
                   <PhoneMockup t={t.mock} bare />
+                </div>
+                <div className="absolute bottom-6 left-0 w-56 rounded-2xl bg-white p-4 shadow-[0_24px_48px_-16px_rgb(20_54_90/0.45)] sm:left-2">
+                  <div className="flex items-center gap-2.5">
+                    <span className="grid h-8 w-8 place-items-center rounded-full bg-[#e2f2ec] text-[#046b4f]">
+                      <Check className="h-4 w-4" strokeWidth={2.5} />
+                    </span>
+                    <div>
+                      <p className="text-xs font-medium text-[#0b1726]">{h.hero.floatTitle}</p>
+                      <p className="text-[0.65rem] text-[#5b6b7c]">{h.hero.floatMeta}</p>
+                    </div>
+                  </div>
+                  <p className="tabular mt-3 font-display text-2xl font-medium tracking-tight text-[#0b1726]">XOF 1,500</p>
                 </div>
               </div>
             </article>

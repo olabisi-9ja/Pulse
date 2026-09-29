@@ -210,6 +210,7 @@ const site = {
   twoLayers: {
     eyebrow: "Two layers, one integration",
     title: "Reliability first. Guaranteed offline acceptance on top.",
+    visual: { queued: "Queued", available: "Available offline", funded: "Your money", overdraft: "Overdraft" },
     lead: "Offline transaction infrastructure with controlled risk and automatic reconciliation. Start with the reliability layer, then add guaranteed acceptance where it pays off.",
     reliability: {
       tag: "Layer A",
@@ -252,6 +253,8 @@ const site = {
       stagePartnersTitle: "Offline acceptance, settled into your own ledger.",
       stageCustomers: "For your customers",
       stageCustomersTitle: "A wallet that pays with no signal.",
+      floatTitle: "Payment received",
+      floatMeta: "Offline · Market stall",
     },
     numbers: {
       title: "Offline, by the numbers.",
@@ -354,8 +357,8 @@ const site = {
   howItWorks: {
     hero: {
       eyebrow: "How it works",
-      title: "Vault, sign, scan, verify, sync.",
-      lead: "A user locks part of their balance into an Offline Vault. From then on, payments are signed on the phone and verified on the merchant's device, with no network in between.",
+      title: "Two scans.|Zero bars.",
+      lead: "The payer's phone signs. The merchant's phone checks. The network catches up later.",
     },
     lifecycle: {
       title: "The life of an allowance",
@@ -419,8 +422,8 @@ const site = {
   product: {
     hero: {
       eyebrow: "Product",
-      title: "Everything a partner needs to run offline payments.",
-      lead: "One protocol and four surfaces, designed so that your customers see your brand and your ledger stays the source of truth.",
+      title: "Your brand.|Our offline rails.",
+      lead: "A wallet, a console, an SDK and an API that run inside your ledger.",
     },
     surfaces: [
       {
@@ -463,8 +466,8 @@ const site = {
   payLater: {
     hero: {
       eyebrow: "Offline overdraft",
-      title: "Pay later that works without a network.",
-      lead: "Some customers are a little short exactly when the network is down. Your partner can extend a small credit line into the same allowance, so the sale still happens.",
+      title: "Short at the till?|Pay anyway.",
+      lead: "A small overdraft inside the vault, repaid from the next deposit.",
     },
     how: {
       title: "How it works",
@@ -514,8 +517,8 @@ const site = {
   useCases: {
     hero: {
       eyebrow: "Use cases",
-      title: "Where offline matters most.",
-      lead: "These are scenarios we are designing for. We are early, and we will name customers only when they agree to be named.",
+      title: "From the market|to the danfo.",
+      lead: "Wherever the signal drops, the sale still goes through.",
     },
     labels: { scenario: "Scenario", benefit: "What changes" },
     cases: [
@@ -566,8 +569,8 @@ const site = {
   coverage: {
     hero: {
       eyebrow: "Coverage",
-      title: "Fifteen countries configured. All at concept stage.",
-      lead: "Country Packs hold the rules of each market as data: currency, limits, KYC tiers, rails and data protection. This page is generated from those packs.",
+      title: "Fifteen markets.|One set of rules each.",
+      lead: "Currency, limits, KYC and rails per country, kept as data. All at concept stage.",
     },
     stats: { countries: "Countries", currencies: "Currencies", regions: "Regions", concept: "At concept status" },
     explorer: { all: "All", hint: "Choose a country or a region" },
@@ -612,8 +615,8 @@ const site = {
   developers: {
     hero: {
       eyebrow: "Developers",
-      title: "An API that stays out of your ledger's way.",
-      lead: "Issue allowances, sync payments and receive events. Your systems remain the source of truth for balances.",
+      title: "Two calls.|Offline payments live.",
+      lead: "Issue a vault, sync payments, listen for events. Your ledger stays in charge.",
     },
     steps: [
       { title: "Issue an allowance", body: "Your backend asks PayVault to sign an allowance for a user's device key, after you lock the funds in your ledger." },
@@ -647,8 +650,8 @@ const site = {
   security: {
     hero: {
       eyebrow: "Security",
-      title: "Honest about what offline can and cannot promise.",
-      lead: "The design goal is not perfect prevention. It is bounded loss, guaranteed detection and a clear path to recovery.",
+      title: "Double-spend happens.|We catch it.",
+      lead: "Bounded by limits, detected at settlement, recovered from the holder.",
     },
     custody: {
       title: "Non-custodial by design",
@@ -710,8 +713,8 @@ const site = {
   pricing: {
     hero: {
       eyebrow: "Pricing",
-      title: "Start free. Pay for what settles.",
-      lead: "We are early, so we price with partners, not from a public rate card. No numbers are published yet.",
+      title: "Start in the sandbox.|Pay as it settles.",
+      lead: "Priced with each partner during the pilot. No public rate card yet.",
     },
     model: {
       title: "How pricing is built",
@@ -766,8 +769,8 @@ const site = {
   about: {
     hero: {
       eyebrow: "About",
-      title: "Payments should not depend on a bar of signal.",
-      lead: "Payment infrastructure for unreliable networks. PayVault builds offline transaction infrastructure for Africa, sold as a service to licensed partners.",
+      title: "Built for places|the network forgets.",
+      lead: "Offline payment infrastructure for Africa, sold to licensed partners.",
     },
     mission: {
       title: "What we are building",
@@ -792,8 +795,8 @@ const site = {
   contact: {
     hero: {
       eyebrow: "Request a pilot",
-      title: "Tell us about your market.",
-      lead: "We are working with a small number of licensed partners. Share a few details and we will reply personally.",
+      title: "Let's talk about|your market.",
+      lead: "Share a few details. We reply to every pilot request personally.",
     },
     form: {
       name: "Full name",

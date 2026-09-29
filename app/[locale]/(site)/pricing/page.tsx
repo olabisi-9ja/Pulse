@@ -4,6 +4,7 @@ import { siteMetadata } from "@/components/site/meta";
 import { StackCards } from "@/components/site/StackCards";
 import { ButtonLink, Card, CtaBand, PageHero, Pill, Section, SectionHeading } from "@/components/site/ui";
 import { isLocale } from "@/lib/i18n";
+import { photos } from "@/lib/photos";
 import { getSiteMessages } from "@/messages/site";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/pricing">) {
@@ -18,7 +19,7 @@ export default async function PricingPage({ params }: PageProps<"/[locale]/prici
 
   return (
     <>
-      <PageHero eyebrow={p.hero.eyebrow} title={p.hero.title} lead={p.hero.lead} />
+      <PageHero title={p.hero.title} lead={p.hero.lead} photos={[photos.shop, photos.stall]} />
 
       <Section>
         <div className="grid gap-4 lg:grid-cols-3">

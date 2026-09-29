@@ -22,9 +22,9 @@ export function HeroShapes({ left, right }: { left: Photo | null; right: Photo |
       <Stadium photo={left} />
       <Asterisk className="hidden aspect-square w-full fill-[#bfe6d6] sm:block" />
       <Stadium photo={right} className="hidden sm:block" />
-      <div aria-hidden className="relative hidden h-full min-h-40 sm:block">
-        <span className="absolute inset-y-0 left-0 w-[200%] rounded-l-full bg-[#14365a]" />
-        <span className="absolute -top-10 left-1/3 h-16 w-[200%] rounded-l-full bg-[#2fb386]" />
+      {/* Navy half-stadium, exactly the photos' height, running off the right edge */}
+      <div aria-hidden className="relative hidden self-stretch sm:block">
+        <span className="absolute inset-y-0 left-0 w-[100vw] rounded-l-full bg-[#14365a]" />
       </div>
       <Asterisk className="w-20 fill-[#bfe6d6] sm:hidden" />
     </div>

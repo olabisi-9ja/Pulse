@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { listCountries } from "@payvault/countries";
 import { ContactForm } from "@/components/site/ContactForm";
 import { siteMetadata } from "@/components/site/meta";
-import { Container, Eyebrow, Watermark } from "@/components/site/ui";
+import { Container } from "@/components/site/ui";
 import { isLocale } from "@/lib/i18n";
 import { getSiteMessages } from "@/messages/site";
 
@@ -24,12 +24,14 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/conta
 
   return (
     <div className="relative overflow-hidden">
-      <Watermark className="-right-20 top-6 h-[30rem] w-[29rem]" />
       <Container className="relative grid gap-10 py-12 sm:py-20 lg:grid-cols-[1fr_1.3fr] lg:gap-16">
         <header>
-          <Eyebrow className="mb-5">{p.hero.eyebrow}</Eyebrow>
-          <h1 className="font-display text-4xl font-medium leading-[1.02] text-navy text-balance sm:text-5xl">
-            {p.hero.title}
+          <h1 className="font-display text-[clamp(2.5rem,6vw,4.5rem)] font-semibold leading-[0.95] tracking-[-0.045em] text-navy">
+            {p.hero.title.split("|").map((line, i) => (
+              <span key={line} className={`block ${i ? "text-green" : ""}`}>
+                {line}
+              </span>
+            ))}
           </h1>
           <p className="mt-6 text-base leading-relaxed text-muted sm:text-lg">{p.hero.lead}</p>
           <div className="mt-10">

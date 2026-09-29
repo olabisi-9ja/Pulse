@@ -5,6 +5,7 @@ import { TwoLayers } from "@/components/site/TwoLayers";
 import { siteMetadata } from "@/components/site/meta";
 import { ButtonLink, Card, CheckList, CtaBand, IconBadge, PageHero, Pill, Section, SectionHeading } from "@/components/site/ui";
 import { isLocale } from "@/lib/i18n";
+import { photos } from "@/lib/photos";
 import { getSiteMessages } from "@/messages/site";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/product">) {
@@ -21,7 +22,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
 
   return (
     <>
-      <PageHero eyebrow={p.hero.eyebrow} title={p.hero.title} lead={p.hero.lead}>
+      <PageHero title={p.hero.title} lead={p.hero.lead} photos={[photos.bank, photos.stall]}>
         <ButtonLink href={`/${locale}/app`} tone="secondary">
           {t.nav.openApp}
         </ButtonLink>

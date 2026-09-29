@@ -212,6 +212,7 @@ const site: SiteMessages = {
   twoLayers: {
     eyebrow: "Deux couches, une seule intégration",
     title: "La fiabilité d'abord. L'acceptation hors ligne garantie par-dessus.",
+    visual: { queued: "En file", available: "Disponible hors ligne", funded: "Votre argent", overdraft: "Découvert" },
     lead: "Une infrastructure de transactions hors ligne à risque maîtrisé et à rapprochement automatique. Commencez par la couche de fiabilité, puis ajoutez l'acceptation garantie là où elle est rentable.",
     reliability: {
       tag: "Couche A",
@@ -254,6 +255,8 @@ const site: SiteMessages = {
       stagePartnersTitle: "L'acceptation hors ligne, réglée dans votre propre grand livre.",
       stageCustomers: "Pour vos clients",
       stageCustomersTitle: "Un portefeuille qui paie sans réseau.",
+      floatTitle: "Paiement reçu",
+      floatMeta: "Hors ligne · Étal du marché",
     },
     numbers: {
       title: "Le hors-ligne en chiffres.",
@@ -356,8 +359,8 @@ const site: SiteMessages = {
   howItWorks: {
     hero: {
       eyebrow: "Comment ça marche",
-      title: "Coffre, signature, scan, vérification, synchro.",
-      lead: "L'utilisateur bloque une partie de son solde dans un Coffre hors ligne. Ensuite, les paiements sont signés sur le téléphone et vérifiés sur l'appareil du commerçant, sans réseau entre les deux.",
+      title: "Deux scans.|Zéro barre.",
+      lead: "Le téléphone du payeur signe. Celui du marchand vérifie. Le réseau suit plus tard.",
     },
     lifecycle: {
       title: "La vie d'une allocation",
@@ -421,8 +424,8 @@ const site: SiteMessages = {
   product: {
     hero: {
       eyebrow: "Produit",
-      title: "Tout ce qu'il faut à un partenaire pour proposer le paiement hors ligne.",
-      lead: "Un protocole et quatre interfaces, conçus pour que vos clients voient votre marque et que votre grand livre reste la référence.",
+      title: "Votre marque.|Nos rails hors ligne.",
+      lead: "Un portefeuille, une console, un SDK et une API qui tournent dans votre grand livre.",
     },
     surfaces: [
       {
@@ -465,8 +468,8 @@ const site: SiteMessages = {
   payLater: {
     hero: {
       eyebrow: "Découvert hors ligne",
-      title: "Le paiement différé qui fonctionne sans réseau.",
-      lead: "Certains clients sont un peu justes précisément quand le réseau est coupé. Votre partenaire peut accorder une petite ligne de crédit dans la même allocation, pour que la vente se fasse quand même.",
+      title: "Un peu juste à la caisse ?|Payez quand même.",
+      lead: "Un petit découvert dans le coffre, remboursé au prochain dépôt.",
     },
     how: {
       title: "Comment ça marche",
@@ -516,8 +519,8 @@ const site: SiteMessages = {
   useCases: {
     hero: {
       eyebrow: "Cas d'usage",
-      title: "Là où le hors ligne compte le plus.",
-      lead: "Ce sont des scénarios pour lesquels nous concevons le produit. Nous sommes au début, et nous ne nommerons des clients que s'ils l'acceptent.",
+      title: "Du marché|au danfo.",
+      lead: "Là où le réseau tombe, la vente passe quand même.",
     },
     labels: { scenario: "Scénario", benefit: "Ce qui change" },
     cases: [
@@ -568,8 +571,8 @@ const site: SiteMessages = {
   coverage: {
     hero: {
       eyebrow: "Couverture",
-      title: "Quinze pays configurés. Tous au stade concept.",
-      lead: "Les Country Packs décrivent les règles de chaque marché sous forme de données : devise, plafonds, niveaux KYC, rails et protection des données. Cette page est générée à partir de ces packs.",
+      title: "Quinze marchés.|Des règles pour chacun.",
+      lead: "Devise, plafonds, KYC et rails par pays, sous forme de données. Tous au stade concept.",
     },
     stats: { countries: "Pays", currencies: "Devises", regions: "Régions", concept: "Au stade concept" },
     explorer: { all: "Toutes", hint: "Choisissez un pays ou une région" },
@@ -614,8 +617,8 @@ const site: SiteMessages = {
   developers: {
     hero: {
       eyebrow: "Développeurs",
-      title: "Une API qui ne gêne pas votre grand livre.",
-      lead: "Émettez des allocations, synchronisez les paiements et recevez des événements. Vos systèmes restent la référence pour les soldes.",
+      title: "Deux appels.|Le hors ligne en production.",
+      lead: "Émettez un coffre, synchronisez, écoutez les événements. Votre grand livre garde la main.",
     },
     steps: [
       { title: "Émettre une allocation", body: "Votre backend demande à PayVault de signer une allocation pour la clé de l'appareil d'un utilisateur, après avoir bloqué les fonds dans votre grand livre." },
@@ -649,8 +652,8 @@ const site: SiteMessages = {
   security: {
     hero: {
       eyebrow: "Sécurité",
-      title: "Honnêtes sur ce que le hors ligne peut et ne peut pas promettre.",
-      lead: "L'objectif de conception n'est pas la prévention parfaite. C'est une perte bornée, une détection garantie et un chemin clair vers le recouvrement.",
+      title: "La double dépense existe.|Nous la détectons.",
+      lead: "Bornée par les plafonds, détectée au règlement, recouvrée auprès du titulaire.",
     },
     custody: {
       title: "Sans détention de fonds par conception",
@@ -712,8 +715,8 @@ const site: SiteMessages = {
   pricing: {
     hero: {
       eyebrow: "Tarifs",
-      title: "Démarrez gratuitement. Payez ce qui est réglé.",
-      lead: "Nous sommes au début : nous fixons les prix avec nos partenaires, pas à partir d'une grille publique. Aucun chiffre n'est encore publié.",
+      title: "Commencez en bac à sable.|Payez ce qui est réglé.",
+      lead: "Tarifs fixés avec chaque partenaire pendant le pilote. Pas encore de grille publique.",
     },
     model: {
       title: "Comment le prix se construit",
@@ -768,8 +771,8 @@ const site: SiteMessages = {
   about: {
     hero: {
       eyebrow: "À propos",
-      title: "Payer ne devrait pas dépendre d'une barre de réseau.",
-      lead: "L'infrastructure de paiement pour les réseaux instables. PayVault construit une infrastructure de transactions hors ligne pour l'Afrique, proposée en tant que service aux partenaires agréés.",
+      title: "Conçu pour les lieux|que le réseau oublie.",
+      lead: "Infrastructure de paiement hors ligne pour l'Afrique, vendue à des partenaires agréés.",
     },
     mission: {
       title: "Ce que nous construisons",
@@ -794,8 +797,8 @@ const site: SiteMessages = {
   contact: {
     hero: {
       eyebrow: "Demander un pilote",
-      title: "Parlez-nous de votre marché.",
-      lead: "Nous travaillons avec un petit nombre de partenaires agréés. Donnez-nous quelques informations et nous vous répondrons personnellement.",
+      title: "Parlons de|votre marché.",
+      lead: "Quelques informations suffisent. Nous répondons personnellement à chaque demande.",
     },
     form: {
       name: "Nom complet",

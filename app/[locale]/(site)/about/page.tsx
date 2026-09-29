@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { siteMetadata } from "@/components/site/meta";
 import { Card, CtaBand, PageHero, Section, SectionHeading } from "@/components/site/ui";
 import { isLocale } from "@/lib/i18n";
+import { photos } from "@/lib/photos";
 import { getSiteMessages } from "@/messages/site";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/about">) {
@@ -16,7 +17,7 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
 
   return (
     <>
-      <PageHero eyebrow={p.hero.eyebrow} title={p.hero.title} lead={p.hero.lead} />
+      <PageHero title={p.hero.title} lead={p.hero.lead} photos={[photos.school, photos.trader]} />
 
       <Section labelledBy="mission">
         <SectionHeading id="mission" title={p.mission.title} lead={p.mission.body} />

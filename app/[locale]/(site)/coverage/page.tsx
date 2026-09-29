@@ -4,6 +4,7 @@ import { CoverageExplorer, type ExplorerCountry } from "@/components/site/Covera
 import { siteMetadata } from "@/components/site/meta";
 import { CheckList, CtaBand, PageHero, Section, SectionHeading } from "@/components/site/ui";
 import { isLocale } from "@/lib/i18n";
+import { photos } from "@/lib/photos";
 import { getSiteMessages } from "@/messages/site";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/coverage">) {
@@ -44,7 +45,7 @@ export default async function CoveragePage({ params }: PageProps<"/[locale]/cove
 
   return (
     <>
-      <PageHero eyebrow={p.hero.eyebrow} title={p.hero.title} lead={p.hero.lead} />
+      <PageHero title={p.hero.title} lead={p.hero.lead} photos={[photos.agent, photos.shop]} />
 
       <Section labelledBy="explore">
         <h2 id="explore" className="sr-only">

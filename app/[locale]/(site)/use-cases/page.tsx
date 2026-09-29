@@ -22,7 +22,7 @@ export default async function UseCasesPage({ params }: PageProps<"/[locale]/use-
 
   return (
     <>
-      <PageHero eyebrow={p.hero.eyebrow} title={p.hero.title} lead={p.hero.lead} />
+      <PageHero title={p.hero.title} lead={p.hero.lead} photos={[photos.transit, photos.school]} />
       <Section>
         <ul className="space-y-20 sm:space-y-28">
           {p.cases.map((c, i) => (

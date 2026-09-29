@@ -68,6 +68,7 @@ const site: SiteMessages = {
     coverage: "Couverture",
     developers: "Développeurs",
     pricing: "Tarifs",
+    pilot: "Demander un pilote",
     openApp: "Ouvrir l'app",
     console: "Console partenaire",
     menu: "Menu",
@@ -249,6 +250,10 @@ const site: SiteMessages = {
       lead: "Des paiements et du paiement différé qui n'attendent pas le réseau. PayVault est une infrastructure de transactions hors ligne à risque maîtrisé et à rapprochement automatique, pour les PSP, les réseaux de TPE, les banques et les opérateurs de mobile money.",
       fine: "Proposé en tant que service aux partenaires agréés. PayVault n'est ni une banque ni un portefeuille et ne détient jamais les fonds des clients.",
       short: "Paiements hors ligne et paiement différé pour banques, PSP et mobile money. Réglés automatiquement au retour du réseau.",
+      stagePartners: "Pour les partenaires",
+      stagePartnersTitle: "L'acceptation hors ligne, réglée dans votre propre grand livre.",
+      stageCustomers: "Pour vos clients",
+      stageCustomersTitle: "Un portefeuille qui paie sans réseau.",
     },
     numbers: {
       title: "Le hors-ligne en chiffres.",

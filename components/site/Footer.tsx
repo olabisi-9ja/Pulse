@@ -39,7 +39,7 @@ export function Footer({ locale, t }: { locale: Locale; t: SiteMessages }) {
   ] as const;
 
   return (
-    <footer className="border-t border-line bg-card-2">
+    <footer className="pv-invert overflow-hidden">
       <Container className="py-12 sm:py-16">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_2fr]">
           <div>
@@ -79,6 +79,9 @@ export function Footer({ locale, t }: { locale: Locale; t: SiteMessages }) {
           <p>{f.status}</p>
         </div>
       </Container>
+      <p aria-hidden className="select-none whitespace-nowrap text-center font-display text-[21vw] font-medium leading-[0.78] tracking-[-0.06em] text-navy/10">
+        payvault
+      </p>
     </footer>
   );
 }

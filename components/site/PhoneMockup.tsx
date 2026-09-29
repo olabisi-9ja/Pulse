@@ -2,15 +2,15 @@ import { ArrowDownLeft, ArrowUpRight, BatteryFull, CircleUser, Eye, Home, LockKe
 import type { SiteMessages } from "@/messages/site";
 
 /**
- * Scaled replica of the wallet PWA's Home screen, built from the same tokens
+ * Scaled replica of the wallet PWA's Home screen at a real phone ratio (393 × 852), built from the same tokens
  * (`.pv-wallet`) and layout as components/wallet/HomeScreen.tsx. Sample data only.
  */
-export function PhoneMockup({ t, className = "" }: { t: SiteMessages["mock"]; className?: string }) {
+export function PhoneMockup({ t, className = "", bare = false }: { t: SiteMessages["mock"]; className?: string; bare?: boolean }) {
   const s = t.screen;
   return (
-    <figure className={`mx-auto w-full max-w-[20rem] ${className}`}>
+    <figure className={`mx-auto w-full ${bare ? "" : "max-w-[20rem]"} ${className}`}>
       <div className="rounded-[3rem] bg-[#0f1216] p-[0.6rem] shadow-[0_40px_80px_-30px_rgb(20_54_90/0.45)] ring-1 ring-black/5">
-        <div className="pv-wallet relative overflow-hidden rounded-[2.5rem]" aria-hidden>
+        <div className="pv-wallet relative aspect-[393/852] overflow-hidden rounded-[2.5rem]" aria-hidden>
           {/* Status bar */}
           <div className="relative flex items-center justify-between px-7 pt-3.5 pb-1 text-[0.72rem] font-semibold text-ink">
             <span className="tabular">9:41</span>
@@ -21,7 +21,7 @@ export function PhoneMockup({ t, className = "" }: { t: SiteMessages["mock"]; cl
             </span>
           </div>
 
-          <div className="space-y-5 px-4 pt-3 pb-24">
+          <div className="space-y-4 px-4 pt-3 pb-24">
             {/* Header */}
             <div className="flex items-center gap-2.5">
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand text-[0.72rem] font-medium text-white">{s.initials}</span>
@@ -113,7 +113,7 @@ export function PhoneMockup({ t, className = "" }: { t: SiteMessages["mock"]; cl
           </div>
         </div>
       </div>
-      <figcaption className="mt-4 text-center text-xs text-muted">{t.caption}</figcaption>
+      {!bare && <figcaption className="mt-4 text-center text-xs text-muted">{t.caption}</figcaption>}
     </figure>
   );
 }

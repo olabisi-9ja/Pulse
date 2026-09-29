@@ -5,11 +5,12 @@ import { FlowDiagram } from "@/components/site/FlowDiagram";
 import { Numbers } from "@/components/site/Numbers";
 import { PhotoOrVisual } from "@/components/site/PhotoOrVisual";
 import { TwoLayers } from "@/components/site/TwoLayers";
+import { HeroShapes } from "@/components/site/HeroShapes";
 import { PhoneMockup } from "@/components/site/PhoneMockup";
 import { Reveal } from "@/components/site/Reveal";
 import { siteMetadata } from "@/components/site/meta";
-import { ButtonLink, Card, Container, CtaBand, Eyebrow, HeadlinePill, Section, SectionHeading, Watermark } from "@/components/site/ui";
-import type { VignetteKind } from "@/components/site/Vignettes";
+import { ButtonLink, Card, Container, CtaBand, Section, SectionHeading } from "@/components/site/ui";
+import { Vignette, type VignetteKind } from "@/components/site/Vignettes";
 import { photos } from "@/lib/photos";
 import { isLocale } from "@/lib/i18n";
 import { getSiteMessages } from "@/messages/site";
@@ -31,34 +32,60 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   return (
     <>
       {/* Hero */}
-      <section className="pv-invert relative overflow-hidden">
-        <Watermark className="-left-24 top-4 h-[34rem] w-[33rem] opacity-[0.07] lg:left-[12%] lg:h-[46rem] lg:w-[44rem]" />
-        <Container className="relative grid items-center gap-14 pb-20 pt-14 sm:pt-20 lg:grid-cols-[1.3fr_1fr] lg:gap-10 lg:pb-28 lg:pt-24">
-          <div>
-            <Reveal onMount>
-              <Eyebrow className="mb-8">{h.hero.eyebrow}</Eyebrow>
-              <h1 className="font-display text-[clamp(3.25rem,10vw,7.25rem)] font-medium leading-[0.92] text-navy">
-                {h.hero.line1}
-                <span className="block whitespace-nowrap text-green">
-                  <HeadlinePill className="ml-0 mr-[0.2em]" />
-                  {h.hero.line2}
-                </span>
-              </h1>
-            </Reveal>
-            <Reveal onMount delay={0.1}>
-              <p className="mt-8 max-w-md text-base leading-relaxed text-muted sm:text-lg">{h.hero.short}</p>
-              <div className="mt-10 flex flex-wrap gap-3">
-                <ButtonLink href={`/${locale}/contact`} arrow>
-                  {t.common.requestPilot}
-                </ButtonLink>
-                <ButtonLink href={`/${locale}/how-it-works`} tone="secondary">
-                  {t.common.seeHow}
-                </ButtonLink>
+      <section className="relative overflow-hidden bg-paper">
+        <Container className="pt-12 sm:pt-16">
+          <Reveal onMount>
+            <h1 className="font-display text-[clamp(3.25rem,10vw,7.5rem)] font-semibold leading-[0.9] tracking-[-0.045em] text-navy">
+              <span className="block">{h.hero.line1}</span>
+              <span className="block text-green">{h.hero.line2}</span>
+            </h1>
+          </Reveal>
+          <Reveal onMount delay={0.1}>
+            <p className="mt-7 max-w-md text-base leading-relaxed text-muted sm:text-lg">{h.hero.short}</p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <ButtonLink href={`/${locale}/contact`} arrow>
+                {t.common.requestPilot}
+              </ButtonLink>
+              <ButtonLink href={`/${locale}/how-it-works`} tone="secondary">
+                {t.common.seeHow}
+              </ButtonLink>
+            </div>
+          </Reveal>
+          <Reveal onMount delay={0.15}>
+            <HeroShapes left={photos.trader} right={photos.agent} />
+          </Reveal>
+        </Container>
+        {/* Arc into the navy stage below */}
+        <div aria-hidden className="pv-invert mx-auto mt-16 h-20 w-[160%] -translate-x-[18.75%] rounded-t-[100%] bg-paper sm:h-28" />
+      </section>
+
+      <section className="pv-invert relative -mt-px">
+        {/* Stage: one card per audience, like a product shelf */}
+        <Container className="relative pb-16 pt-2 sm:pb-24">
+          <Reveal onMount delay={0.2} className="grid gap-4 lg:grid-cols-12">
+            <article className="relative flex min-h-[26rem] flex-col justify-between overflow-hidden rounded-[2rem] rounded-br-[6rem] bg-[#046b4f] p-7 text-white sm:p-10 lg:col-span-7">
+              <div>
+                <span className="inline-flex rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-medium">{h.hero.stagePartners}</span>
+                <h2 className="mt-5 max-w-sm font-display text-3xl font-medium leading-[1.05] sm:text-4xl">{h.hero.stagePartnersTitle}</h2>
               </div>
-            </Reveal>
-          </div>
-          <Reveal onMount delay={0.2}>
-            <PhoneMockup t={t.mock} />
+              <div aria-hidden className="mt-8 flex items-end justify-end gap-4">
+                <div className="w-[16rem] shrink-0">
+                  <Vignette kind="platform" />
+                </div>
+                <div className="hidden w-[16rem] shrink-0 xl:block">
+                  <Vignette kind="sync" />
+                </div>
+              </div>
+            </article>
+            <article className="relative flex min-h-[26rem] flex-col overflow-hidden rounded-[2rem] rounded-br-[6rem] bg-[#e8eef5] p-7 text-[#0b1726] sm:p-10 lg:col-span-5">
+              <span className="inline-flex w-fit rounded-full bg-[#14365a]/10 px-3.5 py-1.5 text-xs font-medium">{h.hero.stageCustomers}</span>
+              <h2 className="mt-5 max-w-xs font-display text-3xl font-medium leading-[1.05] sm:text-4xl">{h.hero.stageCustomersTitle}</h2>
+              <div aria-hidden className="pointer-events-none mt-8 flex flex-1 items-end justify-center">
+                <div className="w-[17.5rem]">
+                  <PhoneMockup t={t.mock} bare />
+                </div>
+              </div>
+            </article>
           </Reveal>
         </Container>
       </section>
@@ -116,7 +143,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               </ButtonLink>
             </div>
           </div>
-          <PhotoOrVisual photo={photos.trader} visual="extend" className="aspect-[4/5]" />
+          <PhotoOrVisual photo={photos.stall} visual="extend" className="aspect-[4/5]" />
         </div>
       </Section>
 

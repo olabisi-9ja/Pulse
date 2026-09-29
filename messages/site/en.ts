@@ -125,6 +125,27 @@ const site = {
     overdraftAmount: "4,000",
     caption: "Illustrative screen. Amounts are sample data.",
     scanToPay: "Scan to pay",
+    screen: {
+      initials: "AK",
+      hello: "Hello, Aminata",
+      balance: "Your balance",
+      balanceAmount: "XOF 42,500",
+      topUp: "Top up",
+      request: "Request",
+      pay: "Pay",
+      vault: "Offline Vault",
+      vaultAmount: "XOF 18,000",
+      ready: "Ready offline",
+      expires: "Expires Oct 2",
+      activity: "Recent activity",
+      seeAll: "See all",
+      rows: [
+        { title: "Paid Market stall", date: "Today, 09:12", amount: "−XOF 1,500", incoming: false, pending: "Pending" },
+        { title: "From Kofi", date: "Today, 08:05", amount: "+XOF 5,000", incoming: true, pending: "" },
+        { title: "Paid Pharmacy", date: "Yesterday", amount: "−XOF 3,200", incoming: false, pending: "" },
+      ],
+      home: "Home",
+    },
   },
 
   flow: {

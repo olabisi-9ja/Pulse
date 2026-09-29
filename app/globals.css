@@ -150,7 +150,6 @@ body {
   --pv-shadow: 0 12px 32px -12px rgb(0 0 0 / 0.22);
   background: var(--pv-paper);
   color: var(--pv-ink);
-  min-height: 100dvh;
 }
 
 @media (prefers-color-scheme: dark) {

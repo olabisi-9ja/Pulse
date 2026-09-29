@@ -1,6 +1,7 @@
 import { Gauge, Scale, ShieldCheck, UserCheck } from "lucide-react";
 import { notFound } from "next/navigation";
 import { siteMetadata } from "@/components/site/meta";
+import { StackCards } from "@/components/site/StackCards";
 import { ButtonLink, Card, CheckList, CtaBand, IconBadge, PageHero, Section, SectionHeading } from "@/components/site/ui";
 import { isLocale } from "@/lib/i18n";
 import { getSiteMessages } from "@/messages/site";
@@ -27,19 +28,9 @@ export default async function PayLaterPage({ params }: PageProps<"/[locale]/pay-
 
       <Section labelledBy="how">
         <SectionHeading id="how" title={p.how.title} />
-        <ol className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {p.how.steps.map((s, i) => (
-            <li key={s.title}>
-              <Card className="h-full">
-                <span className="tabular flex h-11 w-11 items-center justify-center rounded-full bg-green font-display text-lg font-black text-on-accent" aria-hidden>
-                  {i + 1}
-                </span>
-                <h3 className="mt-4 font-display text-xl font-extrabold text-navy">{s.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{s.body}</p>
-              </Card>
-            </li>
-          ))}
-        </ol>
+        <StackCards
+          items={p.how.steps.map((s, i) => ({ title: s.title, body: s.body, visual: (["extend", "sign", "loan", "repay"] as const)[i] ?? "loan" }))}
+        />
       </Section>
 
       <Section tone="card" labelledBy="example">

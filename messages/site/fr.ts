@@ -127,6 +127,27 @@ const site: SiteMessages = {
     overdraftAmount: "4 000",
     caption: "Écran d'illustration. Les montants sont fictifs.",
     scanToPay: "Scanner pour payer",
+    screen: {
+      initials: "AK",
+      hello: "Bonjour, Aminata",
+      balance: "Votre solde",
+      balanceAmount: "42 500 XOF",
+      topUp: "Recharger",
+      request: "Demander",
+      pay: "Payer",
+      vault: "Coffre hors ligne",
+      vaultAmount: "18 000 XOF",
+      ready: "Prêt hors ligne",
+      expires: "Expire le 2 oct.",
+      activity: "Activité récente",
+      seeAll: "Tout voir",
+      rows: [
+        { title: "Payé Étal du marché", date: "Aujourd'hui, 09:12", amount: "−1 500 XOF", incoming: false, pending: "En attente" },
+        { title: "De Kofi", date: "Aujourd'hui, 08:05", amount: "+5 000 XOF", incoming: true, pending: "" },
+        { title: "Payé Pharmacie", date: "Hier", amount: "−3 200 XOF", incoming: false, pending: "" },
+      ],
+      home: "Accueil",
+    },
   },
 
   flow: {

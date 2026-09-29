@@ -22,7 +22,7 @@ export default async function AppPage({ params }: PageProps<"/[locale]/app">) {
   if (!isLocale(locale)) notFound();
   return (
     <I18nProvider locale={locale}>
-      <div className="pv-wallet">
+      <div className="pv-wallet min-h-dvh">
         <WalletApp />
       </div>
     </I18nProvider>

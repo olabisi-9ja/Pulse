@@ -13,7 +13,7 @@ export default async function SignInPage({ params, searchParams }: PageProps<"/[
   const target = typeof next === "string" && next.startsWith("/") && !next.startsWith("//") ? next : `/${locale}/app`;
   return (
     <I18nProvider locale={locale}>
-      <div className="pv-wallet">
+      <div className="pv-wallet min-h-dvh">
         <SignIn next={target} />
       </div>
     </I18nProvider>

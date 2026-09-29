@@ -1,6 +1,7 @@
 import { Check } from "lucide-react";
 import { notFound } from "next/navigation";
 import { siteMetadata } from "@/components/site/meta";
+import { StackCards } from "@/components/site/StackCards";
 import { ButtonLink, Card, CtaBand, PageHero, Pill, Section, SectionHeading } from "@/components/site/ui";
 import { isLocale } from "@/lib/i18n";
 import { getSiteMessages } from "@/messages/site";
@@ -58,19 +59,13 @@ export default async function PricingPage({ params }: PageProps<"/[locale]/prici
 
       <Section tone="card" labelledBy="model">
         <SectionHeading id="model" title={p.model.title} lead={p.model.lead} />
-        <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {p.model.items.map((it, i) => (
-            <li key={it.title}>
-              <Card className="h-full">
-                <span className="tabular font-display text-3xl font-black text-line" aria-hidden>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="mt-2 font-display text-lg font-bold text-navy">{it.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{it.body}</p>
-              </Card>
-            </li>
-          ))}
-        </ol>
+        <StackCards
+          items={p.model.items.map((it, i) => ({
+            title: it.title,
+            body: it.body,
+            visual: (["integrate", "platform", "usage", "support"] as const)[i] ?? "platform",
+          }))}
+        />
       </Section>
 
       <Section labelledBy="faq">

@@ -13,16 +13,16 @@ export function Button({
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; loading?: boolean }) {
   const styles: Record<Variant, string> = {
-    primary: "bg-green text-on-accent hover:bg-green-strong",
-    secondary: "bg-card text-ink border border-line hover:bg-card-2",
-    ghost: "text-ink hover:bg-card-2",
+    primary: "bg-ink text-paper hover:opacity-90",
+    secondary: "bg-card text-ink hover:bg-line",
+    ghost: "text-ink hover:bg-card",
     danger: "bg-danger-soft text-danger hover:opacity-90",
   };
   return (
     <button
       {...rest}
       disabled={rest.disabled || loading}
-      className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-5 text-[15px] font-semibold transition disabled:opacity-50 ${styles[variant]} ${className}`}
+      className={`inline-flex min-h-14 items-center justify-center gap-2 rounded-full px-6 text-[15px] font-medium transition active:scale-[0.98] disabled:opacity-40 ${styles[variant]} ${className}`}
     >
       {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
       {children}
@@ -40,7 +40,7 @@ export function Field({
   const id = useId();
   return (
     <div className={className}>
-      <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-ink">
+      <label htmlFor={id} className="mb-2 block text-sm text-muted">
         {label}
       </label>
       <input
@@ -48,10 +48,10 @@ export function Field({
         {...rest}
         aria-invalid={!!error}
         aria-describedby={hint || error ? `${id}-d` : undefined}
-        className="h-12 w-full rounded-2xl border border-line bg-card px-4 text-base text-ink outline-none placeholder:text-muted focus:border-green"
+        className="h-14 w-full rounded-full border border-line bg-paper px-5 text-base text-ink outline-none placeholder:text-muted focus:border-ink"
       />
       {(hint || error) && (
-        <p id={`${id}-d`} className={`mt-1.5 text-sm ${error ? "text-danger" : "text-muted"}`}>
+        <p id={`${id}-d`} className={`mt-2 px-1 text-[13px] ${error ? "text-danger" : "text-muted"}`}>
           {error || hint}
         </p>
       )}
@@ -68,23 +68,23 @@ export function Select({
   const id = useId();
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-ink">
+      <label htmlFor={id} className="mb-2 block text-sm text-muted">
         {label}
       </label>
       <select
         id={id}
         {...rest}
-        className="h-12 w-full appearance-none rounded-2xl border border-line bg-card px-4 text-base text-ink outline-none focus:border-green"
+        className="h-14 w-full appearance-none rounded-full border border-line bg-paper px-5 text-base text-ink outline-none focus:border-ink"
       >
         {children}
       </select>
-      {hint && <p className="mt-1.5 text-sm text-muted">{hint}</p>}
+      {hint && <p className="mt-2 px-1 text-[13px] text-muted">{hint}</p>}
     </div>
   );
 }
 
 export function Card({ className = "", children }: { className?: string; children: ReactNode }) {
-  return <div className={`rounded-[28px] border border-line bg-card p-5 ${className}`}>{children}</div>;
+  return <div className={`rounded-[26px] bg-card p-5 ${className}`}>{children}</div>;
 }
 
 export function Notice({ tone = "info", children }: { tone?: "info" | "warn" | "danger" | "success"; children: ReactNode }) {
@@ -140,7 +140,7 @@ export function Sheet({
             aria-modal="true"
             aria-label={title}
             tabIndex={-1}
-            className="relative max-h-[92dvh] w-full overflow-y-auto rounded-t-[32px] bg-paper px-5 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))] outline-none sm:max-w-md sm:rounded-[32px]"
+            className="relative max-h-[92dvh] w-full overflow-y-auto rounded-t-[32px] bg-paper shadow-[var(--pv-shadow)] px-5 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))] outline-none sm:max-w-md sm:rounded-[32px]"
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}
@@ -148,11 +148,11 @@ export function Sheet({
           >
             <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-line sm:hidden" aria-hidden />
             <div className="mb-4 flex items-center justify-between gap-4">
-              <h2 className="font-display text-xl font-bold text-ink">{title}</h2>
+              <h2 className="text-lg font-medium text-ink">{title}</h2>
               <button
                 onClick={onClose}
                 aria-label="Close"
-                className="grid h-10 w-10 place-items-center rounded-full bg-card text-ink"
+                className="grid h-11 w-11 place-items-center rounded-full bg-card text-ink"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -180,7 +180,7 @@ export function Toast({ message, onDone }: { message: string | null; onDone: () 
       {message && (
         <motion.div
           role="status"
-          className="fixed inset-x-4 top-[max(1rem,env(safe-area-inset-top))] z-[60] mx-auto max-w-sm rounded-2xl bg-ink px-4 py-3 text-center text-sm font-medium text-paper shadow-lg"
+          className="fixed inset-x-4 top-[max(1rem,env(safe-area-inset-top))] z-[60] mx-auto max-w-sm rounded-full bg-ink px-5 py-3 text-center text-sm font-medium text-paper shadow-[var(--pv-shadow)]"
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -20, opacity: 0 }}
@@ -189,5 +189,30 @@ export function Toast({ message, onDone }: { message: string | null; onDone: () 
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+/** Small status pill, like "In transit" in a tracking app. */
+export function StatusPill({ tone = "info", children }: { tone?: "info" | "success" | "danger" | "muted"; children: ReactNode }) {
+  const tones = {
+    info: "bg-navy-soft text-navy",
+    success: "bg-green-soft text-green",
+    danger: "bg-danger-soft text-danger",
+    muted: "bg-paper text-muted",
+  };
+  return <span className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium ${tones[tone]}`}>{children}</span>;
+}
+
+/** Section title row with an optional "See all" action. */
+export function SectionHead({ title, action }: { title: string; action?: { label: string; onClick: () => void } }) {
+  return (
+    <div className="flex items-center justify-between">
+      <h2 className="text-[17px] font-medium text-ink">{title}</h2>
+      {action && (
+        <button onClick={action.onClick} className="text-sm text-ink">
+          {action.label}
+        </button>
+      )}
+    </div>
   );
 }

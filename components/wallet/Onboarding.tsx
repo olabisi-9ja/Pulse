@@ -31,7 +31,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
   return (
     <form onSubmit={submit} className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-center gap-5 px-4 py-10">
       <LogoMark className="h-12 w-12" />
-      <h1 className="font-display text-3xl font-extrabold tracking-tight text-navy">{m.onboarding.title}</h1>
+      <h1 className="text-[26px] font-medium tracking-tight text-ink">{m.onboarding.title}</h1>
       <Field label={m.onboarding.name} required autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
       <Select label={m.onboarding.country} hint={m.onboarding.countryHint} value={country} onChange={(e) => setCountry(e.target.value)}>
         {sorted.map((p) => (

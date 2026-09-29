@@ -120,3 +120,67 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Wallet: monochrome surfaces, black primary, soft grey cards, blue status pills. Scoped so the site keeps its palette. */
+.pv-wallet {
+  --pv-paper: #ffffff;
+  --pv-card: #f4f4f5;
+  --pv-card-2: #ffffff;
+  --pv-ink: #0b0b0c;
+  --pv-muted: #8a8d93;
+  --pv-line: #e9e9ec;
+  --pv-navy: #2f6fdb;
+  --pv-navy-soft: #e6eefc;
+  --pv-green: #1f9d57;
+  --pv-green-strong: #188048;
+  --pv-green-soft: #e3f5ea;
+  --pv-danger: #e03a2f;
+  --pv-danger-soft: #fdecea;
+  --pv-on-accent: #ffffff;
+  --pv-shadow: 0 12px 32px -12px rgb(0 0 0 / 0.22);
+  background: var(--pv-paper);
+  color: var(--pv-ink);
+  min-height: 100dvh;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .pv-wallet {
+    --pv-paper: #0b0b0c;
+    --pv-card: #18181b;
+    --pv-card-2: #232327;
+    --pv-ink: #f5f5f6;
+    --pv-muted: #8f9299;
+    --pv-line: #2a2a2e;
+    --pv-navy: #8db4f5;
+    --pv-navy-soft: #1a2638;
+    --pv-green: #4cc98a;
+    --pv-green-strong: #6bd6a0;
+    --pv-green-soft: #14281d;
+    --pv-danger: #f47b70;
+    --pv-danger-soft: #34171a;
+    --pv-on-accent: #0b0b0c;
+    --pv-shadow: 0 12px 32px -12px rgb(0 0 0 / 0.7);
+  }
+}
+
+:root[data-theme="dark"] .pv-wallet {
+  --pv-paper: #0b0b0c;
+  --pv-card: #18181b;
+  --pv-card-2: #232327;
+  --pv-ink: #f5f5f6;
+  --pv-muted: #8f9299;
+  --pv-line: #2a2a2e;
+  --pv-navy: #8db4f5;
+  --pv-navy-soft: #1a2638;
+  --pv-green: #4cc98a;
+  --pv-green-strong: #6bd6a0;
+  --pv-green-soft: #14281d;
+  --pv-danger: #f47b70;
+  --pv-danger-soft: #34171a;
+  --pv-on-accent: #0b0b0c;
+  --pv-shadow: 0 12px 32px -12px rgb(0 0 0 / 0.7);
+}
+
+.pv-wallet :focus-visible {
+  outline-color: var(--pv-ink);
+}

@@ -1,11 +1,11 @@
 "use client";
-import { Download, KeyRound, LogOut, RefreshCw, Store } from "lucide-react";
+import { Download, KeyRound, LogOut, Store } from "lucide-react";
 import { useEffect, useState } from "react";
 import { api, ApiError, NetworkError } from "@/lib/client/api";
 import { money, parseMajor } from "@/lib/client/money";
 import { useApp } from "@/lib/client/store";
 import { useI18n } from "./I18n";
-import { ConnectivityPill, TxRow, useRows } from "./parts";
+import { TxRow, useRows } from "./parts";
 import { Button, Card, Field, Notice, Sheet } from "./ui";
 
 export function ActivityScreen() {
@@ -15,10 +15,7 @@ export function ActivityScreen() {
   const pending = useApp((s) => s.outbox.filter((i) => i.status === "pending").length);
   return (
     <div className="px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-6">
-      <h1 className="font-display text-3xl font-bold tracking-tight text-ink">{m.activity.title}</h1>
-      <div className="mt-3">
-        <ConnectivityPill />
-      </div>
+      <h1 className="text-[22px] font-medium tracking-tight text-ink">{m.activity.title}</h1>
       {pending > 0 && (
         <div className="mt-4">
           <Notice>
@@ -34,13 +31,13 @@ export function ActivityScreen() {
             role="tab"
             aria-selected={filter === f}
             onClick={() => setFilter(f)}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${filter === f ? "bg-ink text-paper" : "bg-card text-muted"}`}
+            className={`h-11 rounded-full px-5 text-sm font-medium ${filter === f ? "bg-ink text-paper" : "bg-card text-muted"}`}
           >
             {m.activity[f]}
           </button>
         ))}
       </div>
-      <Card className="mt-4 py-1">
+      <Card className="mt-4 px-4 py-1">
         {rows.length ? (
           <ul className="divide-y divide-line">
             {rows.map((r) => (
@@ -114,14 +111,14 @@ export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSi
 
   return (
     <div className="space-y-4 px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-6">
-      <h1 className="font-display text-3xl font-bold tracking-tight text-ink">{m.profile.title}</h1>
+      <h1 className="text-[22px] font-medium tracking-tight text-ink">{m.profile.title}</h1>
       <Card className="divide-y divide-line py-1">
         {row(m.profile.email, <span className="break-all">{u.email}</span>)}
         {row(m.profile.country, `${u.country} · ${u.currency}`)}
         {row(m.profile.verification, m.vault.tier[u.kycTier])}
         {row(
           m.profile.merchantMode,
-          <button onClick={() => setMerchantOpen(true)} className="inline-flex items-center gap-1.5 text-green">
+          <button onClick={() => setMerchantOpen(true)} className="inline-flex items-center gap-1.5 text-ink underline-offset-4 hover:underline">
             <Store className="h-4 w-4" />
             {u.merchant ? t(m.profile.merchantOn, { name: u.merchant.name }) : m.profile.merchantOff}
           </button>,
@@ -139,7 +136,7 @@ export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSi
                 key={l}
                 onClick={() => void switchLocale(l)}
                 aria-pressed={locale === l}
-                className={`rounded-full px-4 py-2 text-sm font-semibold ${locale === l ? "bg-ink text-paper" : "bg-card-2 text-ink"}`}
+                className={`h-11 rounded-full px-5 text-sm font-medium ${locale === l ? "bg-ink text-paper" : "bg-card-2 text-ink"}`}
               >
                 {l === "en" ? "English" : "Français"}
               </button>
@@ -154,7 +151,7 @@ export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSi
                 key={v}
                 onClick={() => applyTheme(v)}
                 aria-pressed={theme === v}
-                className={`rounded-full px-4 py-2 text-sm font-semibold ${theme === v ? "bg-ink text-paper" : "bg-card-2 text-ink"}`}
+                className={`h-11 rounded-full px-5 text-sm font-medium ${theme === v ? "bg-ink text-paper" : "bg-card-2 text-ink"}`}
               >
                 {m.profile.theme[v]}
               </button>
@@ -165,16 +162,12 @@ export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSi
 
       <Card className="space-y-3">
         <div className="flex items-start gap-3">
-          <KeyRound className="mt-0.5 h-5 w-5 text-green" />
+          <KeyRound className="mt-0.5 h-5 w-5 text-ink" />
           <div>
             <p className="font-medium text-ink">{m.profile.device}</p>
             <p className="text-sm text-muted">{m.profile.deviceHint}</p>
           </div>
         </div>
-        <ConnectivityPill />
-        <Button variant="secondary" className="w-full" onClick={() => void useApp.getState().sync("manual")}>
-          <RefreshCw className="h-4 w-4" /> {m.profile.syncNow}
-        </Button>
         {install && (
           <Button variant="secondary" className="w-full" onClick={() => void install.prompt()}>
             <Download className="h-4 w-4" /> {m.profile.install}
@@ -262,14 +255,14 @@ export function AddSheet({ open, onClose, toast, onLoadVault }: { open: boolean;
           {snapshot.partner.sandbox && (
             <button
               onClick={() => setMode("topup")}
-              className={`rounded-full px-4 py-2 text-sm font-semibold ${mode === "topup" ? "bg-ink text-paper" : "bg-card text-ink"}`}
+              className={`h-11 rounded-full px-5 text-sm font-medium ${mode === "topup" ? "bg-ink text-paper" : "bg-card text-ink"}`}
             >
               {m.add.topUp}
             </button>
           )}
           <button
             onClick={() => setMode("send")}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${mode === "send" ? "bg-ink text-paper" : "bg-card text-ink"}`}
+            className={`h-11 rounded-full px-5 text-sm font-medium ${mode === "send" ? "bg-ink text-paper" : "bg-card text-ink"}`}
           >
             {m.add.send}
           </button>

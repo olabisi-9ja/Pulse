@@ -121,7 +121,7 @@ export function RequestSheet({ open, onClose }: { open: boolean; onClose: () => 
 
       {step.s === "show" && (
         <div className="space-y-5 text-center">
-          <p className="font-display text-3xl font-extrabold tabular text-navy">
+          <p className="text-[34px] leading-none font-medium tracking-tight tabular text-ink">
             {money(step.open.amount, step.open.currency, locale)}
           </p>
           <QrCode text={step.open.qr} label={m.request.showHint} />
@@ -156,8 +156,8 @@ export function RequestSheet({ open, onClose }: { open: boolean; onClose: () => 
         <div className="space-y-5 text-center">
           <CheckCircle2 className="mx-auto h-16 w-16 text-green" />
           <div>
-            <p className="font-display text-2xl font-bold text-ink">{m.request.accepted}</p>
-            <p className="mt-1 font-display text-3xl font-extrabold tabular text-navy">{money(step.amount, step.currency, locale)}</p>
+            <p className="text-xl font-medium text-ink">{m.request.accepted}</p>
+            <p className="mt-1 text-[34px] leading-none font-medium tracking-tight tabular text-ink">{money(step.amount, step.currency, locale)}</p>
           </div>
           <Notice tone="success">{m.request.acceptedHint}</Notice>
           {step.creditDrawn > 0 && <Notice>{t(m.request.withOverdraft, { amount: money(step.creditDrawn, step.currency, locale) })}</Notice>}
@@ -176,7 +176,7 @@ export function RequestSheet({ open, onClose }: { open: boolean; onClose: () => 
       {step.s === "rejected" && (
         <div className="space-y-5 text-center">
           <ShieldAlert className="mx-auto h-16 w-16 text-danger" />
-          <p className="font-display text-2xl font-bold text-ink">{m.request.rejected}</p>
+          <p className="text-xl font-medium text-ink">{m.request.rejected}</p>
           <Notice tone="danger">{reasons[step.code] ?? m.common.genericError}</Notice>
           <Button
             className="w-full"

@@ -8,7 +8,7 @@ import { checkPin, getDeviceKey } from "@/lib/client/security";
 import { useApp } from "@/lib/client/store";
 import { useI18n } from "./I18n";
 import { PinPad } from "./PinPad";
-import { Button, Card, Field, Notice, Select, Sheet } from "./ui";
+import { Button, Card, Field, Notice, Select, Sheet, StatusPill } from "./ui";
 
 export function VaultScreen({ toast }: { toast: (s: string) => void }) {
   const { m, t, locale } = useI18n();
@@ -53,18 +53,18 @@ export function VaultScreen({ toast }: { toast: (s: string) => void }) {
   return (
     <div className="space-y-4 px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-6">
       <header>
-        <h1 className="font-display text-3xl font-bold tracking-tight text-ink">{m.vault.title}</h1>
+        <h1 className="text-[22px] font-medium tracking-tight text-ink">{m.vault.title}</h1>
         <p className="mt-1 text-muted">{m.vault.subtitle}</p>
       </header>
 
       {vault ? (
-        <Card className="bg-navy text-paper dark:bg-navy-soft dark:text-ink">
+        <Card className="rounded-[28px] bg-ink text-paper">
           <p className="text-sm opacity-70">{m.vault.remaining}</p>
-          <p className="mt-1 font-display text-4xl font-bold tabular">{f(vault.remaining)}</p>
-          <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-white/15" aria-hidden>
+          <p className="tabular mt-2 text-[34px] leading-none font-medium tracking-tight">{f(vault.remaining)}</p>
+          <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-paper/20" aria-hidden>
             <div className="flex h-full">
-              <span className="bg-[#2fb386]" style={{ width: `${(vault.fundedRemaining / vault.cap) * 100}%` }} />
-              <span className="bg-[#e7b35a]" style={{ width: `${(vault.creditRemaining / vault.cap) * 100}%` }} />
+              <span className="bg-paper" style={{ width: `${(vault.fundedRemaining / vault.cap) * 100}%` }} />
+              <span className="bg-paper/50" style={{ width: `${(vault.creditRemaining / vault.cap) * 100}%` }} />
             </div>
           </div>
           <dl className="mt-4 grid grid-cols-3 gap-2 text-sm">
@@ -75,7 +75,7 @@ export function VaultScreen({ toast }: { toast: (s: string) => void }) {
           <p className="mt-4 text-xs opacity-70">
             {t(m.vault.payments, { n: vaultState?.seq ?? 0 })} · {t(m.vault.expires, { date: shortDate(vault.expiresAt, locale) })}
           </p>
-          <Button variant="secondary" className="mt-5 w-full" onClick={() => setPinFor("cashout")}>
+          <Button variant="secondary" className="mt-6 w-full bg-paper text-ink hover:bg-paper" onClick={() => setPinFor("cashout")}>
             <LogOut className="h-4 w-4" /> {m.vault.cashOut}
           </Button>
           <p className="mt-2 text-center text-xs opacity-70">{m.vault.cashOutHint}</p>
@@ -100,7 +100,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <dt className="text-xs opacity-70">{label}</dt>
-      <dd className="tabular font-semibold">{value}</dd>
+      <dd className="tabular mt-0.5 font-medium">{value}</dd>
     </div>
   );
 }
@@ -146,7 +146,7 @@ function LoadVault({ toast }: { toast: (s: string) => void }) {
     <Card>
       <form onSubmit={load} className="space-y-4">
         <div>
-          <h2 className="font-display text-xl font-bold text-ink">{m.vault.loadTitle}</h2>
+          <h2 className="text-[17px] font-medium text-ink">{m.vault.loadTitle}</h2>
           <p className="mt-1 text-sm text-muted">{m.vault.loadHint}</p>
         </div>
         <Field
@@ -160,12 +160,12 @@ function LoadVault({ toast }: { toast: (s: string) => void }) {
           error={funded > maxFunded ? m.pay.errors.over_cap : null}
         />
         {creditAvail > 0 ? (
-          <label className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-card-2 px-4 py-3">
+          <label className="flex items-center justify-between gap-3 rounded-[20px] bg-card-2 px-4 py-3.5">
             <span>
               <span className="block font-medium text-ink">{m.vault.addOverdraft}</span>
               <span className="text-sm text-muted">{t(m.vault.overdraftAvailable, { amount: money(creditAvail, cur, locale) })}</span>
             </span>
-            <input type="checkbox" className="h-6 w-6 accent-[var(--pv-green)]" checked={credit} onChange={(e) => setCredit(e.target.checked)} />
+            <input type="checkbox" className="h-6 w-6 accent-[var(--pv-ink)]" checked={credit} onChange={(e) => setCredit(e.target.checked)} />
           </label>
         ) : (
           <p className="text-sm text-muted">{unavailable[snapshot.credit.reason] ?? unavailable.ok}</p>
@@ -201,22 +201,22 @@ function CreditCardPanel() {
   return (
     <Card>
       <div className="flex items-center gap-2">
-        <CreditCard className="h-5 w-5 text-green" />
-        <h2 className="font-display text-xl font-bold text-ink">{m.vault.credit}</h2>
+        <CreditCard className="h-5 w-5 text-ink" />
+        <h2 className="text-[17px] font-medium text-ink">{m.vault.credit}</h2>
       </div>
       <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-        <div className="rounded-2xl bg-card-2 p-3">
+        <div className="rounded-[20px] bg-card-2 p-4">
           <dt className="text-muted">{m.vault.creditLimit}</dt>
-          <dd className="tabular text-lg font-semibold text-ink">{f(snapshot.credit.limit)}</dd>
+          <dd className="tabular mt-1 text-lg font-medium text-ink">{f(snapshot.credit.limit)}</dd>
         </div>
-        <div className="rounded-2xl bg-card-2 p-3">
+        <div className="rounded-[20px] bg-card-2 p-4">
           <dt className="text-muted">{m.vault.creditOutstanding}</dt>
-          <dd className="tabular text-lg font-semibold text-ink">{f(snapshot.credit.outstanding)}</dd>
+          <dd className="tabular mt-1 text-lg font-medium text-ink">{f(snapshot.credit.outstanding)}</dd>
         </div>
       </dl>
       {snapshot.loans.length > 0 && (
         <>
-          <h3 className="mt-5 text-sm font-semibold text-muted">{m.vault.loans}</h3>
+          <h3 className="mt-5 text-sm text-muted">{m.vault.loans}</h3>
           <ul className="mt-2 divide-y divide-line">
             {snapshot.loans.slice(0, 5).map((l) => (
               <li key={l.id} className="flex items-center justify-between py-2.5 text-sm">
@@ -224,13 +224,9 @@ function CreditCardPanel() {
                   <span className="tabular font-medium text-ink">{f(l.principal + l.fee - l.repaid)}</span>
                   <span className="ml-2 text-muted">{t(m.vault.due, { date: shortDate(l.dueAt, locale) })}</span>
                 </span>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                    l.status === "overdue" ? "bg-danger-soft text-danger" : l.status === "repaid" ? "bg-green-soft text-green" : "bg-warn-soft text-warn"
-                  }`}
-                >
+                <StatusPill tone={l.status === "overdue" ? "danger" : l.status === "repaid" ? "success" : "info"}>
                   {m.vault.loanStatus[l.status]}
-                </span>
+                </StatusPill>
               </li>
             ))}
           </ul>
@@ -270,8 +266,8 @@ function KycPanel({ toast }: { toast: (s: string) => void }) {
     <Card>
       <form onSubmit={submit} className="space-y-4">
         <div className="flex items-center gap-2">
-          <ShieldCheck className="h-5 w-5 text-green" />
-          <h2 className="font-display text-xl font-bold text-ink">{m.vault.kycTitle}</h2>
+          <ShieldCheck className="h-5 w-5 text-ink" />
+          <h2 className="text-[17px] font-medium text-ink">{m.vault.kycTitle}</h2>
         </div>
         <p className="text-sm text-muted">{m.vault.kycHint}</p>
         <Select label={m.vault.idType} value={idType} onChange={(e) => setIdType(e.target.value)}>

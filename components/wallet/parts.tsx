@@ -1,75 +1,46 @@
 "use client";
-import { ArrowDownLeft, ArrowUpRight, Cloud, CloudOff, Home, LineChart, Loader2, ScanLine, ShieldCheck, User, Vault } from "lucide-react";
-import { money, relativeTime, shortDate } from "@/lib/client/money";
+import { ArrowDownLeft, ArrowUpRight, CircleUser, Home, LockKeyhole, ReceiptText, ShieldCheck } from "lucide-react";
+import { money, shortDate } from "@/lib/client/money";
 import type { OutboxItem } from "@/lib/client/offline";
-import { type Connectivity, useApp } from "@/lib/client/store";
+import { useApp } from "@/lib/client/store";
 import type { AppSnapshot } from "@/lib/server/snapshot";
 import { useI18n } from "./I18n";
+import { StatusPill } from "./ui";
 
 export type Tab = "home" | "activity" | "vault" | "profile";
 
-export function ConnectivityPill() {
-  const { m, t, locale } = useI18n();
-  const c = useApp((s) => s.connectivity);
-  const pending = useApp((s) => s.outbox.filter((i) => i.status === "pending").length);
-  const lastSyncAt = useApp((s) => s.lastSyncAt);
-  const retryIn = useApp((s) => s.retryIn);
-  const tone: Record<Connectivity, string> = {
-    online: "bg-green-soft text-green",
-    settled: "bg-green-soft text-green",
-    degraded: "bg-warn-soft text-warn",
-    offline: "bg-navy-soft text-navy",
-    reconnecting: "bg-warn-soft text-warn",
-    reconciling: "bg-navy-soft text-navy",
-  };
-  const Icon = c === "offline" ? CloudOff : c === "reconciling" || c === "reconnecting" ? Loader2 : Cloud;
-  const detail = pending
-    ? t(m.status.pending, { n: pending })
-    : lastSyncAt
-      ? t(m.status.lastSync, { time: relativeTime(lastSyncAt, locale) })
-      : m.status.never;
-  return (
-    <button
-      onClick={() => void useApp.getState().sync("manual")}
-      className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ${tone[c]}`}
-      aria-live="polite"
-      title={retryIn ? t(m.status.retryIn, { s: retryIn }) : detail}
-    >
-      <Icon className={`h-3.5 w-3.5 ${Icon === Loader2 ? "animate-spin" : ""}`} aria-hidden />
-      <span>{m.status[c]}</span>
-      <span className="font-medium opacity-80">· {detail}</span>
-    </button>
-  );
-}
-
-export function BottomNav({ tab, setTab, onScan }: { tab: Tab; setTab: (t: Tab) => void; onScan: () => void }) {
+export function BottomNav({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   const { m } = useI18n();
-  const item = (id: Tab, label: string, Icon: typeof Home) => (
-    <button
-      onClick={() => setTab(id)}
-      aria-current={tab === id ? "page" : undefined}
-      className={`flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium ${tab === id ? "text-ink" : "text-muted"}`}
-    >
-      <Icon className="h-6 w-6" strokeWidth={tab === id ? 2.2 : 1.8} aria-hidden />
-      {label}
-    </button>
-  );
+  const items: [Tab, string, typeof Home][] = [
+    ["home", m.nav.home, Home],
+    ["activity", m.nav.activity, ReceiptText],
+    ["vault", m.nav.vault, LockKeyhole],
+    ["profile", m.nav.profile, CircleUser],
+  ];
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
-      <div className="mx-auto flex max-w-md items-end px-2">
-        {item("home", m.nav.home, Home)}
-        {item("activity", m.nav.activity, LineChart)}
-        <div className="flex flex-1 justify-center">
-          <button
-            onClick={onScan}
-            aria-label={m.nav.scan}
-            className="-mt-7 grid h-16 w-16 place-items-center rounded-full bg-green text-on-accent shadow-[0_10px_30px_-8px_var(--pv-green)] transition active:scale-95"
-          >
-            <ScanLine className="h-7 w-7" />
-          </button>
-        </div>
-        {item("vault", m.nav.vault, Vault)}
-        {item("profile", m.nav.profile, User)}
+    <nav className="pointer-events-none fixed inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex justify-center px-4">
+      <div className="pointer-events-auto flex items-center gap-1 rounded-full bg-paper p-1.5 shadow-[var(--pv-shadow)] ring-1 ring-line">
+        {items.map(([id, label, Icon]) =>
+          tab === id ? (
+            <button
+              key={id}
+              aria-current="page"
+              className="flex h-14 items-center gap-2 rounded-full bg-ink px-5 text-sm font-medium text-paper"
+            >
+              <Icon className="h-5 w-5" aria-hidden />
+              {label}
+            </button>
+          ) : (
+            <button
+              key={id}
+              onClick={() => setTab(id)}
+              aria-label={label}
+              className="grid h-14 w-14 place-items-center rounded-full text-muted transition hover:text-ink"
+            >
+              <Icon className="h-[22px] w-[22px]" strokeWidth={1.7} aria-hidden />
+            </button>
+          ),
+        )}
       </div>
     </nav>
   );
@@ -88,25 +59,25 @@ type Row = {
 
 export function TxRow({ row }: { row: Row }) {
   const { locale } = useI18n();
-  const tones = { warn: "bg-warn-soft text-warn", danger: "bg-danger-soft text-danger", muted: "bg-card-2 text-muted", green: "bg-green-soft text-green" };
+  const tones = { warn: "info", danger: "danger", muted: "muted", green: "success" } as const;
   return (
-    <li className="flex items-center gap-3 py-3">
-      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-card-2 text-ink">
-        {row.incoming ? <ArrowDownLeft className="h-5 w-5" /> : <ArrowUpRight className="h-5 w-5" />}
+    <li className="flex items-center gap-3 py-3.5">
+      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-paper text-ink">
+        {row.incoming ? <ArrowDownLeft className="h-[18px] w-[18px]" /> : <ArrowUpRight className="h-[18px] w-[18px]" />}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="truncate font-medium text-ink">{row.title}</p>
-        <p className="truncate text-sm text-muted">
+        <p className="truncate text-[15px] font-medium text-ink">{row.title}</p>
+        <p className="truncate text-[13px] text-muted">
           {row.subtitle}
           {row.note ? ` · ${row.note}` : ""}
         </p>
       </div>
-      <div className="text-right">
-        <p className={`tabular font-semibold ${row.incoming ? "text-green" : "text-ink"}`}>
+      <div className="flex flex-col items-end gap-1">
+        <p className={`tabular text-[15px] font-medium ${row.incoming ? "text-green" : "text-ink"}`}>
           {row.incoming ? "+" : "−"}
           {money(Math.abs(row.amount), row.currency, locale)}
         </p>
-        {row.badge && <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold ${tones[row.badge.tone]}`}>{row.badge.label}</span>}
+        {row.badge && <StatusPill tone={tones[row.badge.tone]}>{row.badge.label}</StatusPill>}
       </div>
     </li>
   );
@@ -178,7 +149,7 @@ export function Initials({ name }: { name: string }) {
     .map((p) => p[0]?.toUpperCase())
     .join("");
   return (
-    <span className="grid h-12 w-12 place-items-center rounded-full bg-navy font-display text-lg font-bold text-paper" aria-hidden>
+    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink text-base font-medium text-paper" aria-hidden>
       {initials || <ShieldCheck className="h-5 w-5" />}
     </span>
   );

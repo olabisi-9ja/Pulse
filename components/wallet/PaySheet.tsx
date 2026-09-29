@@ -100,8 +100,8 @@ export function PaySheet({ open, onClose, onNeedVault }: { open: boolean; onClos
         <div className="space-y-5">
           <div className="rounded-[28px] bg-card p-5 text-center">
             <p className="text-sm text-muted">{m.pay.to}</p>
-            <p className="font-display text-xl font-bold text-ink">{step.quote.request.name}</p>
-            <p className="mt-4 font-display text-4xl font-extrabold tabular text-navy">
+            <p className="text-[17px] font-medium text-ink">{step.quote.request.name}</p>
+            <p className="mt-4 text-[38px] leading-none font-medium tracking-tight tabular text-ink">
               {money(step.quote.request.amount, step.quote.request.currency, locale)}
             </p>
           </div>
@@ -137,7 +137,7 @@ export function PaySheet({ open, onClose, onNeedVault }: { open: boolean; onClos
 
       {step.s === "show" && (
         <div className="space-y-5 text-center">
-          <p className="font-display text-3xl font-extrabold tabular text-navy">{money(step.amount, step.currency, locale)}</p>
+          <p className="text-[34px] leading-none font-medium tracking-tight tabular text-ink">{money(step.amount, step.currency, locale)}</p>
           <p className="text-sm text-muted">
             {m.pay.to} {step.name}
           </p>

@@ -75,7 +75,7 @@ export function SignIn({ next, onSignedIn }: { next: string; onSignedIn?: () => 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-center px-4 py-10">
       <LogoMark className="mb-6 h-14 w-14" />
-      <h1 className="font-display text-3xl font-extrabold tracking-tight text-navy">{m.auth.title}</h1>
+      <h1 className="text-[26px] font-medium tracking-tight text-ink">{m.auth.title}</h1>
       <p className="mt-2 text-muted">{m.auth.subtitle}</p>
       <div className="mt-8 space-y-4">
         {offline && <Notice tone="warn">{m.auth.offline}</Notice>}

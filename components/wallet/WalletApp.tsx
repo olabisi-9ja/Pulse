@@ -92,7 +92,7 @@ export function WalletApp() {
       <div className="grid min-h-dvh place-items-center px-4 text-center">
         <div className="space-y-4">
           <p className="text-muted">{m.common.genericError}</p>
-          <button className="font-semibold text-green" onClick={reboot}>
+          <button className="h-12 rounded-full bg-ink px-6 font-medium text-paper" onClick={reboot}>
             {m.common.retry}
           </button>
         </div>
@@ -163,7 +163,7 @@ function Main({ userId, onSignedOut }: { userId: string; onSignedOut: () => void
     );
 
   return (
-    <div className="mx-auto min-h-dvh max-w-md pb-28">
+    <div className="mx-auto min-h-dvh max-w-md pb-32">
       <main>
         {tab === "home" && (
           <HomeScreen onPay={() => setSheet("pay")} onRequest={() => setSheet("request")} onAdd={() => setSheet("add")} setTab={setTab} />
@@ -172,7 +172,7 @@ function Main({ userId, onSignedOut }: { userId: string; onSignedOut: () => void
         {tab === "vault" && <VaultScreen toast={setToast} />}
         {tab === "profile" && <ProfileScreen locale={locale} onSignOut={() => void signOut()} />}
       </main>
-      <BottomNav tab={tab} setTab={setTab} onScan={() => setSheet("pay")} />
+      <BottomNav tab={tab} setTab={setTab} />
       <PaySheet
         open={sheet === "pay"}
         onClose={() => setSheet(null)}

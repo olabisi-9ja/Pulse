@@ -1,0 +1,1 @@
+No signal. Still paid. PayVault lets a phone sign a payment and another phone verify it with zero bars, then settles it automatically when the signal returns. Offline payments and pay-later for banks, PSPs and mobile money in Africa.

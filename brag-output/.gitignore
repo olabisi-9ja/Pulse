@@ -1,0 +1,7 @@
+brag.mp4
+work/node_modules
+work/*.mp4
+work/*.wav
+work/*.jpg
+!work/trader.jpg
+work/package-lock.json

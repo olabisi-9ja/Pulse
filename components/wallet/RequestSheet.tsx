@@ -31,14 +31,16 @@ export function RequestSheet({ open, onClose }: { open: boolean; onClose: () => 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Keyed on the merchant id: a snapshot refresh creates a new object and must not reset the flow.
+  const merchantId = merchant?.id ?? null;
   useEffect(() => {
     if (!open) return;
     (async () => {
       const pending = await getOpenRequest(userId);
-      if (pending && merchant) setStep({ s: "show", open: pending });
-      else setStep({ s: merchant ? "amount" : "enable" });
+      if (pending && merchantId) setStep({ s: "show", open: pending });
+      else setStep({ s: merchantId ? "amount" : "enable" });
     })();
-  }, [open, userId, merchant]);
+  }, [open, userId, merchantId]);
 
   const close = () => {
     setError(null);

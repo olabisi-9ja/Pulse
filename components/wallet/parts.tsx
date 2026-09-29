@@ -101,6 +101,8 @@ export function useRows(limit?: number, filter: "all" | "offline" | "online" = "
     if (filter === "online" && offline) continue;
     const kinds = m.activity.kinds;
     const incoming = a.amount > 0;
+    // An offline payment's ledger line is the vault part only; show what the customer actually paid.
+    const amount = a.offline && !incoming ? a.amount - a.offline.fromCredit : a.amount;
     let title = kinds[a.kind] ?? a.kind;
     if (offline) title = incoming ? t(m.activity.receivedFrom, { name: a.counterparty || m.activity.customer }) : t(m.activity.paidTo, { name: a.counterparty || "—" });
     else if (a.counterparty) title = `${title} · ${a.counterparty}`;
@@ -109,10 +111,9 @@ export function useRows(limit?: number, filter: "all" | "offline" | "online" = "
       at: new Date(a.at).getTime(),
       title,
       subtitle: shortDate(a.at, locale),
-      amount: a.amount,
+      amount,
       currency: a.currency,
       incoming,
-      note: a.offline && a.offline.fromCredit > 0 && !incoming ? t(m.activity.viaOverdraft, { amount: money(a.offline.fromCredit, a.currency, locale) }) : undefined,
       badge: a.offline?.status === "flagged" ? { label: m.activity.statuses.flagged, tone: "danger" } : undefined,
     });
   }
@@ -127,7 +128,6 @@ export function useRows(limit?: number, filter: "all" | "offline" | "online" = "
       amount: incoming ? i.amount : -i.amount,
       currency: i.currency,
       incoming,
-      note: i.fromCredit > 0 && !incoming ? t(m.activity.viaOverdraft, { amount: money(i.fromCredit, i.currency, locale) }) : undefined,
       badge:
         i.status === "pending"
           ? { label: m.activity.statuses.pending, tone: "warn" }

@@ -111,7 +111,7 @@ const app: AppMessages = {
     amount: "Montant",
     fromVault: "Depuis le coffre",
     fromOverdraft: "Depuis le découvert",
-    overdraftNote: "Après synchronisation, le découvert devient un prêt court : frais {fee}, échéance {days} jours, remboursé automatiquement sur l'argent reçu.",
+    overdraftNote: "Frais, à rembourser sous {days} jours",
     approve: "Approuver avec le code",
     showTitle: "Montrez ceci au marchand",
     showHint: "Le marchand scanne ce code. Fonctionne sans réseau.",

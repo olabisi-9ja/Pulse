@@ -109,7 +109,7 @@ const app = {
     amount: "Amount",
     fromVault: "From vault",
     fromOverdraft: "From overdraft",
-    overdraftNote: "Overdraft becomes a short loan after sync: fee {fee}, due in {days} days, repaid automatically from money you receive.",
+    overdraftNote: "Fee, due in {days} days",
     approve: "Approve with PIN",
     showTitle: "Show this to the merchant",
     showHint: "The merchant scans this code. It works without a network.",

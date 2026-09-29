@@ -113,18 +113,18 @@ export function PaySheet({ open, onClose, onNeedVault }: { open: boolean; onClos
             {step.quote.fromCredit > 0 && (
               <div className="flex justify-between">
                 <dt className="text-muted">{m.pay.fromOverdraft}</dt>
-                <dd className="tabular font-medium text-warn">{money(step.quote.fromCredit, step.quote.request.currency, locale)}</dd>
+                <dd className="tabular font-medium text-accent-text">{money(step.quote.fromCredit, step.quote.request.currency, locale)}</dd>
+              </div>
+            )}
+            {step.quote.fromCredit > 0 && (
+              <div className="flex justify-between">
+                <dt className="text-muted">{t(m.pay.overdraftNote, { days: termDays })}</dt>
+                <dd className="tabular font-medium">
+                  {money(Math.ceil((step.quote.fromCredit * feeBps) / 10_000), step.quote.request.currency, locale)}
+                </dd>
               </div>
             )}
           </dl>
-          {step.quote.fromCredit > 0 && (
-            <Notice tone="warn">
-              {t(m.pay.overdraftNote, {
-                fee: money(Math.ceil((step.quote.fromCredit * feeBps) / 10_000), step.quote.request.currency, locale),
-                days: termDays,
-              })}
-            </Notice>
-          )}
           <Button className="w-full" onClick={() => setStep({ s: "pin", quote: step.quote })}>
             {m.pay.approve}
           </Button>

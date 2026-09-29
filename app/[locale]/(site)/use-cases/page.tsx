@@ -1,7 +1,9 @@
-import { Bus, CreditCard, Globe2, GraduationCap, HandCoins, Landmark, Smartphone, Store } from "lucide-react";
 import { notFound } from "next/navigation";
 import { siteMetadata } from "@/components/site/meta";
-import { Card, CtaBand, IconBadge, PageHero, Section } from "@/components/site/ui";
+import { PhotoOrVisual } from "@/components/site/PhotoOrVisual";
+import { CtaBand, PageHero, Section } from "@/components/site/ui";
+import type { VignetteKind } from "@/components/site/Vignettes";
+import { photos } from "@/lib/photos";
 import { isLocale } from "@/lib/i18n";
 import { getSiteMessages } from "@/messages/site";
 
@@ -9,7 +11,8 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/use-case
   return siteMetadata(params, "useCases", "use-cases");
 }
 
-const icons = [CreditCard, Landmark, Smartphone, Store, Bus, GraduationCap, HandCoins, Globe2];
+const PHOTOS = ["stall", "bank", "agent", "shop", "transit", "school", "trader", ""];
+const VISUALS: VignetteKind[] = ["verify", "platform", "sync", "request", "scan", "usage", "extend", "integrate"];
 
 export default async function UseCasesPage({ params }: PageProps<"/[locale]/use-cases">) {
   const { locale } = await params;
@@ -21,31 +24,22 @@ export default async function UseCasesPage({ params }: PageProps<"/[locale]/use-
     <>
       <PageHero eyebrow={p.hero.eyebrow} title={p.hero.title} lead={p.hero.lead} />
       <Section>
-        <div className="grid gap-4 md:grid-cols-2">
-          {p.cases.map((c, i) => {
-            const Icon = icons[i];
-            return (
-              <Card key={c.title}>
-                <div className="flex items-center gap-3">
-                  <IconBadge>
-                    <Icon className="h-5 w-5" />
-                  </IconBadge>
-                  <h2 className="font-display text-xl font-medium text-navy">{c.title}</h2>
-                </div>
-                <dl className="mt-5 space-y-4 text-sm leading-relaxed sm:text-base">
-                  <div>
-                    <dt className="text-xs font-bold uppercase tracking-wider text-muted">{p.labels.scenario}</dt>
-                    <dd className="mt-1 text-ink">{c.scenario}</dd>
-                  </div>
-                  <div className="rounded-2xl bg-green-soft p-4">
-                    <dt className="text-xs font-bold uppercase tracking-wider text-green">{p.labels.benefit}</dt>
-                    <dd className="mt-1 text-ink">{c.benefit}</dd>
-                  </div>
-                </dl>
-              </Card>
-            );
-          })}
-        </div>
+        <ul className="space-y-20 sm:space-y-28">
+          {p.cases.map((c, i) => (
+            <li key={c.title} className="grid items-center gap-8 lg:grid-cols-2 lg:gap-16">
+              <PhotoOrVisual
+                photo={photos[PHOTOS[i]] ?? null}
+                visual={VISUALS[i % VISUALS.length]}
+                className={`aspect-[4/3] ${i % 2 ? "lg:order-2" : ""}`}
+              />
+              <div>
+                <h2 className="font-display text-[clamp(2rem,4.5vw,3.25rem)] font-medium leading-[1] text-navy text-balance">{c.title}</h2>
+                <p className="mt-6 text-lg leading-relaxed text-ink sm:text-xl">{c.benefit}</p>
+                <p className="mt-5 border-l-2 border-green pl-4 text-sm leading-relaxed text-muted">{c.scenario}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
       </Section>
       <CtaBand
         title={p.cta.title}

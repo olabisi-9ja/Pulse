@@ -61,6 +61,11 @@ Last updated: 2026-09-29. Branch: `claude/hopeful-volta-m5q6kl` (repo `olabisi-9
 - Wallet redesign: follows the owner's inspiration (a tracking-app layout) in the brand colours (navy #14365A surfaces, green #046B4F actions), with a wallet-scoped palette in `globals.css` (`.pv-wallet`). Copy trimmed hard. No sync or connectivity UI is shown to users; sync is automatic. Owner feedback: keep text minimal and hide internals.
 - PWA: the service worker precaches both locale shells and every chunk they reference. A production offline launch of `/app` was verified with the server stopped. Not yet tested: installing on a real Android/iOS device.
 
+## Deployment (2026-09-29)
+- Vercel project `payvault` (id `prj_jWpsBiXPfGvJyRLlaVc9RbJUHSwN`, team `olabisi-side-projects`), linked to this repo. The production branch is `claude/hopeful-volta-m5q6kl`, and every push deploys. Live at https://payvault-phi.vercel.app. `vercel.json` runs `/api/cron` daily at 03:00 UTC (the Hobby limit).
+- The site is live. The wallet shows "sign-in not configured" until Supabase and the env vars are set.
+- The Vercel connector can't write env vars (403), and the Supabase connector can't create projects (it needs a cost confirmation). The owner does both in the dashboards, then Claude applies the migrations through the Supabase connector.
+
 ## Next steps
 1. ~~Run `pnpm lint` and `pnpm build`; fix any errors.~~ Done.
 2. ~~Review and finish the console and docs work.~~ Done.

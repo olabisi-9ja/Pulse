@@ -1,9 +1,9 @@
 /** Payer-side logic: spending an allowance offline. */
 import { allowanceGenesis, nowSeconds, paymentId } from "./allowance";
 import { ProtocolError, randomBytes } from "./bytes";
-import { encodePaymentBody } from "./codec";
+import { encodeCloseBody, encodePaymentBody } from "./codec";
 import { sign } from "./crypto";
-import { type AllowanceCert, capOf, type Payment, type PaymentRequest, SIZES, type WalletState } from "./types";
+import { type AllowanceCert, capOf, type CloseStatement, type Payment, type PaymentRequest, SIZES, type WalletState } from "./types";
 
 export async function initWalletState(cert: AllowanceCert): Promise<WalletState> {
   return { cert, seq: 0, cumulative: 0, lastHash: await allowanceGenesis(cert) };
@@ -101,4 +101,10 @@ export function createRequest(
 ): PaymentRequest {
   if (!Number.isInteger(amount) || amount <= 0) throw new ProtocolError("bad_amount", "Amount must be positive");
   return { merchantId, amount, currency, nonce: randomBytes(SIZES.nonce), time: now, name };
+}
+
+/** Payer side: stop spending this allowance and sign where it stopped. */
+export async function signClose(deviceKey: CryptoKey, state: WalletState, now = nowSeconds()): Promise<CloseStatement> {
+  const body = { allowanceId: state.cert.allowanceId, seq: state.seq, cumulative: state.cumulative, time: now };
+  return { ...body, sig: await sign(deviceKey, encodeCloseBody(body)) };
 }

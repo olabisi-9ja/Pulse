@@ -1,7 +1,7 @@
 import { randomBytes } from "./bytes";
-import { encodeAllowanceBody, encodePaymentBody } from "./codec";
+import { encodeAllowanceBody, encodeCloseBody, encodePaymentBody } from "./codec";
 import { hash16, sign, verify } from "./crypto";
-import { type AllowanceCert, type AllowanceParams, type Payment, SIZES } from "./types";
+import { type AllowanceCert, type AllowanceParams, type CloseStatement, type Payment, SIZES } from "./types";
 
 export const nowSeconds = () => Math.floor(Date.now() / 1000);
 
@@ -35,4 +35,8 @@ export async function paymentId(p: Omit<Payment, "sig">): Promise<Uint8Array> {
 
 export async function verifyPaymentSignature(p: Payment, devicePub: CryptoKey): Promise<boolean> {
   return verify(devicePub, p.sig, encodePaymentBody(p));
+}
+
+export async function verifyCloseSignature(c: CloseStatement, devicePub: CryptoKey): Promise<boolean> {
+  return verify(devicePub, c.sig, encodeCloseBody(c));
 }

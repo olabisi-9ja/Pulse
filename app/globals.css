@@ -1,0 +1,122 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/montserrat";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  --pv-green: #046b4f;
+  --pv-green-strong: #035a42;
+  --pv-green-soft: #e3f1ec;
+  --pv-navy: #14365a;
+  --pv-navy-soft: #e7edf4;
+  --pv-paper: #f4f3ef;
+  --pv-card: #ffffff;
+  --pv-card-2: #f7f7f4;
+  --pv-ink: #10161d;
+  --pv-muted: #66707a;
+  --pv-line: #e4e3de;
+  --pv-danger: #c2412d;
+  --pv-danger-soft: #fbe9e5;
+  --pv-warn: #a86a12;
+  --pv-warn-soft: #fbf1df;
+  --pv-on-accent: #ffffff;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --pv-green: #2fb386;
+    --pv-green-strong: #4cc79c;
+    --pv-green-soft: #12302a;
+    --pv-navy: #9cc0e6;
+    --pv-navy-soft: #16283a;
+    --pv-paper: #0a0f0e;
+    --pv-card: #121a18;
+    --pv-card-2: #18221f;
+    --pv-ink: #eef3f1;
+    --pv-muted: #93a19c;
+    --pv-line: #24312d;
+    --pv-danger: #f07a64;
+    --pv-danger-soft: #3a1a15;
+    --pv-warn: #e7b35a;
+    --pv-warn-soft: #33260f;
+    --pv-on-accent: #06140f;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --pv-green: #2fb386;
+  --pv-green-strong: #4cc79c;
+  --pv-green-soft: #12302a;
+  --pv-navy: #9cc0e6;
+  --pv-navy-soft: #16283a;
+  --pv-paper: #0a0f0e;
+  --pv-card: #121a18;
+  --pv-card-2: #18221f;
+  --pv-ink: #eef3f1;
+  --pv-muted: #93a19c;
+  --pv-line: #24312d;
+  --pv-danger: #f07a64;
+  --pv-danger-soft: #3a1a15;
+  --pv-warn: #e7b35a;
+  --pv-warn-soft: #33260f;
+  --pv-on-accent: #06140f;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-green: var(--pv-green);
+  --color-green-strong: var(--pv-green-strong);
+  --color-green-soft: var(--pv-green-soft);
+  --color-navy: var(--pv-navy);
+  --color-navy-soft: var(--pv-navy-soft);
+  --color-paper: var(--pv-paper);
+  --color-card: var(--pv-card);
+  --color-card-2: var(--pv-card-2);
+  --color-ink: var(--pv-ink);
+  --color-muted: var(--pv-muted);
+  --color-line: var(--pv-line);
+  --color-danger: var(--pv-danger);
+  --color-danger-soft: var(--pv-danger-soft);
+  --color-warn: var(--pv-warn);
+  --color-warn-soft: var(--pv-warn-soft);
+  --color-on-accent: var(--pv-on-accent);
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Montserrat Variable", "Inter Variable", ui-sans-serif, sans-serif;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--pv-paper);
+  color: var(--pv-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--pv-green);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -9,6 +9,11 @@ import {
   compressPoint,
   createRequest,
   decodeAllowance,
+  decodeClose,
+  encodeClose,
+  importPublicKey,
+  signClose,
+  verifyCloseSignature,
   decodePayment,
   decompressPoint,
   encodeAllowance,
@@ -228,5 +233,18 @@ describe("reconciliation", () => {
     expect(res.forks).toEqual([{ seq: 1, ids: expect.arrayContaining([toHex(a.id), toHex(cloned.id)]) }]);
     expect(res.overspend).toBe(800);
     expect(res.honoured).toHaveLength(2);
+  });
+});
+
+describe("close statement", () => {
+  it("signs and verifies where the device stopped", async () => {
+    const { state, device, merchantA } = await setup();
+    const a = await pay(device, state, merchantA, 250);
+    const close = await signClose(device.privateKey, a.state, NOW + 100);
+    const decoded = decodeClose(encodeClose(close));
+    expect(decoded).toMatchObject({ seq: 1, cumulative: 250 });
+    const pub = await importPublicKey(state.cert.devicePub);
+    expect(await verifyCloseSignature(decoded, pub)).toBe(true);
+    expect(await verifyCloseSignature({ ...decoded, cumulative: 0 }, pub)).toBe(false);
   });
 });

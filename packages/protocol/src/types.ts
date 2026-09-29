@@ -5,6 +5,7 @@ export const MsgType = {
   Payment: 0x02,
   Request: 0x03,
   Bundle: 0x04,
+  Close: 0x05,
 } as const;
 
 export const SIZES = {
@@ -81,3 +82,15 @@ export type WalletState = {
 };
 
 export const capOf = (c: Pick<AllowanceCert, "funded" | "credit">) => c.funded + c.credit;
+
+/**
+ * Device-signed statement that it has stopped spending an allowance at
+ * (seq, cumulative). Lets the holder cash out unspent value before expiry.
+ */
+export type CloseStatement = {
+  allowanceId: Uint8Array;
+  seq: number;
+  cumulative: number;
+  time: number;
+  sig: Uint8Array;
+};

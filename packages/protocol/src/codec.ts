@@ -14,6 +14,7 @@ import { concat, ProtocolError, Reader, Writer } from "./bytes";
 import {
   type AllowanceCert,
   type Bundle,
+  type CloseStatement,
   MsgType,
   type Payment,
   type PaymentRequest,
@@ -166,4 +167,33 @@ export function peekType(b: Uint8Array): number {
 function checkSig(sig: Uint8Array): Uint8Array {
   if (sig.length !== SIZES.signature) throw new ProtocolError("bad_signature", "Signature must be 64 bytes");
   return sig;
+}
+
+export function encodeCloseBody(c: Omit<CloseStatement, "sig">): Uint8Array {
+  return new Writer()
+    .u8(PROTOCOL_VERSION)
+    .u8(MsgType.Close)
+    .bytes(c.allowanceId, SIZES.allowanceId)
+    .u16(c.seq)
+    .u32(c.cumulative)
+    .u32(c.time)
+    .finish();
+}
+
+export function encodeClose(c: CloseStatement): Uint8Array {
+  return concat(encodeCloseBody(c), checkSig(c.sig));
+}
+
+export function decodeClose(b: Uint8Array): CloseStatement {
+  const r = new Reader(b);
+  header(r, MsgType.Close);
+  const c = {
+    allowanceId: r.bytes(SIZES.allowanceId),
+    seq: r.u16(),
+    cumulative: r.u32(),
+    time: r.u32(),
+    sig: r.bytes(SIZES.signature),
+  };
+  r.done();
+  return c;
 }

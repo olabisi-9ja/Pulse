@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]">) {
   return siteMetadata(params, "home");
 }
 
-const AUDIENCE_PHOTOS = ["shop", "bank", "agent", "trader", "transit", "school"];
+const AUDIENCE_PHOTOS = ["stall", "bank", "agent", "shop", "transit", "school"];
 const AUDIENCE_VISUALS: VignetteKind[] = ["verify", "platform", "sync", "request", "scan", "usage"];
 
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
@@ -72,7 +72,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           rows={[
             { value: String(countries.length), label: h.numbers.packs, visual: "codes", codes: countries.slice(0, 15).map((c) => c.code) },
             { value: "276 B", label: h.numbers.bytes, visual: "qr" },
-            { value: "0", label: h.numbers.bars, photo: photos.trader, visual: "verify" },
+            { value: "0", label: h.numbers.bars, visual: "verify" },
             { value: "2", label: h.numbers.languages, visual: "request" },
           ]}
         />
@@ -116,7 +116,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               </ButtonLink>
             </div>
           </div>
-          <PhotoOrVisual photo={photos.shop} visual="extend" className="aspect-[4/5]" />
+          <PhotoOrVisual photo={photos.trader} visual="extend" className="aspect-[4/5]" />
         </div>
       </Section>
 

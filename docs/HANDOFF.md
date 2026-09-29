@@ -51,9 +51,17 @@ Last updated: 2026-09-29. Branch: `claude/hopeful-volta-m5q6kl` (repo `olabisi-9
 - **Typecheck:** `pnpm tsc --noEmit` was clean at the handoff commit.
 - **Wallet PWA:** code complete but **never run in a browser**. Not yet checked: `next build`, lint, screenshots, and a two-device offline test.
 
+## Session 2 (2026-09-29, Windows machine)
+- Done: steps 1 and 2 below. Lint, typecheck and `next build` all pass. 49/49 tests pass against Postgres.
+- On a fresh clone, run `pnpm next typegen` before `pnpm tsc`: the `PageProps` / `LayoutProps` / `RouteContext` globals are generated.
+- Console reviewed: every mutation checks the partner role and every query is scoped by `partner_id`. Webhook URLs now reject private, loopback and link-local hosts, and delivery doesn't follow redirects.
+- Docs: added the missing Security page. The site developers page samples now match the real API. Removed overclaims from the site's security copy (CBOR, "audited libraries", attestation and biometric described as current). Partner issuance now returns 400 `unsupported_country` / `over_limit` instead of 500.
+- Local Postgres on Windows: the `embedded-postgres` npm package, kept outside the repo, on port 54329.
+- QA progress: dev sign-in, onboarding, PIN, top-up all work in the browser. The rest of the flow (KYC → vault with overdraft → offline pay → sync → loan → repay) is still to do.
+
 ## Next steps
-1. Run `pnpm lint` and `pnpm build`; fix any errors.
-2. Review and finish the console and docs work from the interrupted subagents. Check the site's developers page code samples against the real API.
+1. ~~Run `pnpm lint` and `pnpm build`; fix any errors.~~ Done.
+2. ~~Review and finish the console and docs work.~~ Done.
 3. Run the app locally and QA it with screenshots:
    - Start Postgres (see below), then `DATABASE_URL=... pnpm dev`.
    - Dev sign-in works when no Supabase env vars are set.

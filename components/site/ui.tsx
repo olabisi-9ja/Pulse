@@ -101,8 +101,9 @@ const buttonBase =
 const buttonTones = {
   primary: "bg-green text-on-accent hover:bg-green-strong",
   secondary: "border border-line bg-paper text-ink hover:border-ink",
-  inverse: "bg-on-accent text-navy hover:opacity-90",
-  outlineInverse: "border border-on-accent/40 text-on-accent hover:bg-on-accent/10",
+  // For the always-navy call-to-action band: fixed colours, readable in both themes.
+  inverse: "bg-white text-[#14365a] hover:opacity-90",
+  outlineInverse: "border border-white/40 text-white hover:bg-white/10",
 } as const;
 
 /** Pill button; `arrow` adds the circled arrow that nudges on hover. */

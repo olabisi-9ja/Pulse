@@ -1,0 +1,95 @@
+import { Check } from "lucide-react";
+import { notFound } from "next/navigation";
+import { siteMetadata } from "@/components/site/meta";
+import { ButtonLink, Card, CtaBand, PageHero, Pill, Section, SectionHeading } from "@/components/site/ui";
+import { isLocale } from "@/lib/i18n";
+import { getSiteMessages } from "@/messages/site";
+
+export async function generateMetadata({ params }: PageProps<"/[locale]/pricing">) {
+  return siteMetadata(params, "pricing", "pricing");
+}
+
+export default async function PricingPage({ params }: PageProps<"/[locale]/pricing">) {
+  const { locale } = await params;
+  if (!isLocale(locale)) notFound();
+  const t = getSiteMessages(locale);
+  const p = t.pricing;
+
+  return (
+    <>
+      <PageHero eyebrow={p.hero.eyebrow} title={p.hero.title} lead={p.hero.lead} />
+
+      <Section>
+        <div className="grid gap-4 lg:grid-cols-3">
+          {p.plans.map((plan, i) => {
+            const featured = plan.featured !== "";
+            return (
+              <div
+                key={plan.name}
+                className={`flex flex-col rounded-3xl border p-6 sm:p-8 ${featured ? "border-green bg-card ring-2 ring-green" : "border-line bg-card"}`}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="font-display text-2xl font-extrabold text-navy">{plan.name}</h2>
+                  {featured && <Pill>{plan.featured}</Pill>}
+                </div>
+                <p className="mt-4 font-display text-xl font-extrabold text-green">{plan.price}</p>
+                <p className="text-sm text-muted">{plan.note}</p>
+                <p className="mt-4 text-sm leading-relaxed text-ink">{plan.body}</p>
+                <ul className="mt-6 flex-1 space-y-3">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex gap-3 text-sm leading-relaxed">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-green" aria-hidden />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <ButtonLink
+                  href={`/${locale}/contact`}
+                  tone={featured || i === 0 ? "primary" : "secondary"}
+                  className="mt-8 w-full"
+                >
+                  {plan.cta}
+                </ButtonLink>
+              </div>
+            );
+          })}
+        </div>
+      </Section>
+
+      <Section tone="card" labelledBy="model">
+        <SectionHeading id="model" title={p.model.title} lead={p.model.lead} />
+        <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {p.model.items.map((it, i) => (
+            <li key={it.title}>
+              <Card className="h-full">
+                <span className="tabular font-display text-3xl font-black text-line" aria-hidden>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="mt-2 font-display text-lg font-bold text-navy">{it.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">{it.body}</p>
+              </Card>
+            </li>
+          ))}
+        </ol>
+      </Section>
+
+      <Section labelledBy="faq">
+        <SectionHeading id="faq" title={p.faq.title} />
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          {p.faq.items.map((f) => (
+            <Card key={f.q}>
+              <h3 className="font-display text-base font-bold text-navy">{f.q}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted">{f.a}</p>
+            </Card>
+          ))}
+        </div>
+      </Section>
+
+      <CtaBand
+        title={p.cta.title}
+        body={p.cta.body}
+        primary={{ href: `/${locale}/contact`, label: t.common.requestPilot }}
+      />
+    </>
+  );
+}

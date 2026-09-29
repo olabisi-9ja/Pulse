@@ -10,6 +10,7 @@ import {
   toHex,
   verifyCloseSignature,
 } from "@payvault/protocol";
+import { getCountryPack } from "@payvault/countries";
 import { creditSummary } from "./credit";
 import { bytes, type Db } from "./db";
 import { emit } from "./events";
@@ -166,7 +167,13 @@ export async function issueForPartner(
     ttlHours?: number;
   },
 ): Promise<AllowanceCert> {
+  if (!getCountryPack(input.country)) {
+    throw new ServiceError("unsupported_country", `No country pack for ${input.country}`);
+  }
   const pack = packFor(input.country);
+  if (input.funded + input.credit <= 0) {
+    throw new ServiceError("over_limit", "funded + credit must be above zero");
+  }
   if (input.funded + input.credit > pack.offlineLimits.allowanceCap) {
     throw new ServiceError("over_limit", `Allowance exceeds the ${pack.code} offline cap`);
   }

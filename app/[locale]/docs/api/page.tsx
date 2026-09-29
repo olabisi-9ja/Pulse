@@ -157,7 +157,8 @@ const ERROR_ROWS: string[][] = [
   ["bad_json", "400", "The body is not valid JSON"],
   ["invalid_request", "400", "A field failed validation. The message names the first offending field"],
   ["hosted_partner", "409", "`POST /api/v1/allowances` on a hosted-ledger partner"],
-  ["over_limit", "400", "`funded + credit` is above the country pack's offline cap"],
+  ["over_limit", "400", "`funded + credit` is zero, or above the country pack's offline cap"],
+  ["unsupported_country", "400", "`country` has no country pack"],
   ["not_found", "404", "Unknown allowance, or one that belongs to another partner"],
   ["forbidden", "403", "The allowance belongs to another partner (close)"],
   ["decode", "400", "The close statement could not be decoded"],
@@ -237,11 +238,6 @@ export default async function ApiPage({ params }: PageProps<"/[locale]/docs/api"
       </P>
       <Code label="Error response" code={ERR} {...cp} />
       <DataTable head={["Code", "HTTP", "Meaning"]} rows={ERROR_ROWS} caption="Error codes" mono={[0, 1]} />
-      <Callout tone="note" title="Known rough edge">
-        Some invalid inputs that pass schema validation, such as a <C>country</C> that is not a supported pack or an
-        allowance with zero spending power, currently return <C>internal</C> (500) rather than a specific 4xx code. Check
-        the country list on the countries page and send <C>funded + credit</C> above zero.
-      </Callout>
 
       <H2 id="endpoints">Endpoints</H2>
 
@@ -269,7 +265,7 @@ export default async function ApiPage({ params }: PageProps<"/[locale]/docs/api"
         <Code label="Request" code={ISSUE_REQ} {...cp} />
         <Code label="Response" code={ISSUE_RES} {...cp} />
         <P>
-          Errors: <C>unauthorized</C>, <C>invalid_request</C>, <C>hosted_partner</C>, <C>over_limit</C>. Emits{" "}
+          Errors: <C>unauthorized</C>, <C>invalid_request</C>, <C>hosted_partner</C>, <C>over_limit</C>, <C>unsupported_country</C>. Emits{" "}
           <C>allowance.issued</C>.
         </P>
       </Endpoint>

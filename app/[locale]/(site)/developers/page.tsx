@@ -11,45 +11,51 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/develope
 }
 
 const ISSUE = `POST /api/v1/allowances
-Idempotency-Key: 5f1c9c0e-2b7a-4c1e-9a0d-3f6b1d7e8a10
+Authorization: Bearer pv_<prefix>_<secret>
 Content-Type: application/json
 
 {
-  "userRef": "usr_8123",
-  "devicePublicKey": "<base64 P-256 public key>",
-  "currency": "XOF",
-  "fundedAmount": 10000,
-  "overdraftLimit": 3000,
-  "expiresInHours": 72
+  "devicePublicKey": "02c4f1...e9",
+  "country": "NG",
+  "funded": 500000,
+  "credit": 0,
+  "externalRef": "cust_8123_vault_1",
+  "ttlHours": 72
 }
 
 // 201 Created
 {
-  "allowanceId": "alw_01J...",
-  "certificate": "<base64 CBOR, signed by your issuer key>",
-  "expiresAt": "..."
+  "id": "9f2c1e5b7a3d4c08b6e1a2d3f4c5b6a7",
+  "cert": "AQEAn8sc63...",
+  "issuerKid": 3,
+  "currency": "NGN",
+  "expiresAt": "2026-10-02T09:30:00.000Z"
 }`;
 
 const SYNC = `POST /api/v1/payments/sync
+Authorization: Bearer pv_<prefix>_<secret>
 Content-Type: application/json
 
 {
-  "payments": ["<base64 CBOR>", "<base64 CBOR>"]
+  "bundles": ["AQMBAQEAn8sc...", "AQMBAQEAn8sc..."]
 }
 
 // 200 OK
 {
-  "settled":    ["pay_..."],
-  "duplicates": [],
-  "forks":      [],
-  "rejected":   []
+  "results": [
+    { "id": "5d0e...c1", "status": "settled", "amount": 250000, "currency": "NGN" },
+    { "id": "77ab...09", "status": "flagged" }
+  ]
 }`;
 
 const HOOK = `{
-  "type": "fork.detected",
-  "allowanceId": "alw_01J...",
-  "evidence": ["<payment A>", "<payment B>"],
-  "action": "key_revoked"
+  "id": 1042,
+  "type": "fraud.detected",
+  "createdAt": "2026-10-02T11:04:12.000Z",
+  "data": {
+    "allowanceId": "9f2c...",
+    "cases": [{ "kind": "fork", "seq": 3, "paymentIds": ["5d0e...c1", "77ab...09"], "loss": 0 }]
+  }
 }`;
 
 const icons = [Send, PackageOpen, Bell];

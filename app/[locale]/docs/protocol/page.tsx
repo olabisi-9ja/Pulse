@@ -91,8 +91,7 @@ export default async function ProtocolPage({ params }: PageProps<"/[locale]/docs
       <PageHeader eyebrow={c.eyebrow} title={c.title} lead={c.lead} />
       {locale === "fr" && <EnglishOnly text={s.englishOnly} />}
       <P>
-        This page is generated from the implementation in <C>packages/protocol</C>. A Markdown copy lives in the
-        repository at <C>docs/PROTOCOL.md</C>. Every message starts with a version byte and a type byte. Decoders reject an
+        This page describes the implementation in <C>packages/protocol</C>. Every message starts with a version byte and a type byte. Decoders reject an
         unknown version, a wrong type, truncated input and trailing bytes.
       </P>
 

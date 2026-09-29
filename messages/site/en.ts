@@ -142,7 +142,7 @@ const site = {
       {
         actor: "payer",
         title: "Scan and confirm",
-        body: "The payer scans, sees the amount, and confirms with PIN or biometric.",
+        body: "The payer scans, sees the amount, and confirms with their PIN.",
       },
       {
         actor: "payer",
@@ -352,7 +352,7 @@ const site = {
       body: "Offline double-spend cannot be prevented with certainty. It can be made hard, bounded, detected and recovered. Here is each defence and what it buys you.",
       head: { defence: "Defence", effect: "Effect" },
       rows: [
-        { defence: "Hardware-backed keys and attestation", effect: "Cloning a device key is expensive." },
+        { defence: "Non-extractable device keys (hardware-backed and attested in native SDKs, planned)", effect: "Copying a device key out is hard; cloning a whole device is contained by caps and fork detection." },
         { defence: "Allowance cap, per-transaction limit, expiry", effect: "Caps the maximum loss." },
         { defence: "Hash-chained, sequenced payments", effect: "Any double-spend becomes a detectable fork." },
         { defence: "Merchant-side consistency checks", effect: "Blocks naive replays at the same merchant." },
@@ -590,7 +590,7 @@ const site = {
     principles: {
       title: "Built for integrators",
       items: [
-        "Idempotent writes, so retries are safe",
+        "Idempotent payment sync, so retries are safe",
         "Signed webhooks with replay protection",
         "Sandbox with test money and the same API",
         "Amounts as integers in minor units",
@@ -613,12 +613,12 @@ const site = {
       title: "Threat model summary",
       head: { threat: "Threat", mitigation: "Mitigation" },
       rows: [
-        { threat: "Cloned device or extracted key", mitigation: "Hardware keystore, attestation, low caps, fork detection and revocation." },
+        { threat: "Cloned device or extracted key", mitigation: "Non-extractable keys (hardware keystore and attestation planned for native SDKs), low caps, fork detection and revocation." },
         { threat: "Replay to the same merchant", mitigation: "One-time request number and sequence checks." },
         { threat: "Replay to a different merchant", mitigation: "Each payment is bound to a merchant ID." },
         { threat: "Counter rollback on the device", mitigation: "The hash chain turns a rollback into a fork that reconciliation detects." },
         { threat: "Fake payment made by a merchant", mitigation: "Not possible without the payer's private key." },
-        { threat: "Lost or stolen phone", mitigation: "PIN or biometric before signing. Remaining allowance is at risk like cash, is capped, and the key can be revoked." },
+        { threat: "Lost or stolen phone", mitigation: "PIN before signing. Remaining allowance is at risk like cash, is capped, and the key can be revoked." },
         { threat: "Expired or revoked allowance", mitigation: "Checked offline against the last synced list. Risk within the sync window is accepted and bounded." },
         { threat: "Coercion and scams", mitigation: "Low offline limits and merchant-bound payments." },
         { threat: "Merchant data loss before sync", mitigation: "Durable encrypted queue. The payer keeps a copy and can also sync it." },
@@ -629,8 +629,8 @@ const site = {
       items: [
         { name: "ECDSA P-256", body: "Supported natively by iOS Secure Enclave and Android StrongBox, so keys stay in hardware." },
         { name: "SHA-256", body: "Used for the hash chain that links each payment to the one before." },
-        { name: "CBOR encoding", body: "Compact binary payloads that fit in a single QR code." },
-        { name: "Audited libraries", body: "Deterministic signatures from well-reviewed open-source implementations." },
+        { name: "Fixed-layout binary encoding", body: "Deterministic, compact payloads: a full payment bundle is 276 bytes and fits in a single QR code." },
+        { name: "Platform cryptography", body: "Signing and hashing use the platform's built-in WebCrypto, with no third-party crypto dependency." },
         { name: "Untrusted clocks", body: "Ordering comes from sequence numbers. Expiry allows a skew window." },
       ],
     },

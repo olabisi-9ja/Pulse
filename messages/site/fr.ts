@@ -144,7 +144,7 @@ const site: SiteMessages = {
       {
         actor: "payer",
         title: "Scanner et confirmer",
-        body: "Le payeur scanne, voit le montant et confirme avec son code PIN ou sa biométrie.",
+        body: "Le payeur scanne, voit le montant et confirme avec son code PIN.",
       },
       {
         actor: "payer",
@@ -354,7 +354,7 @@ const site: SiteMessages = {
       body: "Le double dépensement hors ligne ne peut pas être empêché avec certitude. On peut le rendre difficile, le borner, le détecter et le recouvrer. Voici chaque défense et ce qu'elle apporte.",
       head: { defence: "Défense", effect: "Effet" },
       rows: [
-        { defence: "Clés protégées par le matériel et attestation", effect: "Cloner la clé d'un appareil coûte cher." },
+        { defence: "Clés d'appareil non exportables (protégées par le matériel et attestées dans les SDK natifs, prévu)", effect: "Extraire une clé est difficile ; cloner un appareil entier est contenu par les plafonds et la détection des bifurcations." },
         { defence: "Plafond d'allocation, limite par transaction, expiration", effect: "Plafonne la perte maximale." },
         { defence: "Paiements chaînés et numérotés", effect: "Tout double dépensement devient une bifurcation détectable." },
         { defence: "Contrôles de cohérence côté commerçant", effect: "Bloque les rejeux naïfs chez le même commerçant." },
@@ -592,7 +592,7 @@ const site: SiteMessages = {
     principles: {
       title: "Pensé pour les intégrateurs",
       items: [
-        "Écritures idempotentes : les nouvelles tentatives sont sans danger",
+        "Synchronisation des paiements idempotente : les nouvelles tentatives sont sans danger",
         "Webhooks signés avec protection contre le rejeu",
         "Sandbox avec argent de test et la même API",
         "Montants en entiers, dans la plus petite unité monétaire",
@@ -615,12 +615,12 @@ const site: SiteMessages = {
       title: "Synthèse du modèle de menaces",
       head: { threat: "Menace", mitigation: "Parade" },
       rows: [
-        { threat: "Appareil cloné ou clé extraite", mitigation: "Module de sécurité matériel, attestation, plafonds bas, détection des bifurcations et révocation." },
+        { threat: "Appareil cloné ou clé extraite", mitigation: "Clés non exportables (module matériel et attestation prévus dans les SDK natifs), plafonds bas, détection des bifurcations et révocation." },
         { threat: "Rejeu chez le même commerçant", mitigation: "Numéro de demande à usage unique et contrôles de séquence." },
         { threat: "Rejeu chez un autre commerçant", mitigation: "Chaque paiement est lié à un identifiant de commerçant." },
         { threat: "Retour en arrière du compteur sur l'appareil", mitigation: "La chaîne de hachage transforme un retour en arrière en bifurcation que le rapprochement détecte." },
         { threat: "Faux paiement fabriqué par un commerçant", mitigation: "Impossible sans la clé privée du payeur." },
-        { threat: "Téléphone perdu ou volé", mitigation: "PIN ou biométrie avant signature. L'allocation restante est exposée comme des espèces, elle est plafonnée, et la clé peut être révoquée." },
+        { threat: "Téléphone perdu ou volé", mitigation: "PIN avant signature. L'allocation restante est exposée comme des espèces, elle est plafonnée, et la clé peut être révoquée." },
         { threat: "Allocation expirée ou révoquée", mitigation: "Contrôlée hors ligne selon la dernière liste synchronisée. Le risque dans la fenêtre de synchro est accepté et borné." },
         { threat: "Contrainte et arnaques", mitigation: "Plafonds hors ligne bas et paiements liés au commerçant." },
         { threat: "Perte de données du commerçant avant synchro", mitigation: "File durable et chiffrée. Le payeur conserve une copie et peut aussi la synchroniser." },
@@ -631,8 +631,8 @@ const site: SiteMessages = {
       items: [
         { name: "ECDSA P-256", body: "Pris en charge nativement par le Secure Enclave d'iOS et le StrongBox d'Android : les clés restent dans le matériel." },
         { name: "SHA-256", body: "Sert à la chaîne de hachage qui relie chaque paiement au précédent." },
-        { name: "Encodage CBOR", body: "Des charges binaires compactes qui tiennent dans un seul QR code." },
-        { name: "Bibliothèques auditées", body: "Des signatures déterministes issues d'implémentations open source bien relues." },
+        { name: "Encodage binaire à format fixe", body: "Des charges déterministes et compactes : un paiement complet fait 276 octets et tient dans un seul QR code." },
+        { name: "Cryptographie de la plateforme", body: "La signature et le hachage utilisent WebCrypto, intégré à la plateforme, sans dépendance cryptographique tierce." },
         { name: "Horloges non fiables", body: "L'ordre vient des numéros de séquence. L'expiration tolère un décalage d'horloge." },
       ],
     },

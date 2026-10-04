@@ -9,8 +9,12 @@ import { Button, Field, Notice } from "./ui";
 
 type Mode = "supabase" | "dev" | "unavailable" | "offline" | null;
 
+type SupabasePublic = { url: string; key: string };
+let supabaseConfig: SupabasePublic | null = null;
+
 function supabase() {
-  return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!);
+  if (!supabaseConfig) throw new Error("Supabase is not configured");
+  return createBrowserClient(supabaseConfig.url, supabaseConfig.key);
 }
 
 /** Email one-time-code sign-in. `next` is where to go afterwards. */
@@ -24,8 +28,11 @@ export function SignIn({ next, onSignedIn }: { next: string; onSignedIn?: () => 
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    api<{ mode: Mode }>("/api/auth/config")
-      .then((r) => setMode(r.mode))
+    api<{ mode: Mode; supabase?: SupabasePublic }>("/api/auth/config")
+      .then((r) => {
+        supabaseConfig = r.supabase ?? null;
+        setMode(r.mode);
+      })
       .catch((err) => setMode(err instanceof NetworkError ? "offline" : "unavailable"));
   }, []);
 

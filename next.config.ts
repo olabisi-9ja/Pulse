@@ -32,6 +32,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // The Dockerfile sets NEXT_OUTPUT=standalone for a minimal Node server image.
+  output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,
   transpilePackages: ["@payvault/protocol", "@payvault/countries"],
   // Lets a second origin act as another phone during local two-device testing.
   allowedDevOrigins: ["127.0.0.1"],

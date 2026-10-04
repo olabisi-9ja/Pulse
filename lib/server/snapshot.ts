@@ -49,7 +49,10 @@ export async function appSnapshot(tx: Db, user: AppUser) {
     limits: {
       maxFunded: maxFunded(pack, user.kyc_tier),
       perTransaction: pack.offlineLimits.perTransaction,
+      maxPayments: pack.offlineLimits.maxPaymentsPerAllowance,
       ttlHours: pack.offlineLimits.allowanceTtlHours,
+      merchantUnsyncedValue: pack.offlineLimits.merchantUnsyncedValue ?? pack.offlineLimits.allowanceCap * 4,
+      merchantUnsyncedCount: pack.offlineLimits.merchantUnsyncedCount ?? 100,
       idSystems: pack.kyc.idSystems,
       minorUnits: pack.currency.minorUnits,
     },

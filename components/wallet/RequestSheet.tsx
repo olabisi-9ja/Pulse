@@ -74,7 +74,9 @@ export function RequestSheet({ open, onClose }: { open: boolean; onClose: () => 
     async (text: string) => {
       if (!merchant) return;
       try {
-        const res = await acceptPayment(userId, merchant.id, text);
+        const limits = useApp.getState().snapshot?.limits;
+        const caps = limits && { maxValue: limits.merchantUnsyncedValue, maxCount: limits.merchantUnsyncedCount };
+        const res = await acceptPayment(userId, merchant.id, text, caps);
         await useApp.getState().reloadLocal();
         if (res.ok) {
           navigator.vibrate?.([30, 40, 30]);

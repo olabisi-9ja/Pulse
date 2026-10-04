@@ -149,3 +149,20 @@ export async function deviceForUser(tx: Db, userId: string, deviceId: string): P
   return d && { ...d, public_key: bytes(d.public_key) };
 }
 
+
+export type DeviceSummary = { id: string; label: string; createdAt: string; lastSeenAt: string | null; frozenAt: string | null; vaultOpen: boolean };
+
+export async function devicesForUser(tx: Db, userId: string): Promise<DeviceSummary[]> {
+  const rows = await tx<{ id: string; label: string; created_at: Date; last_seen_at: Date | null; revoked_at: Date | null; vault_open: boolean }[]>`
+    select d.id, d.label, d.created_at, d.last_seen_at, d.revoked_at,
+      exists (select 1 from pv.allowances a where a.device_id = d.id and a.status in ('active', 'closing')) as vault_open
+    from pv.devices d where d.user_id = ${userId} order by d.created_at desc`;
+  return rows.map((r) => ({
+    id: r.id,
+    label: r.label,
+    createdAt: r.created_at.toISOString(),
+    lastSeenAt: r.last_seen_at?.toISOString() ?? null,
+    frozenAt: r.revoked_at?.toISOString() ?? null,
+    vaultOpen: r.vault_open,
+  }));
+}

@@ -5,6 +5,8 @@ import { z } from "zod";
 import { ServiceError } from "./allowances";
 import { AuthError } from "./auth";
 
+export { ServiceError };
+
 export function json(data: unknown, init?: ResponseInit) {
   return NextResponse.json(data, { ...init, headers: { "cache-control": "no-store", ...init?.headers } });
 }

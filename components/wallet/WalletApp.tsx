@@ -17,6 +17,7 @@ import { RequestSheet } from "./RequestSheet";
 import { SignIn } from "./SignIn";
 import { Spinner, Toast } from "./ui";
 import { VaultScreen } from "./VaultScreen";
+import { CashTapSheet } from "./CashTapSheet";
 
 type Phase = "boot" | "signin" | "onboarding" | "pin" | "ready" | "error";
 
@@ -150,7 +151,7 @@ function CreatePin({ userId, onDone }: { userId: string; onDone: () => void }) {
 function Main({ userId, onSignedOut }: { userId: string; onSignedOut: () => void }) {
   const { locale } = useI18n();
   const [tab, setTab] = useState<Tab>("home");
-  const [sheet, setSheet] = useState<null | "pay" | "request" | "add">(null);
+  const [sheet, setSheet] = useState<null | "pay" | "request" | "add" | "tap">(null);
   const [toast, setToast] = useState<string | null>(null);
   const snapshot = useApp((s) => s.snapshot);
 
@@ -176,7 +177,13 @@ function Main({ userId, onSignedOut }: { userId: string; onSignedOut: () => void
     <div className="mx-auto min-h-dvh max-w-md pb-32">
       <main>
         {tab === "home" && (
-          <HomeScreen onPay={() => setSheet("pay")} onRequest={() => setSheet("request")} onAdd={() => setSheet("add")} setTab={setTab} />
+          <HomeScreen
+            onPay={() => setSheet("pay")}
+            onRequest={() => setSheet("request")}
+            onAdd={() => setSheet("add")}
+            onTap={() => setSheet("tap")}
+            setTab={setTab}
+          />
         )}
         {tab === "activity" && <ActivityScreen />}
         {tab === "vault" && <VaultScreen toast={setToast} />}
@@ -190,9 +197,11 @@ function Main({ userId, onSignedOut }: { userId: string; onSignedOut: () => void
           setSheet(null);
           setTab("vault");
         }}
+        onTap={() => setSheet("tap")}
       />
       <RequestSheet open={sheet === "request"} onClose={() => setSheet(null)} />
       <AddSheet open={sheet === "add"} onClose={() => setSheet(null)} toast={setToast} onLoadVault={() => setTab("vault")} />
+      <CashTapSheet open={sheet === "tap"} onClose={() => setSheet(null)} />
       <Toast message={toast} onDone={() => setToast(null)} />
     </div>
   );

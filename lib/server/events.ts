@@ -10,7 +10,8 @@ export type EventType =
   | "payment.flagged"
   | "fraud.detected"
   | "loan.drawn"
-  | "loan.repaid";
+  | "loan.repaid"
+  | "cashtap.payment.settled";
 
 export async function emit(tx: Db, partnerId: string, type: EventType, payload: Record<string, unknown>) {
   await tx`insert into pv.events (partner_id, type, payload) values (${partnerId}, ${type}, ${tx.json(payload as never)})`;

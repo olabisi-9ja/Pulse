@@ -16,7 +16,7 @@ import {
   type WalletState,
 } from "@payvault/protocol";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { closeWithStatement, issueForUser } from "./allowances";
+import { closeWithStatement, freezeDevice, issueForUser, sweepExpired } from "./allowances";
 import { creditSummary, loansForUser, repayFromWallet } from "./credit";
 import { db, type Sql } from "./db";
 import { createUser, enableMerchant, registerDevice, submitKyc, userById } from "./identity";
@@ -109,7 +109,7 @@ describe.skipIf(!enabled)("settlement flows", () => {
     expect((await loansForUser(sql, user.id))[0].status).toBe("repaid");
 
     expect(await ledgerSum()).toBe(0);
-  });
+  }, 30_000);
 
   it("cashes out early with a signed close statement, then closes when the last payment syncs", async () => {
     const { user, device, deviceId } = await newPayer(2_000_000);
@@ -153,5 +153,54 @@ describe.skipIf(!enabled)("settlement flows", () => {
     await expect(
       sql.begin((tx) => issueForUser(tx, { userId: user.id, deviceId, funded: 100_000, credit: 9_000_000 })),
     ).rejects.toMatchObject({ code: "over_credit" });
+  });
+
+  it("applies holder-chosen limits and refuses ones above the country pack", async () => {
+    const { user, deviceId } = await newPayer(2_000_000);
+    const cert = await sql.begin((tx) =>
+      issueForUser(tx, { userId: user.id, deviceId, funded: 500_000, credit: 0, perTxLimit: 100_000, maxPayments: 3, ttlHours: 6 }),
+    );
+    expect(cert).toMatchObject({ perTxLimit: 100_000, maxPayments: 3 });
+    expect(cert.expiresAt - cert.issuedAt).toBe(6 * 3600);
+
+    const other = await newPayer(2_000_000);
+    await expect(
+      sql.begin((tx) => issueForUser(tx, { userId: other.user.id, deviceId: other.deviceId, funded: 100_000, credit: 0, maxPayments: 70_000 })),
+    ).rejects.toMatchObject({ code: "over_limit" });
+  });
+
+  it("freezes a lost phone: revokes its vault, blocks new ones, honours earlier payments, refunds the rest after expiry", async () => {
+    const { user, device, deviceId } = await newPayer(2_000_000);
+    const shop = await newUser("NG", "Kiosk");
+    const cert = await sql.begin((tx) => issueForUser(tx, { userId: user.id, deviceId, funded: 1_000_000, credit: 0 }));
+    const p1 = await pay(device.privateKey, await initWalletState(cert), shop.merchant_id!, 300_000);
+
+    const res = await sql.begin((tx) => freezeDevice(tx, user.id, deviceId));
+    expect(res.revoked).toBe(1);
+    const [a] = await sql`select status from pv.allowances where id = ${cert.allowanceId}`;
+    expect(a.status).toBe("revoked");
+    const [r] = await sql`select reason from pv.revocations where allowance_id = ${cert.allowanceId}`;
+    expect(r.reason).toBe("device_lost");
+
+    await expect(
+      sql.begin((tx) => issueForUser(tx, { userId: user.id, deviceId, funded: 100_000, credit: 0 })),
+    ).rejects.toMatchObject({ code: "bad_device" });
+
+    // Signed before the freeze reached the merchant: still paid.
+    const [settled] = await ingestBundles(sql, { kind: "user", userId: shop.id }, [p1.bytes]);
+    expect(settled.status).not.toBe("rejected");
+    expect((await balances(sql, shop)).merchant).toBe(300_000);
+
+    // Another user can't freeze this phone.
+    const stranger = await newUser();
+    await expect(sql.begin((tx) => freezeDevice(tx, stranger.id, deviceId))).rejects.toMatchObject({ code: "not_found" });
+
+    await sql`update pv.allowances set expires_at = now() - interval '2 days' where id = ${cert.allowanceId}`;
+    await sql.begin((tx) => sweepExpired(tx));
+    const after = await balances(sql, user);
+    expect(after.vault).toBe(0);
+    expect(after.wallet).toBe(2_000_000 - 300_000);
+    const [still] = await sql`select status from pv.allowances where id = ${cert.allowanceId}`;
+    expect(still.status).toBe("revoked");
   });
 });

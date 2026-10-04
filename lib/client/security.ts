@@ -67,3 +67,15 @@ export async function checkPin(userId: string, pin: string): Promise<PinCheck> {
     ? { ok: false, reason: "locked", retryAt: lockedUntil }
     : { ok: false, reason: "wrong", attemptsLeft: 5 - failures };
 }
+
+/**
+ * Optional amount up to which offline payments skip the PIN (0 = always ask).
+ * Off by default; the holder opts in, as with contactless card limits.
+ */
+export async function getNoPinLimit(userId: string): Promise<number> {
+  return (await kv.get<number>(`nopin:${userId}`)) ?? 0;
+}
+
+export async function setNoPinLimit(userId: string, amount: number): Promise<void> {
+  await kv.set(`nopin:${userId}`, Math.max(0, Math.floor(amount)));
+}

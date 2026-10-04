@@ -1,9 +1,10 @@
 "use client";
-import { Download, LogOut, Store } from "lucide-react";
+import { Download, LogOut, Smartphone, Store } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api, ApiError, NetworkError } from "@/lib/client/api";
-import { money, parseMajor } from "@/lib/client/money";
+import { minorUnitsOf, money, parseMajor, shortDate } from "@/lib/client/money";
+import { getDeviceKey, getNoPinLimit, setNoPinLimit } from "@/lib/client/security";
 import { useApp } from "@/lib/client/store";
 import { useI18n } from "./I18n";
 import { TxRow, useRows } from "./parts";
@@ -124,6 +125,8 @@ export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSi
         )}
       </Card>
       {snapshot.partner.sandbox && <Notice tone="warn">{m.profile.sandbox}</Notice>}
+
+      <DevicesCard />
 
       <Card className="space-y-4">
         <div>
@@ -311,5 +314,84 @@ export function AddSheet({ open, onClose, toast, onLoadVault }: { open: boolean;
         </div>
       </div>
     </Sheet>
+  );
+}
+
+type DeviceSummary = { id: string; label: string; createdAt: string; frozenAt: string | null; vaultOpen: boolean };
+
+/** Lost-phone control: freeze any of your phones from another one, plus the PIN-free limit for this phone. */
+function DevicesCard() {
+  const { m, t, locale } = useI18n();
+  const userId = useApp((s) => s.userId)!;
+  const cur = useApp((s) => s.snapshot?.user.currency) ?? "NGN";
+  const [devices, setDevices] = useState<DeviceSummary[] | null>(null);
+  const [current, setCurrent] = useState<string | undefined>();
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [noPin, setNoPin] = useState("");
+
+  useEffect(() => {
+    void getDeviceKey(userId).then((d) => setCurrent(d.deviceId));
+    void getNoPinLimit(userId).then((v) => setNoPin(v ? String(v / 10 ** minorUnitsOf(cur)) : ""));
+    api<{ devices: DeviceSummary[] }>("/api/app/devices")
+      .then((r) => setDevices(r.devices))
+      .catch(() => setDevices(null));
+  }, [userId, cur]);
+
+  const freeze = async (id: string) => {
+    if (!window.confirm(m.profile.freezeConfirm)) return;
+    setBusy(id);
+    setError(null);
+    try {
+      await api("/api/app/devices/freeze", { deviceId: id });
+      setDevices((ds) => ds?.map((d) => (d.id === id ? { ...d, frozenAt: new Date().toISOString(), vaultOpen: false } : d)) ?? null);
+      await useApp.getState().refresh();
+    } catch (err) {
+      setError(err instanceof NetworkError ? m.common.needsNetwork : err instanceof ApiError ? err.message : m.common.genericError);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const saveNoPin = (v: string) => {
+    setNoPin(v);
+    const minor = v.trim() ? parseMajor(v, cur) : 0;
+    if (minor !== null) void setNoPinLimit(userId, minor);
+  };
+
+  return (
+    <Card className="space-y-4">
+      {devices && devices.length > 0 && (
+        <div>
+          <p className="mb-2 text-sm font-medium text-muted">{m.profile.devices}</p>
+          <ul className="divide-y divide-line">
+            {devices.map((d) => (
+              <li key={d.id} className="flex items-center justify-between gap-3 py-2.5">
+                <span className="flex items-center gap-2 text-sm text-ink">
+                  <Smartphone className="h-4 w-4 text-muted" />
+                  {d.id === current ? m.profile.thisDevice : t(m.profile.otherDevice, { date: shortDate(d.createdAt, locale) })}
+                </span>
+                {d.frozenAt ? (
+                  <span className="text-sm text-muted">{m.profile.frozen}</span>
+                ) : (
+                  <Button variant="secondary" className="h-9 px-4 text-sm" loading={busy === d.id} onClick={() => void freeze(d.id)}>
+                    {m.profile.freeze}
+                  </Button>
+                )}
+              </li>
+            ))}
+          </ul>
+          {error && <Notice tone="danger">{error}</Notice>}
+        </div>
+      )}
+      <Field
+        label={m.profile.noPin}
+        inputMode="decimal"
+        value={noPin}
+        onChange={(e) => saveNoPin(e.target.value)}
+        hint={m.profile.noPinHint}
+        placeholder={money(0, cur, locale)}
+      />
+    </Card>
   );
 }

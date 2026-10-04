@@ -103,11 +103,20 @@ function LoadVault({ toast }: { toast: (s: string) => void }) {
   const cur = snapshot.user.currency;
   const [amount, setAmount] = useState("");
   const [credit, setCredit] = useState(false);
+  const [showLimits, setShowLimits] = useState(false);
+  const [perTx, setPerTx] = useState("");
+  const [maxPay, setMaxPay] = useState("");
+  const [ttl, setTtl] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const funded = parseMajor(amount, cur) ?? 0;
   const maxFunded = Math.min(snapshot.limits.maxFunded, snapshot.balances.wallet);
   const creditAvail = snapshot.credit.available;
+  const L = snapshot.limits;
+  const perTxMinor = perTx.trim() ? parseMajor(perTx, cur) : undefined;
+  const int = (v: string) => (v.trim() ? Number(v) : undefined);
+  const bad = (v: number | null | undefined, max: number) => v !== undefined && (v === null || !Number.isInteger(v) || v < 1 || v > max);
+  const limitsBad = bad(perTxMinor, L.perTransaction) || bad(int(maxPay), L.maxPayments) || bad(int(ttl), L.ttlHours);
 
   const load = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,6 +129,9 @@ function LoadVault({ toast }: { toast: (s: string) => void }) {
         deviceId: device.deviceId,
         funded,
         credit: credit ? creditAvail : 0,
+        perTxLimit: perTxMinor ?? undefined,
+        maxPayments: int(maxPay),
+        ttlHours: int(ttl),
       });
       await installVault(userId, res.cert);
       await useApp.getState().sync("vault");
@@ -152,8 +164,40 @@ function LoadVault({ toast }: { toast: (s: string) => void }) {
             <input type="checkbox" className="h-6 w-6 accent-[var(--pv-accent)]" checked={credit} onChange={(e) => setCredit(e.target.checked)} />
           </label>
         )}
+        {showLimits ? (
+          <div className="space-y-3">
+            <Field
+              label={m.vault.perTxLimit}
+              inputMode="decimal"
+              value={perTx}
+              onChange={(e) => setPerTx(e.target.value)}
+              hint={t(m.vault.upTo, { value: money(L.perTransaction, cur, locale) })}
+              error={bad(perTxMinor, L.perTransaction) ? m.pay.errors.bad_amount : null}
+            />
+            <Field
+              label={m.vault.maxPayments}
+              inputMode="numeric"
+              value={maxPay}
+              onChange={(e) => setMaxPay(e.target.value)}
+              hint={t(m.vault.upTo, { value: String(L.maxPayments) })}
+              error={bad(int(maxPay), L.maxPayments) ? m.pay.errors.bad_amount : null}
+            />
+            <Field
+              label={m.vault.ttlHours}
+              inputMode="numeric"
+              value={ttl}
+              onChange={(e) => setTtl(e.target.value)}
+              hint={t(m.vault.upTo, { value: String(L.ttlHours) })}
+              error={bad(int(ttl), L.ttlHours) ? m.pay.errors.bad_amount : null}
+            />
+          </div>
+        ) : (
+          <button type="button" onClick={() => setShowLimits(true)} className="text-sm font-medium text-ink underline underline-offset-4">
+            {m.vault.myLimits}
+          </button>
+        )}
         {error && <Notice tone="danger">{error}</Notice>}
-        <Button type="submit" className="w-full" loading={busy} disabled={(funded <= 0 && !credit) || funded > maxFunded}>
+        <Button type="submit" className="w-full" loading={busy} disabled={(funded <= 0 && !credit) || funded > maxFunded || limitsBad}>
           {m.vault.load}
         </Button>
       </form>

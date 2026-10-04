@@ -1,10 +1,10 @@
 "use client";
 import type { PaymentRequest } from "@payvault/protocol";
-import { CheckCircle2, WifiOff } from "lucide-react";
-import { useCallback, useState } from "react";
+import { CheckCircle2, Radio, WifiOff } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { money } from "@/lib/client/money";
 import { parseQr, payRequest, type PayQuote, quotePayment } from "@/lib/client/offline";
-import { checkPin, getDeviceKey } from "@/lib/client/security";
+import { checkPin, getDeviceKey, getNoPinLimit } from "@/lib/client/security";
 import { useApp } from "@/lib/client/store";
 import { useI18n } from "./I18n";
 import { PinPad } from "./PinPad";
@@ -19,7 +19,17 @@ type Step =
   | { s: "show"; qr: string; amount: number; currency: string; name: string };
 
 /** Payer flow: scan request → confirm → PIN → sign → show payment code. Fully offline. */
-export function PaySheet({ open, onClose, onNeedVault }: { open: boolean; onClose: () => void; onNeedVault: () => void }) {
+export function PaySheet({
+  open,
+  onClose,
+  onNeedVault,
+  onTap,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onNeedVault: () => void;
+  onTap?: () => void;
+}) {
   const { m, t, locale } = useI18n();
   const userId = useApp((s) => s.userId)!;
   const snapshot = useApp((s) => s.snapshot);
@@ -27,6 +37,11 @@ export function PaySheet({ open, onClose, onNeedVault }: { open: boolean; onClos
   const [error, setError] = useState<string | null>(null);
   const [pinError, setPinError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [noPinLimit, setNoPinLimit] = useState(0);
+
+  useEffect(() => {
+    if (open) void getNoPinLimit(userId).then(setNoPinLimit);
+  }, [open, userId]);
 
   const close = () => {
     setStep({ s: "scan" });
@@ -60,14 +75,23 @@ export function PaySheet({ open, onClose, onNeedVault }: { open: boolean; onClos
     [userId, m, onNeedVault],
   );
 
-  const approve = async (pin: string, quote: Extract<PayQuote, { ok: true }>) => {
+  const approve = async (pin: string | null, quote: Extract<PayQuote, { ok: true }>) => {
     setBusy(true);
     setPinError(null);
-    const check = await checkPin(userId, pin);
-    if (!check.ok) {
-      setBusy(false);
-      setPinError(check.reason === "locked" ? m.pin.locked : t(m.pin.wrong, { n: check.attemptsLeft ?? 0 }));
-      return;
+    if (pin === null) {
+      // Holder opted in to PIN-free payments up to a small amount.
+      if (noPinLimit <= 0 || quote.request.amount > noPinLimit) {
+        setBusy(false);
+        setStep({ s: "pin", quote });
+        return;
+      }
+    } else {
+      const check = await checkPin(userId, pin);
+      if (!check.ok) {
+        setBusy(false);
+        setPinError(check.reason === "locked" ? m.pin.locked : t(m.pin.wrong, { n: check.attemptsLeft ?? 0 }));
+        return;
+      }
     }
     try {
       const device = await getDeviceKey(userId);
@@ -93,6 +117,18 @@ export function PaySheet({ open, onClose, onNeedVault }: { open: boolean; onClos
         <div className="space-y-4">
           {error && <Notice tone="danger">{error}</Notice>}
           <Scanner hint={m.pay.scanHint} onResult={(text) => void onScan(text)} />
+          {onTap && (
+            <button
+              type="button"
+              onClick={() => {
+                close();
+                onTap();
+              }}
+              className="flex w-full items-center justify-center gap-2 rounded-full border border-line bg-card py-3.5 text-sm font-medium text-ink transition active:scale-[0.98]"
+            >
+              <Radio className="h-4 w-4 text-accent-text" /> {m.pay.tapInstead}
+            </button>
+          )}
         </div>
       )}
 
@@ -125,9 +161,15 @@ export function PaySheet({ open, onClose, onNeedVault }: { open: boolean; onClos
               </div>
             )}
           </dl>
-          <Button className="w-full" onClick={() => setStep({ s: "pin", quote: step.quote })}>
-            {m.pay.approve}
-          </Button>
+          {noPinLimit > 0 && step.quote.request.amount <= noPinLimit ? (
+            <Button className="w-full" loading={busy} onClick={() => void approve(null, step.quote)}>
+              {m.pay.approveNoPin}
+            </Button>
+          ) : (
+            <Button className="w-full" onClick={() => setStep({ s: "pin", quote: step.quote })}>
+              {m.pay.approve}
+            </Button>
+          )}
         </div>
       )}
 

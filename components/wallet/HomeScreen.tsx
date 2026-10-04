@@ -1,5 +1,5 @@
 "use client";
-import { ArrowDownLeft, ArrowUpRight, Eye, EyeOff, ScanLine } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Eye, EyeOff, Radio, ScanLine } from "lucide-react";
 import { useState } from "react";
 import { money, shortDate } from "@/lib/client/money";
 import { vaultSummary } from "@/lib/client/offline";
@@ -12,11 +12,13 @@ export function HomeScreen({
   onPay,
   onRequest,
   onAdd,
+  onTap,
   setTab,
 }: {
   onPay: () => void;
   onRequest: () => void;
   onAdd: () => void;
+  onTap?: () => void;
   setTab: (t: Tab) => void;
 }) {
   const { m, locale } = useI18n();
@@ -66,13 +68,18 @@ export function HomeScreen({
             {m.home.merchant}: {show(snapshot.balances.merchant)}
           </p>
         )}
-        <div className="mt-7 flex gap-3">
+        <div className="mt-7 flex gap-2">
           <PillAction onClick={onRequest} icon={<ArrowDownLeft className="h-5 w-5" />}>
             {m.home.request}
           </PillAction>
           <PillAction onClick={onPay} icon={<ArrowUpRight className="h-5 w-5" />}>
             {m.home.pay}
           </PillAction>
+          {onTap && (
+            <PillAction onClick={onTap} icon={<Radio className="h-5 w-5 text-accent-text" />}>
+              {m.home.tap}
+            </PillAction>
+          )}
         </div>
       </section>
 

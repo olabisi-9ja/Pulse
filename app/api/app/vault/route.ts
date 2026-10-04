@@ -9,6 +9,9 @@ const Body = z.object({
   deviceId: z.uuid(),
   funded: z.number().int().min(0).max(1_000_000_000),
   credit: z.number().int().min(0).max(1_000_000_000),
+  perTxLimit: z.number().int().min(1).optional(),
+  maxPayments: z.number().int().min(1).max(65535).optional(),
+  ttlHours: z.number().int().min(1).optional(),
 });
 
 export const POST = handle(async (req: Request) => {

@@ -66,6 +66,13 @@ export const CountryPackSchema = z
       allowanceTtlHours: z.number().int().positive(),
       maxPaymentsPerAllowance: z.number().int().min(1).max(65535),
       releaseGraceHours: z.number().int().nonnegative(),
+      /**
+       * Merchant side: offline payments a merchant phone may accept before it
+       * must sync. Bounds exposure to vaults revoked since its last sync.
+       * Defaults: 4 x allowanceCap and 100 payments.
+       */
+      merchantUnsyncedValue: minorInt.optional(),
+      merchantUnsyncedCount: z.number().int().min(1).optional(),
     }),
     kyc: z.object({
       tiers: z.array(KycTier).min(1),

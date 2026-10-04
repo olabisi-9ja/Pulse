@@ -12,7 +12,7 @@ import type { WalletState } from "@payvault/protocol";
 import { create } from "zustand";
 import { api, ApiError, NetworkError } from "./api";
 import { kv } from "./kv";
-import { getOutbox, loadVault, markOutbox, type OutboxItem, pendingOutbox, saveNetwork } from "./offline";
+import { clearVault, getOutbox, loadVault, markOutbox, type OutboxItem, pendingOutbox, saveNetwork, vaultSummary } from "./offline";
 import type { AppSnapshot } from "@/lib/server/snapshot";
 
 export type Connectivity = "online" | "degraded" | "offline" | "reconnecting" | "reconciling" | "settled";
@@ -76,6 +76,12 @@ export const useApp = create<State & Actions>((set, get) => ({
     await kv.set(snapKey(u), { data, at: Date.now() });
     await saveNetwork(data.network);
     set({ snapshot: data, snapshotAt: Date.now() });
+    // This phone's vault was frozen (lost-phone flow) or blocked: stop offering it.
+    const local = vaultSummary(await loadVault(u));
+    if (local && data.allowances.some((a) => a.id === local.allowanceId && a.status === "revoked")) {
+      await clearVault(u);
+      set({ vault: null });
+    }
     if (Date.now() - started > 4000 && get().connectivity === "online") set({ connectivity: "degraded" });
   },
 

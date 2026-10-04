@@ -94,7 +94,16 @@ async function storeAllowance(
  */
 export async function issueForUser(
   tx: Db,
-  input: { userId: string; deviceId: string; funded: number; credit: number },
+  input: {
+    userId: string;
+    deviceId: string;
+    funded: number;
+    credit: number;
+    /** Optional holder-chosen limits; each may only tighten the country pack's. */
+    perTxLimit?: number;
+    maxPayments?: number;
+    ttlHours?: number;
+  },
 ): Promise<AllowanceCert> {
   const user = await userById(tx, input.userId);
   if (!user) throw new ServiceError("not_found", "User not found", 404);
@@ -110,6 +119,7 @@ export async function issueForUser(
   if (open) throw new ServiceError("vault_open", "This device already has an active offline vault");
 
   const pack = packFor(user.country);
+  const limits = holderLimits(pack, input);
   const fundedCap = maxFunded(pack, user.kyc_tier);
   if (input.funded > fundedCap) throw new ServiceError("over_limit", "Above your offline vault limit");
   if (input.credit > 0) {
@@ -132,10 +142,10 @@ export async function issueForUser(
     currency: pack.currency.code,
     funded: input.funded,
     credit: input.credit,
-    perTxLimit: pack.offlineLimits.perTransaction,
-    maxPayments: pack.offlineLimits.maxPaymentsPerAllowance,
+    perTxLimit: limits.perTxLimit,
+    maxPayments: limits.maxPayments,
     issuedAt: now,
-    expiresAt: now + pack.offlineLimits.allowanceTtlHours * 3600,
+    expiresAt: now + limits.ttlHours * 3600,
   });
   await storeAllowance(tx, cert, { partnerId: partner.id, userId: user.id, deviceId: device.id, externalRef: null });
   if (input.funded > 0) {
@@ -149,6 +159,24 @@ export async function issueForUser(
   }
   await emit(tx, partner.id, "allowance.issued", allowanceEvent(cert, user.id));
   return cert;
+}
+
+function holderLimits(
+  pack: ReturnType<typeof packFor>,
+  input: { perTxLimit?: number; maxPayments?: number; ttlHours?: number },
+): { perTxLimit: number; maxPayments: number; ttlHours: number } {
+  const L = pack.offlineLimits;
+  const pick = (v: number | undefined, max: number, label: string) => {
+    if (v === undefined) return max;
+    if (!Number.isSafeInteger(v) || v < 1) throw new ServiceError("bad_limit", `Invalid ${label}`);
+    if (v > max) throw new ServiceError("over_limit", `${label} is above the allowed maximum`);
+    return v;
+  };
+  return {
+    perTxLimit: pick(input.perTxLimit, L.perTransaction, "per-payment limit"),
+    maxPayments: pick(input.maxPayments, L.maxPaymentsPerAllowance, "payment count"),
+    ttlHours: pick(input.ttlHours, L.allowanceTtlHours, "duration"),
+  };
 }
 
 /**
@@ -270,20 +298,45 @@ export async function maybeFinishClosing(tx: Db, id: Uint8Array): Promise<void> 
   }
 }
 
-/** Returns unspent value from vaults past expiry + grace. Run on a schedule. */
+/**
+ * Returns unspent value from vaults past expiry + grace. Vaults frozen as lost
+ * stay revoked but get their leftover back too: payments signed before the
+ * freeze reached merchants can still arrive until then. Run on a schedule.
+ */
 export async function sweepExpired(tx: Db): Promise<number> {
   const rows = await tx<AllowanceRow[]>`
-    select * from pv.allowances
-    where status in ('active', 'closing')
-      and expires_at + make_interval(hours => 24) < now()
+    select * from pv.allowances a
+    where expires_at + make_interval(hours => 24) < now()
+      and (status in ('active', 'closing')
+        or (status = 'revoked' and funded > settled_funded + refunded
+          and exists (select 1 from pv.revocations r where r.allowance_id = a.id and r.reason = ${DEVICE_LOST})))
     order by expires_at limit 200 for update skip locked`;
   for (const raw of rows) {
     const a = normalizeAllowance(raw);
     await refund(tx, a, Math.max(0, a.funded - a.settled_funded - a.refunded), "vault_expiry");
+    if (a.status === "revoked") continue;
     await tx`update pv.allowances set status = 'closed', closed_at = now() where id = ${a.id}`;
     await emit(tx, a.partner_id, "allowance.closed", { allowanceId: toHex(a.id), reason: "expired" });
   }
   return rows.length;
+}
+
+const DEVICE_LOST = "device_lost";
+
+/**
+ * Lost or stolen phone: blocks the device from loading new vaults and revokes
+ * its open vaults. Merchants refuse the vault once their phone has synced the
+ * revocation list; payments it signed before that are still honoured.
+ */
+export async function freezeDevice(tx: Db, userId: string, deviceId: string): Promise<{ revoked: number }> {
+  const [d] = await tx<{ id: string }[]>`
+    update pv.devices set revoked_at = coalesce(revoked_at, now())
+    where id = ${deviceId} and user_id = ${userId} returning id`;
+  if (!d) throw new ServiceError("not_found", "Device not found", 404);
+  const rows = await tx<AllowanceRow[]>`
+    select * from pv.allowances where device_id = ${deviceId} and status in ('active', 'closing') for update`;
+  for (const raw of rows) await revokeAllowance(tx, normalizeAllowance(raw), DEVICE_LOST);
+  return { revoked: rows.length };
 }
 
 export async function revokeAllowance(tx: Db, a: AllowanceRow, reason: string): Promise<void> {

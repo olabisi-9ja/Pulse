@@ -197,10 +197,16 @@ function parseStoredRequest(o: OpenRequest): PaymentRequest {
   return { ...r, merchantId: fromHex(r.merchantId), nonce: fromHex(r.nonce) };
 }
 
-export type AcceptResult = VerifyResult & { item?: OutboxItem };
+export type AcceptResult = VerifyResult | { ok: false; code: "merchant_cap" };
 
-/** Verifies a scanned payment fully offline and, if valid, queues it for settlement. */
-export async function acceptPayment(u: string, merchantIdHex: string, qrText: string): Promise<AcceptResult> {
+/** How much this merchant phone may hold unsynced before it must get signal (from the country pack). */
+export type MerchantCaps = { maxValue: number; maxCount: number };
+
+/**
+ * Verifies a scanned payment fully offline and, if valid, queues it for
+ * settlement. Refuses once unsynced takings would pass the merchant caps.
+ */
+export async function acceptPayment(u: string, merchantIdHex: string, qrText: string, caps?: MerchantCaps): Promise<AcceptResult> {
   const scanned = parseQr(qrText);
   if (scanned.kind !== "bundle") return { ok: false, code: "request_mismatch" };
   const { bundle } = scanned;
@@ -227,6 +233,13 @@ export async function acceptPayment(u: string, merchantIdHex: string, qrText: st
     isNonceUsed: (n) => usedNonces.has(n),
   });
   if (!res.ok) return res;
+  if (caps) {
+    const unsynced = outbox.filter((i) => i.role === "merchant" && i.status === "pending");
+    const value = unsynced.reduce((n, i) => n + i.amount, 0);
+    if (unsynced.length + 1 > caps.maxCount || value + bundle.payment.amount > caps.maxValue) {
+      return { ok: false, code: "merchant_cap" };
+    }
+  }
   const item: OutboxItem = {
     id: res.id,
     role: "merchant",
@@ -243,7 +256,7 @@ export async function acceptPayment(u: string, merchantIdHex: string, qrText: st
   };
   await putOutbox(u, item);
   await cancelRequest(u);
-  return { ...res, item };
+  return res;
 }
 
 export { parseQr };

@@ -1,5 +1,6 @@
 # Container image for hosts that run Docker (RumptyCloud, Fly, a VM). Vercel ignores it.
-# Env vars (DATABASE_URL, PV_MASTER_KEY, CRON_SECRET, Supabase keys...) are read at runtime.
+# Env vars (DATABASE_URL, PV_MASTER_KEY, PV_DEMO_AUTH, Supabase keys...) are read at runtime.
+# Maintenance runs in-app from traffic (lib/server/maintenance.ts), so no scheduler is needed.
 FROM node:24-slim AS deps
 WORKDIR /app
 RUN corepack enable

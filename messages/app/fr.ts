@@ -24,7 +24,7 @@ const app: AppMessages = {
     code: "Code à 6 chiffres",
     verify: "Vérifier et continuer",
     useOtherEmail: "Utiliser une autre adresse",
-    devMode: "Connexion de développement : aucun e-mail n'est envoyé.",
+    devMode: "Connexion de démonstration : aucun code requis.",
     unavailable: "La connexion n'est pas encore configurée sur ce serveur.",
     invalidCode: "Ce code ne fonctionne pas. Vérifiez-le et réessayez.",
     offline: "Vous êtes hors ligne. Connectez-vous une fois en ligne ; ensuite l'application fonctionne sans réseau.",

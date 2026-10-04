@@ -22,7 +22,7 @@ const app = {
     code: "6-digit code",
     verify: "Verify and continue",
     useOtherEmail: "Use a different email",
-    devMode: "Development sign-in: no email is sent.",
+    devMode: "Demo sign-in: no code needed.",
     unavailable: "Sign-in isn't configured on this server yet.",
     invalidCode: "That code didn't work. Check it and try again.",
     offline: "You're offline. Sign in once online; after that the app works without a network.",

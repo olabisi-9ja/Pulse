@@ -5,10 +5,16 @@ import { errorResponse, handle, json, parseBody } from "@/lib/server/http";
 
 const Body = z.object({ email: z.email() });
 
-/** Local development sign-in (disabled when Supabase is configured or in production). */
+/** Email-only sign-in for local development and PV_DEMO_AUTH demos (off when Supabase is configured). */
 export const POST = handle(async (req: Request) => {
   if (!devAuthAllowed()) return errorResponse("disabled", "Development sign-in is disabled", 404);
   const { email } = await parseBody(req, Body);
-  (await cookies()).set(DEV_COOKIE, email.toLowerCase(), { httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 30 });
+  (await cookies()).set(DEV_COOKIE, email.toLowerCase(), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30,
+  });
   return json({ ok: true });
 });

@@ -2,7 +2,9 @@ import "server-only";
 /**
  * Identity comes from Supabase Auth (email OTP / magic link). Without Supabase
  * configured, development builds fall back to a local email sign-in so the
- * product can be run end to end on a laptop. Production refuses that fallback.
+ * product can be run end to end on a laptop. Production refuses that fallback
+ * unless PV_DEMO_AUTH=1 (pitch/demo deployments with sandbox money only:
+ * anyone can sign in as any email).
  */
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -14,7 +16,9 @@ export type Identity = { id: string; email: string };
 export const supabaseConfigured = () =>
   !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
 
-export const devAuthAllowed = () => !supabaseConfigured() && process.env.NODE_ENV !== "production";
+export const demoAuth = () => process.env.PV_DEMO_AUTH === "1";
+
+export const devAuthAllowed = () => !supabaseConfigured() && (process.env.NODE_ENV !== "production" || demoAuth());
 
 export async function supabaseServer() {
   const store = await cookies();

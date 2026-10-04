@@ -230,6 +230,10 @@ const app = {
     freezeConfirm: "Freeze this phone? Its offline vault stops working once merchants sync, and it can't load a new one. Unspent money returns to your wallet after the vault expires.",
     frozenToast: "Phone frozen",
     noPin: "Pay without PIN up to",
+    showIn: "Also show amounts in",
+    showInOff: "Off",
+    showInHint: "For reference only. Payments stay in {currency}. Rates from {date}, by exchangerate-api.com.",
+    showInRough: "For reference only. Payments stay in {currency}. Approximate rates: connect to update.",
     noPinHint: "Offline payments at or below this amount skip the PIN. Leave empty to always ask.",
   },
 };

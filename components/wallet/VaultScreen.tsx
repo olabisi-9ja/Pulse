@@ -7,6 +7,7 @@ import { clearVault, installVault, signCloseStatement, vaultSummary } from "@/li
 import { checkPin, getDeviceKey } from "@/lib/client/security";
 import { useApp } from "@/lib/client/store";
 import { useI18n } from "./I18n";
+import { useApprox } from "./parts";
 import { PinPad } from "./PinPad";
 import { Button, Card, Field, Notice, Select, Sheet, StatusPill } from "./ui";
 
@@ -19,6 +20,7 @@ export function VaultScreen({ toast }: { toast: (s: string) => void }) {
   const [pinFor, setPinFor] = useState<null | "cashout">(null);
   const [pinError, setPinError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const approxOf = useApprox();
   if (!snapshot) return null;
   const cur = snapshot.user.currency;
   const f = (v: number) => money(v, cur, locale);
@@ -58,6 +60,7 @@ export function VaultScreen({ toast }: { toast: (s: string) => void }) {
         <section className="rounded-[28px] bg-brand p-5 text-white">
           <p className="text-sm opacity-70">{m.vault.remaining}</p>
           <p className="tabular mt-2 text-[34px] leading-none font-medium tracking-tight">{f(vault.remaining)}</p>
+          {approxOf(vault.remaining, cur) && <p className="tabular mt-1 text-sm opacity-70">{approxOf(vault.remaining, cur)}</p>}
           <div className="mt-5 flex h-1.5 overflow-hidden rounded-full bg-white/20" aria-hidden>
             <span className="bg-white" style={{ width: `${(vault.fundedRemaining / vault.cap) * 100}%` }} />
             <span className="bg-[#2fb386]" style={{ width: `${(vault.creditRemaining / vault.cap) * 100}%` }} />

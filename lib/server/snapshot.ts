@@ -9,6 +9,7 @@ import { type AppUser, partnerById } from "./identity";
 import { publicIssuerKeys } from "./issuer";
 import { maxFunded } from "./policy";
 import { activity, balances } from "./money";
+import { DISPLAY_CURRENCIES, getRates } from "./rates";
 
 export async function networkSnapshot(tx: Db, since = new Date(Date.now() - 30 * 86_400_000)) {
   return {
@@ -20,7 +21,7 @@ export async function networkSnapshot(tx: Db, since = new Date(Date.now() - 30 *
 
 export async function appSnapshot(tx: Db, user: AppUser) {
   const pack = getCountryPack(user.country)!;
-  const [partner, bal, credit, allowances, loans, feed, network] = await Promise.all([
+  const [partner, bal, credit, allowances, loans, feed, network, rates] = await Promise.all([
     partnerById(tx, user.partner_id),
     balances(tx, user),
     creditSummary(tx, user),
@@ -28,6 +29,7 @@ export async function appSnapshot(tx: Db, user: AppUser) {
     loansForUser(tx, user.id),
     activity(tx, user, 40),
     networkSnapshot(tx),
+    getRates(),
   ]);
   return {
     user: {
@@ -89,6 +91,7 @@ export async function appSnapshot(tx: Db, user: AppUser) {
     })),
     activity: feed,
     network,
+    fx: { ...rates, currencies: DISPLAY_CURRENCIES },
   };
 }
 

@@ -7,6 +7,7 @@ import { parseQr, payRequest, type PayQuote, quotePayment } from "@/lib/client/o
 import { checkPin, getDeviceKey, getNoPinLimit } from "@/lib/client/security";
 import { useApp } from "@/lib/client/store";
 import { useI18n } from "./I18n";
+import { useApprox } from "./parts";
 import { PinPad } from "./PinPad";
 import { QrCode } from "./QrCode";
 import { Scanner } from "./Scanner";
@@ -38,6 +39,7 @@ export function PaySheet({
   const [pinError, setPinError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [noPinLimit, setNoPinLimit] = useState(0);
+  const approxOf = useApprox();
 
   useEffect(() => {
     if (open) void getNoPinLimit(userId).then(setNoPinLimit);
@@ -140,6 +142,9 @@ export function PaySheet({
             <p className="mt-4 text-[38px] leading-none font-medium tracking-tight tabular text-ink">
               {money(step.quote.request.amount, step.quote.request.currency, locale)}
             </p>
+            {approxOf(step.quote.request.amount, step.quote.request.currency) && (
+              <p className="tabular mt-2 text-sm text-muted">{approxOf(step.quote.request.amount, step.quote.request.currency)}</p>
+            )}
           </div>
           <dl className="space-y-2 rounded-[28px] bg-card p-5 text-sm">
             <div className="flex justify-between">

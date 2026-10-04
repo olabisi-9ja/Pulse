@@ -5,7 +5,7 @@ import { money, shortDate } from "@/lib/client/money";
 import { vaultSummary } from "@/lib/client/offline";
 import { useApp } from "@/lib/client/store";
 import { useI18n } from "./I18n";
-import { Initials, type Tab, TxRow, useRows } from "./parts";
+import { Initials, type Tab, TxRow, useApprox, useRows } from "./parts";
 import { Card, SectionHead, StatusPill } from "./ui";
 
 export function HomeScreen({
@@ -26,6 +26,7 @@ export function HomeScreen({
   const vault = vaultSummary(useApp((s) => s.vault));
   const [hidden, setHidden] = useState(false);
   const rows = useRows(5);
+  const approxOf = useApprox();
   if (!snapshot) return null;
   const u = snapshot.user;
   const cur = u.currency;
@@ -63,6 +64,9 @@ export function HomeScreen({
             {hidden ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
           </button>
         </div>
+        {!hidden && approxOf(snapshot.balances.wallet, cur) && (
+          <p className="tabular text-sm opacity-70">{approxOf(snapshot.balances.wallet, cur)}</p>
+        )}
         {u.merchant && (
           <p className="mt-1 text-[13px] opacity-60">
             {m.home.merchant}: {show(snapshot.balances.merchant)}

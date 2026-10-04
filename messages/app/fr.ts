@@ -232,6 +232,10 @@ const app: AppMessages = {
     freezeConfirm: "Geler ce téléphone ? Son coffre hors ligne cesse de fonctionner dès que les marchands se synchronisent, et il ne peut plus en charger un nouveau. L'argent non dépensé revient sur votre portefeuille après l'expiration du coffre.",
     frozenToast: "Téléphone gelé",
     noPin: "Payer sans code jusqu'à",
+    showIn: "Afficher aussi les montants en",
+    showInOff: "Non",
+    showInHint: "À titre indicatif. Les paiements restent en {currency}. Taux du {date}, par exchangerate-api.com.",
+    showInRough: "À titre indicatif. Les paiements restent en {currency}. Taux approximatifs : connectez-vous pour les mettre à jour.",
     noPinHint: "Les paiements hors ligne jusqu'à ce montant ne demandent pas le code. Laissez vide pour toujours le demander.",
   },
 };

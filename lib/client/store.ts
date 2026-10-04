@@ -27,6 +27,8 @@ type State = {
   lastSyncAt: number | null;
   lastError: string | null;
   retryIn: number | null;
+  /** Extra currency balances are also shown in (display only), or null. */
+  displayCurrency: string | null;
 };
 
 type Actions = {
@@ -35,6 +37,7 @@ type Actions = {
   reloadLocal(): Promise<void>;
   sync(reason?: string): Promise<void>;
   setConnectivity(c: Connectivity): void;
+  setDisplayCurrency(c: string | null): Promise<void>;
 };
 
 const snapKey = (u: string) => `snapshot:${u}`;
@@ -52,12 +55,26 @@ export const useApp = create<State & Actions>((set, get) => ({
   lastSyncAt: null,
   lastError: null,
   retryIn: null,
+  displayCurrency: null,
 
   setConnectivity: (c) => set({ connectivity: c }),
 
+  async setDisplayCurrency(c) {
+    const u = get().userId;
+    set({ displayCurrency: c });
+    if (!u) return;
+    if (c) await kv.set(`display:${u}`, c);
+    else await kv.del(`display:${u}`);
+  },
+
   async init(userId) {
     const cached = await kv.get<{ data: AppSnapshot; at: number }>(snapKey(userId));
-    set({ userId, snapshot: cached?.data ?? null, snapshotAt: cached?.at ?? null });
+    set({
+      userId,
+      snapshot: cached?.data ?? null,
+      snapshotAt: cached?.at ?? null,
+      displayCurrency: (await kv.get<string>(`display:${userId}`)) ?? null,
+    });
     await get().reloadLocal();
     void get().sync("init");
   },

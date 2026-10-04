@@ -8,7 +8,7 @@ import { getDeviceKey, getNoPinLimit, setNoPinLimit } from "@/lib/client/securit
 import { useApp } from "@/lib/client/store";
 import { useI18n } from "./I18n";
 import { TxRow, useRows } from "./parts";
-import { Button, Card, Field, Notice, Sheet } from "./ui";
+import { Button, Card, Field, Notice, Select, Sheet } from "./ui";
 
 export function ActivityScreen() {
   const { m } = useI18n();
@@ -75,6 +75,7 @@ export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSi
   const [theme, setTheme] = useState<Theme>(readTheme);
   const [install, setInstall] = useState<InstallEvent | null>(null);
   const [merchantOpen, setMerchantOpen] = useState(false);
+  const displayCurrency = useApp((s) => s.displayCurrency);
 
   useEffect(() => {
     const onPrompt = (e: Event) => {
@@ -129,6 +130,27 @@ export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSi
       <DevicesCard />
 
       <Card className="space-y-4">
+        {snapshot.fx && (
+          <Select
+            label={m.profile.showIn}
+            value={displayCurrency ?? ""}
+            onChange={(e) => void useApp.getState().setDisplayCurrency(e.target.value || null)}
+            hint={
+              snapshot.fx.source === "live"
+                ? t(m.profile.showInHint, { currency: u.currency, date: shortDate(snapshot.fx.asOf * 1000, locale) })
+                : t(m.profile.showInRough, { currency: u.currency })
+            }
+          >
+            <option value="">{m.profile.showInOff}</option>
+            {snapshot.fx.currencies
+              .filter((c) => c !== u.currency)
+              .map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+          </Select>
+        )}
         <div>
           <p className="mb-2 text-sm font-medium text-muted">{m.profile.language}</p>
           <div className="flex gap-2">

@@ -1,5 +1,6 @@
 "use client";
 import { ArrowDownLeft, ArrowUpRight, CircleUser, Home, LockKeyhole, ReceiptText, ShieldCheck } from "lucide-react";
+import { approx } from "@/lib/client/fx";
 import { money, shortDate } from "@/lib/client/money";
 import type { OutboxItem } from "@/lib/client/offline";
 import { useApp } from "@/lib/client/store";
@@ -8,6 +9,14 @@ import { useI18n } from "./I18n";
 import { StatusPill } from "./ui";
 
 export type Tab = "home" | "activity" | "vault" | "profile";
+
+/** Formats an amount in the holder's chosen display currency ("≈ €12.34"), or null when off. */
+export function useApprox() {
+  const { locale } = useI18n();
+  const to = useApp((s) => s.displayCurrency);
+  const fx = useApp((s) => s.snapshot?.fx);
+  return (amountMinor: number, currency: string) => approx(amountMinor, currency, to, fx, locale);
+}
 
 export function BottomNav({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   const { m } = useI18n();

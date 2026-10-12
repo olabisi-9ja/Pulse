@@ -34,6 +34,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // The Dockerfile sets NEXT_OUTPUT=standalone for a minimal Node server image.
   output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,
+  // Container builders report many CPUs but little memory; 31 page workers ran RumptyCloud's out.
+  experimental: process.env.NEXT_OUTPUT === "standalone" ? { cpus: 2 } : undefined,
   transpilePackages: ["@payvault/protocol", "@payvault/countries"],
   // Lets a second origin act as another phone during local two-device testing.
   allowedDevOrigins: ["127.0.0.1"],

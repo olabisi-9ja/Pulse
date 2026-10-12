@@ -10,14 +10,17 @@ export type CreditProfile = { user_id: string; credit_limit: number; score: numb
 
 export async function refreshCreditProfile(tx: Db, user: AppUser): Promise<CreditProfile> {
   const [h] = await tx<
-    { on_time: number; late: number; overdue: number; fraud: number; settled: number }[]
+    { on_time: number; late: number; overdue: number; fraud: number; settled: number; trading_days: number }[]
   >`
     select
       (select count(*)::int from pv.loans where user_id = ${user.id} and status = 'repaid' and updated_at <= due_at) as on_time,
       (select count(*)::int from pv.loans where user_id = ${user.id} and status = 'repaid' and updated_at > due_at) as late,
       (select count(*)::int from pv.loans where user_id = ${user.id} and (status = 'overdue' or (status = 'open' and due_at < now()))) as overdue,
       (select count(*)::int from pv.fraud_cases f join pv.allowances a on a.id = f.allowance_id where a.user_id = ${user.id}) as fraud,
-      (select count(*)::int from pv.payments where payer_user_id = ${user.id}) as settled`;
+      (select count(*)::int from pv.payments where payer_user_id = ${user.id}) as settled,
+      -- ponytail: sale day comes from the payer's phone clock; capped at sync time, so a fake day can't be in the future.
+      (select count(distinct least(device_time, received_at)::date)::int from pv.payments
+        where merchant_user_id = ${user.id} and status = 'settled' and received_at > now() - interval '30 days') as trading_days`;
   const ageDays = Math.floor((Date.now() - new Date(user.created_at).getTime()) / 86_400_000);
   const d = creditDecision(packFor(user.country), {
     tier: user.kyc_tier,
@@ -27,6 +30,7 @@ export async function refreshCreditProfile(tx: Db, user: AppUser): Promise<Credi
     openOverdue: h.overdue,
     fraudCases: h.fraud,
     settledPayments: h.settled,
+    tradingDays: h.trading_days,
   });
   const status = d.reason === "fraud" ? "frozen" : "active";
   const [p] = await tx<CreditProfile[]>`

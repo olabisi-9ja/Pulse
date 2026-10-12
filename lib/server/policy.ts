@@ -35,6 +35,8 @@ export type CreditHistory = {
   openOverdue: number;
   fraudCases: number;
   settledPayments: number;
+  /** Alternative data for traders: distinct days in the last 30 with takings received. */
+  tradingDays: number;
 };
 
 /**
@@ -50,6 +52,7 @@ export function creditDecision(pack: CountryPack, h: CreditHistory): { score: nu
   score += Math.min(15, Math.floor(h.accountAgeDays / 7));
   score += Math.min(30, h.loansRepaidOnTime * 6);
   score += Math.min(10, Math.floor(h.settledPayments / 5));
+  score += Math.min(20, h.tradingDays);
   score -= h.loansRepaidLate * 10;
   score = Math.max(0, Math.min(100, score));
 

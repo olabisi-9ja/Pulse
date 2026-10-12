@@ -1,6 +1,6 @@
 # PayVault: Session Handoff
 
-Last updated: 2026-09-29. Branch: `claude/hopeful-volta-m5q6kl` (repo `olabisi-9ja/Pulse`, to be renamed `PayVault` by the owner on GitHub).
+Last updated: 2026-10-12. Branch: `claude/hopeful-volta-m5q6kl` (repo `olabisi-9ja/Pulse`, to be renamed `PayVault` by the owner on GitHub).
 
 ## Product decisions (agreed with owner)
 - **Positioning:** B2B "Payment infrastructure for unreliable networks". Headline "No signal. Still paid." / FR "Pas de réseau. Payé quand même." Not a bank; partners hold licences and funds. The web app is the reference / white-label wallet, not a consumer brand.
@@ -65,6 +65,24 @@ Last updated: 2026-09-29. Branch: `claude/hopeful-volta-m5q6kl` (repo `olabisi-9
 - Vercel project `payvault` (id `prj_jWpsBiXPfGvJyRLlaVc9RbJUHSwN`, team `olabisi-side-projects`), linked to this repo. The production branch is `claude/hopeful-volta-m5q6kl`, and every push deploys. Live at https://payvault-phi.vercel.app. `vercel.json` runs `/api/cron` daily at 03:00 UTC (the Hobby limit).
 - The site is live. The wallet shows "sign-in not configured" until Supabase and the env vars are set.
 - The Vercel connector can't write env vars (403), and the Supabase connector can't create projects (it needs a cost confirmation). The owner does both in the dashboards, then Claude applies the migrations through the Supabase connector.
+
+## Session 3 (2026-10-04 → 10-12)
+- **Hackathon track: 3, Smart SME Financing (women-led businesses).** Pitch: a market trader's offline takings become her credit history. Merchant phones accept payments with no signal; each settled sale counts toward her overdraft score (`tradingDays` in `lib/server/policy.ts`, up to 20 of 100 points; sale day = payer's signed time, capped at sync time). Supporting angles: Track 1 (works where data is patchy), Track 7 (PIN-free small payments, large tap targets).
+- CashTap (another agent's work): online tap payment wallet → merchant on the ledger, `lib/server/cashafrica.ts`, migration 0004. Not real NFC; the card number is a 9xxx placeholder; sheet text is English only; "CashAfrica" is unverified branding.
+- From the offline-payments research (PBoC/e-CNY, Razorpay, ElasticPay): freeze a lost phone from Profile (revokes its vaults, reason `device_lost`, leftover refunded after expiry), holder-chosen lower vault limits, optional pay-without-PIN amount, merchant cap on unsynced value/count (country pack `merchantUnsynced*`, defaults 4× cap / 100).
+- Display currency: Profile "Also show amounts in"; `lib/server/rates.ts` (exchangerate-api daily, XOF/XAF via euro peg), cached in the snapshot for offline. Display only.
+- Maintenance (`lib/server/maintenance.ts`) runs after app requests at most hourly (`pv.job_runs`, migration 0005); `/api/cron` reuses it.
+- `PV_DEMO_AUTH=1`: email-only sign-in on a deployed build without Supabase. Anyone can sign in as any email, so sandbox money only and don't set `PV_ADMIN_EMAILS`.
+
+## RumptyCloud (live pitch host)
+- **URL:** https://payvault.rumptycloud.app (workspace `olabisiorg-01a0f838`, Lagos, zone `olas-closet`, single zone, no failover).
+- **App:** deployment `payvault`, Free size (0.5 vCPU, 512 MB, sleeps when idle, ~8 s cold start). Repo `olabisi-9ja/Pulse`, branch `claude/hopeful-volta-m5q6kl`, auto-deploys on push. Built from the root `Dockerfile` (Next standalone, 2 build workers because the builder runs out of memory with more). Port 8080, health check `/api/health`. CVE scan and PR previews off (paid).
+- **Container start:** `node scripts/migrate.mjs && node server.js`, so migrations apply on every boot.
+- **Database:** `payvault-db`, Postgres 17, Playground (free, 256 MB, 2 GiB), public endpoint off. The app uses the internal URL `pg-15aa1f.db.rumpty.internal`.
+- **Env vars (set in the console; the owner enters secrets):** `DATABASE_URL`, `PV_MASTER_KEY` (back it up: losing it orphans issuer keys), `PV_DEMO_AUTH=1`. RumptyCloud also passes env vars as Docker build args. `NEXT_PUBLIC_SITE_URL` defaults to the Rumpty URL in the Dockerfile.
+- **No email, cron or auth service on Rumpty:** that's why maintenance runs in-app and sign-in is demo mode. Supabase settings are read at runtime via `/api/auth/config` if ever added.
+- **Vercel** (payvault-phi.vercel.app) still exists and is unaffected by the Dockerfile.
+- **Local Postgres on Windows:** `%TEMP%/pvpg/start.mjs` (embedded-postgres, port 54329, user/pass postgres). `.env.local` points at a Docker DB on 5432; `.claude/launch.json` overrides it for the preview server.
 
 ## Next steps
 1. ~~Run `pnpm lint` and `pnpm build`; fix any errors.~~ Done.

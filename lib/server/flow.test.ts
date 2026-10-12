@@ -196,7 +196,11 @@ describe.skipIf(!enabled)("settlement flows", () => {
     const stranger = await newUser();
     await expect(sql.begin((tx) => freezeDevice(tx, stranger.id, deviceId))).rejects.toMatchObject({ code: "not_found" });
 
+    // Not refunded blind at expiry: the phone may still hold unsynced payments.
     await sql`update pv.allowances set expires_at = now() - interval '2 days' where id = ${cert.allowanceId}`;
+    await sql.begin((tx) => sweepExpired(tx));
+    expect((await balances(sql, user)).vault).toBeGreaterThan(0);
+    await sql`update pv.allowances set expires_at = now() - interval '31 days' where id = ${cert.allowanceId}`;
     await sql.begin((tx) => sweepExpired(tx));
     const after = await balances(sql, user);
     expect(after.vault).toBe(0);
@@ -216,4 +220,21 @@ describe.skipIf(!enabled)("settlement flows", () => {
     expect((await creditSummary(sql, after)).credit_limit).toBeGreaterThan(0);
     await expect(seedDemoTrader(sql, trader.id)).rejects.toMatchObject({ code: "already_seeded" });
   }, 60_000);
+
+  it("settles a payment carried by a stranger's phone or an SMS (relay), paying the right trader once", async () => {
+    const { bundlesToRelay, relayToBundles } = await import("@payvault/protocol");
+    const { user, device, deviceId } = await newPayer(2_000_000);
+    const shop = await newUser("NG", "Relay Shop");
+    const cert = await sql.begin((tx) => issueForUser(tx, { userId: user.id, deviceId, funded: 500_000, credit: 0 }));
+    const p1 = await pay(device.privateKey, await initWalletState(cert), shop.merchant_id!, 120_000);
+    const carried = relayToBundles(bundlesToRelay([p1.bytes]))!;
+    const [r] = await ingestBundles(sql, { kind: "relay" }, carried);
+    expect(r.status).toBe("settled");
+    const [row] = await sql`select received_via from pv.payments where allowance_id = ${cert.allowanceId}`;
+    expect(row.received_via).toBe("courier");
+    expect((await balances(sql, shop)).merchant).toBe(120_000);
+    const [again] = await ingestBundles(sql, { kind: "relay" }, carried); // second carrier, same payment
+    expect(again.status).toBe("duplicate");
+    expect((await balances(sql, shop)).merchant).toBe(120_000);
+  });
 });

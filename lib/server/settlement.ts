@@ -27,7 +27,9 @@ import { accountId, balanceOf, type Posting, postJournal } from "./ledger";
 
 export type Submitter =
   | { kind: "user"; userId: string }
-  | { kind: "api"; partnerId: string };
+  | { kind: "api"; partnerId: string }
+  /** Unauthenticated carrier (inbound SMS). Safe because every payment is signed by its payer. */
+  | { kind: "relay" };
 
 export type IngestResult = {
   id?: string;
@@ -103,11 +105,13 @@ async function ingestOne(tx: Db, submitter: Submitter, raw: Uint8Array): Promise
   const receivedVia =
     submitter.kind === "api"
       ? "api"
-      : submitter.userId === merchant?.id
-        ? "merchant"
-        : submitter.userId === a.user_id
-          ? "payer"
-          : "courier";
+      : submitter.kind === "relay"
+        ? "courier"
+        : submitter.userId === merchant?.id
+          ? "merchant"
+          : submitter.userId === a.user_id
+            ? "payer"
+            : "courier";
 
   // Allocate: funded value first, then overdraft, then (for late payments on a
   // refunded vault) the holder's wallet, and only then the risk pool.

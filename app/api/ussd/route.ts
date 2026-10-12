@@ -1,5 +1,5 @@
-import { timingSafeEqual } from "node:crypto";
 import { db } from "@/lib/server/db";
+import { gatewayAllowed } from "@/lib/server/gateway";
 import { normalizePhone } from "@/lib/server/identity";
 import { ussdReply } from "@/lib/server/ussd";
 
@@ -9,10 +9,7 @@ import { ussdReply } from "@/lib/server/ussd";
  * so the key in the URL is what keeps strangers from driving the menu.
  */
 export async function POST(req: Request) {
-  const secret = process.env.USSD_SECRET;
-  const key = new URL(req.url).searchParams.get("key") ?? "";
-  const ok = secret ? key.length === secret.length && timingSafeEqual(Buffer.from(key), Buffer.from(secret)) : process.env.NODE_ENV !== "production";
-  if (!ok) return new Response("END Service unavailable", { status: 403, headers: { "content-type": "text/plain" } });
+  if (!gatewayAllowed(req)) return new Response("END Service unavailable", { status: 403, headers: { "content-type": "text/plain" } });
 
   const form = await req.formData();
   const phone = normalizePhone(String(form.get("phoneNumber") ?? ""));

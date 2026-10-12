@@ -301,14 +301,20 @@ export async function maybeFinishClosing(tx: Db, id: Uint8Array): Promise<void> 
 }
 
 /**
- * Returns unspent value from vaults past expiry + grace. Vaults frozen as lost
- * stay revoked but get their leftover back too: payments signed before the
- * freeze reached merchants can still arrive until then. Run on a schedule.
+ * Backstop refund for vaults whose phone never checked in. The server can't see
+ * payments still waiting on phones, so refunding at expiry would hand the payer
+ * money he already spent. Normally the phone signs a close statement when it next
+ * gets signal (exact refund, see closeWithStatement); only a vault silent for
+ * RELEASE_DAYS after expiry is refunded blind. Late payments still settle after
+ * that, from the payer's wallet or the risk pool. Vaults frozen as lost follow the
+ * same rule. Run on a schedule.
  */
+export const RELEASE_DAYS = 30;
+
 export async function sweepExpired(tx: Db): Promise<number> {
   const rows = await tx<AllowanceRow[]>`
     select * from pv.allowances a
-    where expires_at + make_interval(hours => 24) < now()
+    where expires_at + make_interval(days => ${RELEASE_DAYS}) < now()
       and (status in ('active', 'closing')
         or (status = 'revoked' and funded > settled_funded + refunded
           and exists (select 1 from pv.revocations r where r.allowance_id = a.id and r.reason = ${DEVICE_LOST})))

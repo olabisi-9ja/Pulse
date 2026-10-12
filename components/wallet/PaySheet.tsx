@@ -11,12 +11,14 @@ import { useApprox } from "./parts";
 import { PinPad } from "./PinPad";
 import { QrCode } from "./QrCode";
 import { Scanner } from "./Scanner";
+import { carry, parseRelay } from "@/lib/client/relay";
 import { parseSticker, type Sticker } from "@/lib/client/sticker";
 import { Button, Field, Notice, Sheet } from "./ui";
 
 type Step =
   | { s: "scan" }
   | { s: "amount"; sticker: Sticker }
+  | { s: "carried"; n: number }
   | { s: "confirm"; quote: Extract<PayQuote, { ok: true }> }
   | { s: "pin"; quote: Extract<PayQuote, { ok: true }> }
   | { s: "show"; qr: string; amount: number; currency: string; name: string; sticker?: boolean };
@@ -64,6 +66,18 @@ export function PaySheet({
   const onScan = useCallback(
     async (text: string) => {
       setError(null);
+      const relayed = parseRelay(text);
+      if (relayed) {
+        try {
+          const n = await carry(userId, relayed);
+          await useApp.getState().reloadLocal();
+          setStep({ s: "carried", n });
+          void useApp.getState().sync("carry");
+        } catch {
+          setError(m.pay.notPayvault);
+        }
+        return;
+      }
       const st = parseSticker(text);
       if (st) {
         setStep({ s: "amount", sticker: st });
@@ -166,6 +180,16 @@ export function PaySheet({
               <Radio className="h-4 w-4 text-accent-text" /> {m.pay.tapInstead}
             </button>
           )}
+        </div>
+      )}
+
+      {step.s === "carried" && (
+        <div className="space-y-5 text-center">
+          <CheckCircle2 className="mx-auto h-12 w-12 text-green" />
+          <p className="text-ink">{t(m.relay.carried, { n: step.n })}</p>
+          <Button className="w-full" onClick={close}>
+            {m.common.done}
+          </Button>
         </div>
       )}
 

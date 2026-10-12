@@ -99,7 +99,8 @@ export function useRows(limit?: number, filter: "all" | "offline" | "online" = "
   const outbox = useApp((s) => s.outbox);
   const rows: (Row & { at: number })[] = [];
 
-  const pending = outbox.filter((i) => i.status !== "settled" && i.status !== "duplicate");
+  // Payments carried for other phones aren't this user's activity.
+  const pending = outbox.filter((i) => i.role !== "courier" && i.status !== "settled" && i.status !== "duplicate");
   for (const i of pending) rows.push({ ...outboxRow(i), at: i.createdAt });
 
   for (const a of (snapshot?.activity ?? []) as AppSnapshot["activity"]) {

@@ -47,7 +47,8 @@ export const saveNetwork = (n: Omit<NetworkCache, "fetchedAt">) => kv.set("netwo
 
 export type OutboxItem = {
   id: string;
-  role: "payer" | "merchant";
+  /** courier: someone else's payment this phone is carrying to the server. */
+  role: "payer" | "merchant" | "courier";
   bundle: string; // base64url
   allowanceId: string;
   seq: number;
@@ -65,7 +66,7 @@ export type OutboxItem = {
 const outboxKey = (u: string) => `outbox:${u}`;
 export const getOutbox = async (u: string) => (await kv.get<OutboxItem[]>(outboxKey(u))) ?? [];
 
-async function putOutbox(u: string, item: OutboxItem) {
+export async function putOutbox(u: string, item: OutboxItem) {
   const items = await getOutbox(u);
   if (!items.some((i) => i.id === item.id && i.role === item.role)) items.unshift(item);
   await kv.set(outboxKey(u), items.slice(0, 1000));

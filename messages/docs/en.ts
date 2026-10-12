@@ -242,7 +242,7 @@ export const en = {
         title: "Expiry and grace",
         paras: [
           "Every allowance expires after a time set by the country pack, for example 72 hours. Merchants and the server tolerate 5 minutes of clock skew, because phone clocks are not trusted.",
-          "Unspent funded value returns to the holder after expiry plus a 24-hour grace period, which gives late payments time to arrive. A payment that arrives after the refund is still honoured: it is taken from the holder's wallet where the ledger is hosted, and otherwise from the risk pool.",
+          "When the holder's phone next gets signal after expiry, it signs a close statement saying how much it spent, and the rest is refunded at once. A vault whose phone never checks in is refunded 30 days after expiry, since the server cannot see payments still waiting on phones. A payment that arrives after that refund is still honoured: it is taken from the holder's wallet where the ledger is hosted, and otherwise from the risk pool.",
         ],
       },
       {

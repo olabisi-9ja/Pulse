@@ -12,7 +12,8 @@ import type { WalletState } from "@payvault/protocol";
 import { create } from "zustand";
 import { api, ApiError, NetworkError } from "./api";
 import { kv } from "./kv";
-import { clearVault, getOutbox, loadVault, markOutbox, type OutboxItem, pendingOutbox, saveNetwork, vaultSummary } from "./offline";
+import { clearVault, getOutbox, loadVault, markOutbox, type OutboxItem, pendingOutbox, saveNetwork, signCloseStatement, vaultSummary } from "./offline";
+import { getDeviceKey } from "./security";
 import type { AppSnapshot } from "@/lib/server/snapshot";
 
 export type Connectivity = "online" | "degraded" | "offline" | "reconnecting" | "reconciling" | "settled";
@@ -100,6 +101,16 @@ export const useApp = create<State & Actions>((set, get) => ({
     if (local && data.allowances.some((a) => a.id === local.allowanceId && a.status === "revoked")) {
       await clearVault(u);
       set({ vault: null });
+    } else if (local && Date.now() > local.expiresAt) {
+      // Expired vault, phone back online: declare what it spent so the rest is refunded now and exactly.
+      try {
+        const device = await getDeviceKey(u);
+        await api("/api/app/vault/close", { close: await signCloseStatement(u, device.keyPair.privateKey) });
+        await clearVault(u);
+        set({ vault: null });
+      } catch {
+        // Retried on the next sync.
+      }
     }
     if (Date.now() - started > 4000 && get().connectivity === "online") set({ connectivity: "degraded" });
   },

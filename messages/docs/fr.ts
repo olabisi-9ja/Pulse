@@ -198,7 +198,7 @@ export const fr: DocsMessages = {
         title: "Expiration et délai de grâce",
         paras: [
           "Chaque allocation expire au bout d'une durée fixée par le pack pays, par exemple 72 heures. Les commerçants et le serveur tolèrent 5 minutes de décalage d'horloge, car les horloges des téléphones ne sont pas fiables.",
-          "La valeur préfinancée non dépensée retourne au titulaire après l'expiration plus 24 heures de grâce, ce qui laisse aux paiements tardifs le temps d'arriver. Un paiement qui arrive après le remboursement est quand même honoré : il est prélevé sur le portefeuille du titulaire quand le registre est hébergé, sinon sur le fonds de risque.",
+          "Quand le téléphone du titulaire retrouve du réseau après l'expiration, il signe une déclaration de clôture indiquant combien il a dépensé, et le reste est remboursé aussitôt. Un coffre dont le téléphone ne se reconnecte jamais est remboursé 30 jours après l'expiration, car le serveur ne voit pas les paiements encore en attente sur les téléphones. Un paiement qui arrive après ce remboursement est quand même honoré : il est prélevé sur le portefeuille du titulaire quand le registre est hébergé, sinon sur le fonds de risque.",
         ],
       },
       {

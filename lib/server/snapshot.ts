@@ -97,6 +97,8 @@ export async function appSnapshot(tx: Db, user: AppUser) {
     network,
     fx: { ...rates, currencies: DISPLAY_CURRENCIES },
     business,
+    /** Inbound SMS number for delivering payments without data (Africa's Talking), if configured. */
+    smsNumber: process.env.PV_SMS_NUMBER ?? null,
   };
 }
 

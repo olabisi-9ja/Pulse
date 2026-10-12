@@ -248,3 +248,17 @@ describe("close statement", () => {
     expect(await verifyCloseSignature({ ...decoded, cumulative: 0 }, pub)).toBe(false);
   });
 });
+
+describe("relay codes", () => {
+  it("round-trips several bundles and rejects anything malformed", async () => {
+    const { bundlesToRelay, relayToBundles } = await import("./qr");
+    const a = new Uint8Array([1, 2, 3]);
+    const b = new Uint8Array(276).fill(7);
+    const code = bundlesToRelay([a, b]);
+    expect(code.startsWith("PVR")).toBe(true);
+    expect(relayToBundles(code)).toEqual([a, b]);
+    expect(relayToBundles("PV" + code.slice(3))).toBeNull();
+    expect(relayToBundles(code.slice(0, -3))).toBeNull();
+    expect(relayToBundles("hello")).toBeNull();
+  });
+});

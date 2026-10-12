@@ -146,6 +146,15 @@ const app: AppMessages = {
       merchant_cap: "Trop de paiements en attente de synchronisation. Trouvez du réseau pour synchroniser, puis réessayez.",
     },
   },
+  relay: {
+    open: "Les faire livrer par un téléphone proche",
+    title: "Confier les paiements en attente",
+    hint: "Demandez à quelqu'un qui a PayVault et des données de toucher Payer et de scanner ceci. Son téléphone livre vos paiements. Il ne peut ni les modifier ni les garder.",
+    page: "{i} sur {n}",
+    smsHint: "Pas de données mais vous pouvez envoyer des SMS ? Envoyez chaque paiement par SMS (environ 3 SMS chacun). Il est réglé dès réception.",
+    sms: "Envoyer le paiement {n} par SMS",
+    carried: "Merci. Ce téléphone transporte {n} paiement(s) et les livrera dès qu'il aura du réseau.",
+  },
   sticker: {
     title: "Autocollant du stand",
     hint: "Imprimez-le ou mettez-le sur une puce NFC. Les clients le scannent ou le touchent pour vous payer, même hors ligne. Pas besoin de smartphone : composez le code USSD ou recevez un SMS.",

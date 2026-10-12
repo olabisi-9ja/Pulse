@@ -144,6 +144,15 @@ const app = {
       merchant_cap: "Too many payments waiting to sync. Get signal to sync, then try again.",
     },
   },
+  relay: {
+    open: "Let a nearby phone deliver them",
+    title: "Hand over waiting payments",
+    hint: "Ask anyone with PayVault and data to tap Pay and scan this. Their phone delivers your payments. They can't change or keep them.",
+    page: "{i} of {n}",
+    smsHint: "No data but you can text? Send each payment by SMS (about 3 texts each). It settles as soon as it arrives.",
+    sms: "Send payment {n} by SMS",
+    carried: "Thank you. This phone is carrying {n} payment(s) and will deliver them as soon as it has signal.",
+  },
   sticker: {
     title: "Stall sticker",
     hint: "Print this, or put it on an NFC tag. Customers scan or tap it to pay you, even offline. You don't need a smartphone: dial the USSD code or get a text.",

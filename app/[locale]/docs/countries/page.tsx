@@ -81,7 +81,7 @@ export default async function CountriesPage({ params }: PageProps<"/[locale]/doc
       </P>
       <P>
         A pack&apos;s <C>releaseGraceHours</C> is part of the schema. The current sweep that returns unspent vault value
-        uses a fixed 24-hour grace period.
+        waits a fixed 30 days after expiry for a phone that never checks in; a returning phone is refunded at once from its signed close statement.
       </P>
     </article>
   );

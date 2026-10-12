@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { api, ApiError, NetworkError } from "@/lib/client/api";
 import { minorUnitsOf, money, parseMajor, shortDate } from "@/lib/client/money";
 import { getDeviceKey, getNoPinLimit, setNoPinLimit } from "@/lib/client/security";
+import type { OutboxItem } from "@/lib/client/offline";
+import { relayCodes } from "@/lib/client/relay";
 import { stickerUrl } from "@/lib/client/sticker";
 import { useApp } from "@/lib/client/store";
 import { useI18n } from "./I18n";
@@ -17,15 +19,21 @@ export function ActivityScreen() {
   const { m } = useI18n();
   const [filter, setFilter] = useState<"all" | "offline" | "online">("all");
   const rows = useRows(200, filter);
-  const pending = useApp((s) => s.outbox.filter((i) => i.status === "pending").length);
+  const outbox = useApp((s) => s.outbox);
+  const waiting = outbox.filter((i) => i.status === "pending");
+  const [relayOpen, setRelayOpen] = useState(false);
   return (
     <div className="px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-6">
       <h1 className="text-[22px] font-medium tracking-tight text-ink">{m.activity.title}</h1>
-      {pending > 0 && (
-        <div className="mt-4">
+      {waiting.length > 0 && (
+        <div className="mt-4 space-y-3">
           <Notice>{m.activity.pendingHint}</Notice>
+          <Button variant="secondary" className="w-full" onClick={() => setRelayOpen(true)}>
+            {m.relay.open}
+          </Button>
         </div>
       )}
+      <RelaySheet open={relayOpen} onClose={() => setRelayOpen(false)} items={waiting} />
       <div className="mt-4 flex gap-2" role="tablist">
         {(["all", "offline", "online"] as const).map((f) => (
           <button
@@ -526,5 +534,52 @@ function DevicesCard() {
         placeholder={money(0, cur, locale)}
       />
     </Card>
+  );
+}
+
+/** Shows waiting payments as QR codes another PayVault phone can scan and deliver. */
+function RelaySheet({ open, onClose, items }: { open: boolean; onClose: () => void; items: OutboxItem[] }) {
+  const { m, t } = useI18n();
+  const smsNumber = useApp((s) => s.snapshot?.smsNumber ?? null);
+  const codes = relayCodes(items);
+  const smsCodes = smsNumber ? relayCodes(items, 1) : [];
+  const [page, setPage] = useState(0);
+  const i = Math.min(page, Math.max(0, codes.length - 1));
+  return (
+    <Sheet open={open} onClose={onClose} title={m.relay.title}>
+      <div className="space-y-4 text-center">
+        <p className="text-sm text-muted">{m.relay.hint}</p>
+        {codes[i] && <QrCode text={codes[i]} label={m.relay.title} />}
+        {codes.length > 1 && (
+          <div className="flex items-center justify-between gap-3">
+            <Button variant="secondary" disabled={i === 0} onClick={() => setPage(i - 1)}>
+              {m.common.back}
+            </Button>
+            <span className="tabular text-sm text-muted">{t(m.relay.page, { i: i + 1, n: codes.length })}</span>
+            <Button variant="secondary" disabled={i === codes.length - 1} onClick={() => setPage(i + 1)}>
+              {m.common.continue}
+            </Button>
+          </div>
+        )}
+        {smsCodes.length > 0 && (
+          <div className="space-y-2 border-t border-line pt-4 text-left">
+            <p className="text-sm text-muted">{m.relay.smsHint}</p>
+            {smsCodes.map((code, n) => (
+              // Opens the phone's messaging app with the payment filled in; the user taps Send. Works without data.
+              <a
+                key={code}
+                href={`sms:${smsNumber}?body=${encodeURIComponent(code)}`}
+                className="flex h-12 items-center justify-center rounded-full bg-card-2 text-sm font-medium text-ink"
+              >
+                {t(m.relay.sms, { n: n + 1 })}
+              </a>
+            ))}
+          </div>
+        )}
+        <Button className="w-full" onClick={onClose}>
+          {m.common.done}
+        </Button>
+      </div>
+    </Sheet>
   );
 }

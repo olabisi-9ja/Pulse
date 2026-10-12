@@ -162,6 +162,7 @@ const app = {
     pinHint: "4 to 6 digits, used only on USSD.",
     link: "Link number",
     update: "Update number or PIN",
+    confirm: "To finish, dial the PayVault USSD code from that phone within 15 minutes and enter:",
   },
   business: {
     title: "Your business",

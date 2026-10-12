@@ -289,6 +289,7 @@ function PhoneCard() {
   const linked = useApp((s) => s.snapshot?.user.phone ?? null);
   const [phone, setPhone] = useState("");
   const [pin, setPin] = useState("");
+  const [code, setCode] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -297,8 +298,8 @@ function PhoneCard() {
     setBusy(true);
     setError(null);
     try {
-      await api("/api/app/phone", { phone, pin });
-      await useApp.getState().refresh();
+      const res = await api<{ code: string }>("/api/app/phone", { phone, pin });
+      setCode(res.code);
       setPhone("");
       setPin("");
     } catch (err) {
@@ -316,6 +317,11 @@ function PhoneCard() {
           <h2 className="text-[17px] font-medium text-ink">{m.phone.title}</h2>
         </div>
         <p className="text-sm text-muted">{linked ? t(m.phone.linked, { phone: linked }) : m.phone.hint}</p>
+        {code && (
+          <Notice>
+            {m.phone.confirm} <span className="tabular font-medium text-ink">{code}</span>
+          </Notice>
+        )}
         <Field label={m.phone.number} inputMode="tel" placeholder="+2348012345678" required value={phone} onChange={(e) => setPhone(e.target.value)} />
         <Field
           label={m.phone.pin}

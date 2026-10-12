@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { merchantStats } from "./credit";
 import { db, type Sql } from "./db";
-import { createUser, enableMerchant, linkPhone, merchantCode, submitKyc, userById } from "./identity";
+import { createUser, enableMerchant, merchantCode, startPhoneLink, submitKyc, userById } from "./identity";
 import { balances, sandboxTopUp } from "./money";
 import { ussdReply } from "./ussd";
 
@@ -27,13 +27,18 @@ describe.skipIf(!enabled)("USSD", () => {
       await enableMerchant(tx, traderId, "Iya Basira Foods");
       await submitKyc(tx, payerId, "NIN", "12345678901");
       await sandboxTopUp(tx, payerId, 1_000_000);
-      await linkPhone(tx, payerId, payerPhone, "1234");
-      await linkPhone(tx, traderId, traderPhone, "4321");
     });
+    // Linking: the app shows a code; it only counts when entered over USSD from that number.
+    const payerCode = await sql.begin((tx) => startPhoneLink(tx, payerId, payerPhone, "1234"));
+    const traderCode = await sql.begin((tx) => startPhoneLink(tx, traderId, traderPhone, "4321"));
+    expect(await ussdReply(sql, payerPhone, "")).toMatch(/^CON PayVault\nEnter the link code/);
+    expect(await ussdReply(sql, "+2349999999999", payerCode)).toMatch(/wrong or expired/); // code from another number
+    expect(await ussdReply(sql, payerPhone, payerCode)).toMatch(/^END Number linked/);
+    expect(await ussdReply(sql, traderPhone, traderCode)).toMatch(/^END Number linked/);
     const code = await sql.begin((tx) => merchantCode(tx, traderId));
     expect(code).toMatch(/^[0-9]{8}$/);
 
-    expect(await ussdReply(sql, "+2340000000000", "")).toMatch(/^END .*isn't linked/);
+    expect(await ussdReply(sql, "+2340000000000", "12345")).toMatch(/^END That code is wrong or expired/);
     expect(await ussdReply(sql, payerPhone, "")).toMatch(/^CON PayVault/);
     expect(await ussdReply(sql, payerPhone, "1")).toMatch(/^END Balance: .*10,000/);
     expect(await ussdReply(sql, payerPhone, `2*${code}`)).toContain("Iya Basira Foods");
@@ -46,5 +51,17 @@ describe.skipIf(!enabled)("USSD", () => {
     expect(await ussdReply(sql, traderPhone, "3")).toMatch(/^END Takings: .*2,500/);
     expect(await ussdReply(sql, traderPhone, "4")).toBe(`END Your trader code: ${code}`);
     expect((await merchantStats(sql, trader)).tradingDays).toBe(1);
+  });
+
+  it("wipes the USSD PIN after 10 wrong tries in a row", async () => {
+    const id = randomUUID();
+    const p = phone();
+    await sql.begin((tx) => createUser(tx, { id, email: `${id}@t.pv`, displayName: "Bisi", country: "NG", locale: "en" }));
+    const code = await sql.begin((tx) => startPhoneLink(tx, id, p, "1111"));
+    await ussdReply(sql, p, code);
+    const { checkUssdPin } = await import("./identity");
+    for (let i = 0; i < 9; i++) expect(await checkUssdPin(sql, (await userById(sql, id))!, "0000")).toBe("wrong");
+    expect(await checkUssdPin(sql, (await userById(sql, id))!, "0000")).toBe("locked");
+    expect(await checkUssdPin(sql, (await userById(sql, id))!, "1111")).toBe("locked"); // right PIN no longer works
   });
 });

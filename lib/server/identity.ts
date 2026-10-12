@@ -1,6 +1,6 @@
 import "server-only";
 /** Partners, users, merchants and devices. */
-import { randomBytes as nodeRandomBytes, randomInt, scryptSync, timingSafeEqual } from "node:crypto";
+import { createHash, randomBytes as nodeRandomBytes, randomInt, scryptSync, timingSafeEqual } from "node:crypto";
 import { randomBytes } from "@payvault/protocol";
 import { bytes, type Db } from "./db";
 import { packFor } from "./policy";
@@ -206,20 +206,50 @@ export function normalizePhone(raw: string): string | null {
 
 const hashPin = (pin: string, salt: Buffer) => scryptSync(pin, salt, 32);
 
-/** Links a phone for USSD/SMS with its own PIN (the app PIN never leaves the phone). */
-export async function linkPhone(tx: Db, userId: string, phone: string, pin: string): Promise<void> {
+const codeHash = (code: string) => createHash("sha256").update(code).digest("hex");
+
+/**
+ * Starts linking a phone for USSD/SMS with its own PIN (the app PIN never leaves
+ * the phone). Returns a one-time code; the link completes only when that code is
+ * entered over USSD from the number itself (see confirmPhoneLink).
+ */
+export async function startPhoneLink(tx: Db, userId: string, phone: string, pin: string): Promise<string> {
   if (!/^[0-9]{4,6}$/.test(pin)) throw new Error("PIN must be 4 to 6 digits");
   const salt = nodeRandomBytes(16);
   const hash = `${salt.toString("hex")}:${hashPin(pin, salt).toString("hex")}`;
-  const [taken] = await tx`select 1 from pv.users where phone = ${phone} and id <> ${userId}`;
-  if (taken) throw new Error("That number is linked to another account");
-  await tx`update pv.users set phone = ${phone}, ussd_pin_hash = ${hash} where id = ${userId}`;
+  const code = String(randomInt(100_000, 1_000_000));
+  await tx`update pv.users set pending_phone = ${phone}, ussd_pin_hash = ${hash},
+           link_code_hash = ${codeHash(code)}, link_expires = now() + interval '15 minutes', ussd_pin_failures = 0
+           where id = ${userId}`;
+  return code;
 }
 
-export function checkUssdPin(user: AppUser, pin: string): boolean {
-  if (!user.ussd_pin_hash) return false;
+/** Called from a USSD session on `phone`: links it to whoever is waiting with this code. */
+export async function confirmPhoneLink(tx: Db, phone: string, code: string): Promise<AppUser | undefined> {
+  const [u] = await tx<{ id: string }[]>`
+    select id from pv.users
+    where pending_phone = ${phone} and link_code_hash = ${codeHash(code.trim())} and link_expires > now()
+    for update`;
+  if (!u) return undefined;
+  // Proving possession of the number wins it, even from an earlier account.
+  await tx`update pv.users set phone = null where phone = ${phone} and id <> ${u.id}`;
+  await tx`update pv.users set phone = ${phone}, pending_phone = null, link_code_hash = null, link_expires = null where id = ${u.id}`;
+  return userById(tx, u.id);
+}
+
+/** Checks the USSD PIN; 10 wrong in a row wipes it, so the owner must re-link from the app. */
+export async function checkUssdPin(tx: Db, user: AppUser, pin: string): Promise<"ok" | "wrong" | "locked"> {
+  if (!user.ussd_pin_hash) return "locked";
   const [salt, hash] = user.ussd_pin_hash.split(":");
   const got = hashPin(pin, Buffer.from(salt, "hex"));
   const want = Buffer.from(hash, "hex");
-  return got.length === want.length && timingSafeEqual(got, want);
+  if (got.length === want.length && timingSafeEqual(got, want)) {
+    await tx`update pv.users set ussd_pin_failures = 0 where id = ${user.id}`;
+    return "ok";
+  }
+  const [r] = await tx<{ ussd_pin_failures: number }[]>`
+    update pv.users set ussd_pin_failures = ussd_pin_failures + 1,
+      ussd_pin_hash = case when ussd_pin_failures + 1 >= 10 then null else ussd_pin_hash end
+    where id = ${user.id} returning ussd_pin_failures`;
+  return r.ussd_pin_failures >= 10 ? "locked" : "wrong";
 }

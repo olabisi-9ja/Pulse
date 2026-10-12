@@ -164,6 +164,7 @@ const app: AppMessages = {
     pinHint: "4 à 6 chiffres, utilisé seulement en USSD.",
     link: "Lier le numéro",
     update: "Changer le numéro ou le PIN",
+    confirm: "Pour terminer, composez le code USSD PayVault depuis ce téléphone dans les 15 minutes et entrez :",
   },
   business: {
     title: "Votre commerce",

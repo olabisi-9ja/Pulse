@@ -8,7 +8,7 @@ import "server-only";
 import { formatMinor, SUPPORTED_CURRENCIES } from "@payvault/countries";
 import { executeTapPayment, TapPaymentError } from "./cashafrica";
 import type { Sql } from "./db";
-import { checkUssdPin, merchantCode, userByMerchantCode, userByPhone } from "./identity";
+import { checkUssdPin, confirmPhoneLink, merchantCode, userByMerchantCode, userByPhone } from "./identity";
 import { balances } from "./money";
 import { rateLimit } from "./ratelimit";
 import { sendSms } from "./sms";
@@ -20,7 +20,18 @@ export async function ussdReply(sql: Sql, phone: string, text: string): Promise<
   const user = await userByPhone(sql, phone);
   const fr = user?.locale === "fr";
   const L = (en: string, frText: string) => (fr ? frText : en);
-  if (!user) return "END " + "This number isn't linked to PayVault. Open the app > Profile to link it.";
+  if (!user) {
+    // Unknown number: the only thing it can do is finish a link started in the app.
+    if (!text) return "CON PayVault\nEnter the link code from the app (Profile > Basic phone)";
+    try {
+      await rateLimit(`ussd-link:${phone}`, 5, 900, sql);
+    } catch {
+      return "END Too many tries. Try again later.";
+    }
+    const linked = await sql.begin((tx) => confirmPhoneLink(tx, phone, text));
+    if (!linked) return "END That code is wrong or expired. Get a new one in the app.";
+    return "END " + (linked.locale === "fr" ? "Numéro lié à PayVault. Composez à nouveau pour le menu." : "Number linked to PayVault. Dial again for the menu.");
+  }
   if (user.status !== "active") return "END " + L("Your account is frozen.", "Votre compte est gelé.");
 
   const [choice, ...rest] = text ? text.split("*") : [];
@@ -59,7 +70,9 @@ export async function ussdReply(sql: Sql, phone: string, text: string): Promise<
     } catch {
       return "END " + L("Too many tries. Try again later.", "Trop d'essais. Réessayez plus tard.");
     }
-    if (!checkUssdPin(user, pin)) return "END " + L("Wrong PIN.", "Code PIN incorrect.");
+    const check = await checkUssdPin(sql, user, pin);
+    if (check === "locked") return "END " + L("USSD PIN locked. Set a new one in the app (Profile).", "Code PIN USSD bloqué. Définissez-en un nouveau dans l'app (Profil).");
+    if (check === "wrong") return "END " + L("Wrong PIN.", "Code PIN incorrect.");
     try {
       const res = await sql.begin((tx) => executeTapPayment(tx, { payer: user, merchant: trader, amount, currency: user.currency, transport: "ussd" }));
       const paid = fmt(res.amount, res.currency);

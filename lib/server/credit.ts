@@ -9,6 +9,8 @@ import { emit } from "./events";
 export type CreditProfile = { user_id: string; credit_limit: number; score: number; status: "active" | "frozen" };
 
 export async function refreshCreditProfile(tx: Db, user: AppUser): Promise<CreditProfile> {
+  // A sale counts toward trading days only above 1% of the per-payment limit (filters dust).
+  const minSale = Math.max(1, Math.floor(packFor(user.country).offlineLimits.perTransaction / 100));
   const [h] = await tx<
     { on_time: number; late: number; overdue: number; fraud: number; settled: number; trading_days: number }[]
   >`
@@ -18,9 +20,15 @@ export async function refreshCreditProfile(tx: Db, user: AppUser): Promise<Credi
       (select count(*)::int from pv.loans where user_id = ${user.id} and (status = 'overdue' or (status = 'open' and due_at < now()))) as overdue,
       (select count(*)::int from pv.fraud_cases f join pv.allowances a on a.id = f.allowance_id where a.user_id = ${user.id}) as fraud,
       (select count(*)::int from pv.payments where payer_user_id = ${user.id}) as settled,
-      -- ponytail: sale day comes from the payer's phone clock; capped at sync time, so a fake day can't be in the future.
-      (select count(distinct least(device_time, received_at)::date)::int from pv.payments
-        where merchant_user_id = ${user.id} and status = 'settled' and received_at > now() - interval '30 days') as trading_days`;
+      -- Sale day is the payer's signed time, clamped between its vault's issue time and sync time, so a
+      -- set-back clock can only shift a sale within one short-lived vault. Self-payments and dust don't count.
+      -- ponytail: one person with a second account can still pay herself; KYC per account limits that.
+      (select count(distinct greatest(a.issued_at, least(p.device_time, p.received_at))::date)::int
+        from pv.payments p join pv.allowances a on a.id = p.allowance_id
+        where p.merchant_user_id = ${user.id} and p.status = 'settled'
+          and p.payer_user_id is distinct from ${user.id}
+          and p.amount >= ${minSale}
+          and p.received_at > now() - interval '30 days') as trading_days`;
   const ageDays = Math.floor((Date.now() - new Date(user.created_at).getTime()) / 86_400_000);
   const d = creditDecision(packFor(user.country), {
     tier: user.kyc_tier,

@@ -1,12 +1,15 @@
 "use client";
-import { Download, LogOut, Smartphone, Store } from "lucide-react";
+import { Download, LogOut, Nfc, Phone, Smartphone, Store } from "lucide-react";
+import QRCode from "qrcode";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api, ApiError, NetworkError } from "@/lib/client/api";
 import { minorUnitsOf, money, parseMajor, shortDate } from "@/lib/client/money";
 import { getDeviceKey, getNoPinLimit, setNoPinLimit } from "@/lib/client/security";
+import { stickerUrl } from "@/lib/client/sticker";
 import { useApp } from "@/lib/client/store";
 import { useI18n } from "./I18n";
+import { QrCode } from "./QrCode";
 import { TxRow, useRows } from "./parts";
 import { Button, Card, Field, Notice, Select, Sheet } from "./ui";
 
@@ -128,6 +131,7 @@ export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSi
       {snapshot.partner.sandbox && <Notice tone="warn">{m.profile.sandbox}</Notice>}
 
       <DevicesCard />
+      <PhoneCard />
 
       <Card className="space-y-4">
         {snapshot.fx && (
@@ -228,7 +232,108 @@ function MerchantSheet({ open, onClose }: { open: boolean; onClose: () => void }
           {m.common.save}
         </Button>
       </form>
+      {snapshot?.user.merchant && <StallSticker merchant={snapshot.user.merchant} />}
     </Sheet>
+  );
+}
+
+/** Printable QR / NFC tag for the stall: customers pay it even when the trader has no smartphone. */
+function StallSticker({ merchant }: { merchant: { id: string; name: string; code: string } }) {
+  const { m, locale } = useI18n();
+  const url = stickerUrl(location.origin, locale, { merchantId: merchant.id, name: merchant.name });
+  const [nfc, setNfc] = useState<string | null>(null);
+
+  const save = async () => {
+    const a = document.createElement("a");
+    a.href = await QRCode.toDataURL(url, { margin: 2, width: 1024 });
+    a.download = `payvault-${merchant.code}.png`;
+    a.click();
+  };
+
+  const writeTag = async () => {
+    try {
+      // Web NFC (Android Chrome): writes the same link onto a blank NFC sticker.
+      const Reader = (window as unknown as { NDEFReader: new () => { write(m: unknown): Promise<void> } }).NDEFReader;
+      setNfc(m.sticker.nfcHold);
+      await new Reader().write({ records: [{ recordType: "url", data: url }] });
+      setNfc(m.sticker.nfcDone);
+    } catch {
+      setNfc(m.common.genericError);
+    }
+  };
+
+  return (
+    <div className="mt-6 space-y-4 border-t border-line pt-5">
+      <h3 className="text-[17px] font-medium text-ink">{m.sticker.title}</h3>
+      <p className="text-sm text-muted">{m.sticker.hint}</p>
+      <QrCode text={url} label={m.sticker.title} />
+      <p className="text-center text-sm text-muted">
+        {m.sticker.code} <span className="tabular font-medium text-ink">{merchant.code}</span>
+      </p>
+      <Button variant="secondary" className="w-full" onClick={() => void save()}>
+        <Download className="h-4 w-4" /> {m.sticker.save}
+      </Button>
+      {"NDEFReader" in window && (
+        <Button variant="secondary" className="w-full" onClick={() => void writeTag()}>
+          <Nfc className="h-4 w-4" /> {m.sticker.nfc}
+        </Button>
+      )}
+      {nfc && <Notice>{nfc}</Notice>}
+    </div>
+  );
+}
+
+/** Basic-phone access: link a number with its own PIN for USSD and SMS. */
+function PhoneCard() {
+  const { m, t } = useI18n();
+  const linked = useApp((s) => s.snapshot?.user.phone ?? null);
+  const [phone, setPhone] = useState("");
+  const [pin, setPin] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const link = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      await api("/api/app/phone", { phone, pin });
+      await useApp.getState().refresh();
+      setPhone("");
+      setPin("");
+    } catch (err) {
+      setError(err instanceof NetworkError ? m.common.needsNetwork : err instanceof ApiError ? err.message : m.common.genericError);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Card>
+      <form onSubmit={link} className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Phone className="h-5 w-5 text-ink" />
+          <h2 className="text-[17px] font-medium text-ink">{m.phone.title}</h2>
+        </div>
+        <p className="text-sm text-muted">{linked ? t(m.phone.linked, { phone: linked }) : m.phone.hint}</p>
+        <Field label={m.phone.number} inputMode="tel" placeholder="+2348012345678" required value={phone} onChange={(e) => setPhone(e.target.value)} />
+        <Field
+          label={m.phone.pin}
+          inputMode="numeric"
+          type="password"
+          autoComplete="off"
+          required
+          maxLength={6}
+          value={pin}
+          onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+          hint={m.phone.pinHint}
+          error={error}
+        />
+        <Button type="submit" variant="secondary" className="w-full" loading={busy} disabled={!/^[0-9]{4,6}$/.test(pin)}>
+          {linked ? m.phone.update : m.phone.link}
+        </Button>
+      </form>
+    </Card>
   );
 }
 

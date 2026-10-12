@@ -1,8 +1,8 @@
 "use client";
-import type { PaymentRequest } from "@payvault/protocol";
+import { createRequest, fromHex, type PaymentRequest } from "@payvault/protocol";
 import { CheckCircle2, Radio, WifiOff } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { money } from "@/lib/client/money";
+import { money, parseMajor } from "@/lib/client/money";
 import { parseQr, payRequest, type PayQuote, quotePayment } from "@/lib/client/offline";
 import { checkPin, getDeviceKey, getNoPinLimit } from "@/lib/client/security";
 import { useApp } from "@/lib/client/store";
@@ -11,13 +11,15 @@ import { useApprox } from "./parts";
 import { PinPad } from "./PinPad";
 import { QrCode } from "./QrCode";
 import { Scanner } from "./Scanner";
-import { Button, Notice, Sheet } from "./ui";
+import { parseSticker, type Sticker } from "@/lib/client/sticker";
+import { Button, Field, Notice, Sheet } from "./ui";
 
 type Step =
   | { s: "scan" }
+  | { s: "amount"; sticker: Sticker }
   | { s: "confirm"; quote: Extract<PayQuote, { ok: true }> }
   | { s: "pin"; quote: Extract<PayQuote, { ok: true }> }
-  | { s: "show"; qr: string; amount: number; currency: string; name: string };
+  | { s: "show"; qr: string; amount: number; currency: string; name: string; sticker?: boolean };
 
 /** Payer flow: scan request → confirm → PIN → sign → show payment code. Fully offline. */
 export function PaySheet({
@@ -25,16 +27,21 @@ export function PaySheet({
   onClose,
   onNeedVault,
   onTap,
+  sticker,
 }: {
   open: boolean;
   onClose: () => void;
   onNeedVault: () => void;
   onTap?: () => void;
+  /** Opened from a stall sticker link: skip scanning, ask for the amount. */
+  sticker?: Sticker | null;
 }) {
   const { m, t, locale } = useI18n();
   const userId = useApp((s) => s.userId)!;
   const snapshot = useApp((s) => s.snapshot);
-  const [step, setStep] = useState<Step>({ s: "scan" });
+  const [step, setStep] = useState<Step>(sticker ? { s: "amount", sticker } : { s: "scan" });
+  const [amountText, setAmountText] = useState("");
+  const [fromSticker, setFromSticker] = useState(!!sticker);
   const [error, setError] = useState<string | null>(null);
   const [pinError, setPinError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -47,6 +54,8 @@ export function PaySheet({
 
   const close = () => {
     setStep({ s: "scan" });
+    setAmountText("");
+    setFromSticker(false);
     setError(null);
     setPinError(null);
     onClose();
@@ -55,6 +64,11 @@ export function PaySheet({
   const onScan = useCallback(
     async (text: string) => {
       setError(null);
+      const st = parseSticker(text);
+      if (st) {
+        setStep({ s: "amount", sticker: st });
+        return;
+      }
       let request: PaymentRequest;
       try {
         const scanned = parseQr(text);
@@ -76,6 +90,23 @@ export function PaySheet({
     },
     [userId, m, onNeedVault],
   );
+
+  // Sticker: the payer builds the request the trader's phone would have shown.
+  const payStickerAmount = async (e: React.FormEvent, st: Sticker) => {
+    e.preventDefault();
+    setError(null);
+    const currency = snapshot?.user.currency ?? "NGN";
+    const minor = parseMajor(amountText, currency);
+    if (!minor || minor <= 0) return setError(m.pay.errors.bad_amount);
+    const quote = await quotePayment(userId, createRequest(fromHex(st.merchantId), minor, currency, st.name || "PayVault"));
+    if (!quote.ok) {
+      setError((m.pay.errors as Record<string, string>)[quote.code] ?? m.common.genericError);
+      if (quote.code === "no_vault") onNeedVault();
+      return;
+    }
+    setFromSticker(true);
+    setStep({ s: "confirm", quote });
+  };
 
   const approve = async (pin: string | null, quote: Extract<PayQuote, { ok: true }>) => {
     setBusy(true);
@@ -99,7 +130,7 @@ export function PaySheet({
       const device = await getDeviceKey(userId);
       const { qr } = await payRequest(userId, device.keyPair.privateKey, quote.request);
       await useApp.getState().reloadLocal();
-      setStep({ s: "show", qr, amount: quote.request.amount, currency: quote.request.currency, name: quote.request.name });
+      setStep({ s: "show", qr, amount: quote.request.amount, currency: quote.request.currency, name: quote.request.name, sticker: fromSticker });
       void useApp.getState().sync("paid");
     } catch (err) {
       const code = err instanceof Error && "code" in err ? String((err as { code: string }).code) : "";
@@ -114,7 +145,11 @@ export function PaySheet({
   const termDays = snapshot?.partner.creditTermDays ?? 14;
 
   return (
-    <Sheet open={open} onClose={close} title={step.s === "show" ? m.pay.showTitle : step.s === "scan" ? m.pay.scanTitle : m.pay.confirmTitle}>
+    <Sheet
+      open={open}
+      onClose={close}
+      title={step.s === "show" ? (step.sticker ? m.pay.paidTitle : m.pay.showTitle) : step.s === "scan" ? m.pay.scanTitle : m.pay.confirmTitle}
+    >
       {step.s === "scan" && (
         <div className="space-y-4">
           {error && <Notice tone="danger">{error}</Notice>}
@@ -132,6 +167,28 @@ export function PaySheet({
             </button>
           )}
         </div>
+      )}
+
+      {step.s === "amount" && (
+        <form onSubmit={(e) => void payStickerAmount(e, step.sticker)} className="space-y-4">
+          <div className="rounded-[28px] bg-card p-5 text-center">
+            <p className="text-sm text-muted">{m.pay.to}</p>
+            <p className="text-[17px] font-medium text-ink">{step.sticker.name || "PayVault"}</p>
+          </div>
+          {error && <Notice tone="danger">{error}</Notice>}
+          <Field
+            label={m.pay.amount}
+            inputMode="decimal"
+            autoFocus
+            required
+            value={amountText}
+            onChange={(e) => setAmountText(e.target.value)}
+            hint={snapshot?.user.currency}
+          />
+          <Button type="submit" className="w-full" disabled={!amountText.trim()}>
+            {m.common.continue}
+          </Button>
+        </form>
       )}
 
       {step.s === "confirm" && (
@@ -188,10 +245,16 @@ export function PaySheet({
           <p className="text-sm text-muted">
             {m.pay.to} {step.name}
           </p>
-          <QrCode text={step.qr} label={m.pay.showTitle} />
-          <p className="flex items-center justify-center gap-2 text-sm text-muted">
-            <WifiOff className="h-4 w-4" /> {m.pay.showHint}
-          </p>
+          {step.sticker ? (
+            <p className="text-sm text-muted">{m.pay.stickerHint}</p>
+          ) : (
+            <>
+              <QrCode text={step.qr} label={m.pay.showTitle} />
+              <p className="flex items-center justify-center gap-2 text-sm text-muted">
+                <WifiOff className="h-4 w-4" /> {m.pay.showHint}
+              </p>
+            </>
+          )}
           <p className="flex items-center justify-center gap-2 text-sm font-medium text-green">
             <CheckCircle2 className="h-4 w-4" /> {m.pay.signedOffline}
           </p>

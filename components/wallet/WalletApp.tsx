@@ -18,6 +18,7 @@ import { SignIn } from "./SignIn";
 import { Spinner, Toast } from "./ui";
 import { VaultScreen } from "./VaultScreen";
 import { CashTapSheet } from "./CashTapSheet";
+import { parseSticker } from "@/lib/client/sticker";
 
 type Phase = "boot" | "signin" | "onboarding" | "pin" | "ready" | "error";
 
@@ -151,7 +152,9 @@ function CreatePin({ userId, onDone }: { userId: string; onDone: () => void }) {
 function Main({ userId, onSignedOut }: { userId: string; onSignedOut: () => void }) {
   const { locale } = useI18n();
   const [tab, setTab] = useState<Tab>("home");
-  const [sheet, setSheet] = useState<null | "pay" | "request" | "add" | "tap">(null);
+  // Opened from a stall sticker (QR or NFC link): go straight to paying that trader.
+  const [sticker] = useState(() => (typeof location === "undefined" ? null : parseSticker(location.href)));
+  const [sheet, setSheet] = useState<null | "pay" | "request" | "add" | "tap">(sticker ? "pay" : null);
   const [toast, setToast] = useState<string | null>(null);
   const snapshot = useApp((s) => s.snapshot);
 
@@ -159,6 +162,10 @@ function Main({ userId, onSignedOut }: { userId: string; onSignedOut: () => void
     void useApp.getState().init(userId);
     return startConnectivityWatch();
   }, [userId]);
+
+  useEffect(() => {
+    if (sticker) history.replaceState(null, "", location.pathname);
+  }, [sticker]);
 
   const signOut = async () => {
     await api("/api/auth/signout", {}).catch(() => {});
@@ -198,6 +205,7 @@ function Main({ userId, onSignedOut }: { userId: string; onSignedOut: () => void
           setTab("vault");
         }}
         onTap={() => setSheet("tap")}
+        sticker={sticker}
       />
       <RequestSheet open={sheet === "request"} onClose={() => setSheet(null)} />
       <AddSheet open={sheet === "add"} onClose={() => setSheet(null)} toast={setToast} onLoadVault={() => setTab("vault")} />

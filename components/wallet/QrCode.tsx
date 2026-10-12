@@ -7,7 +7,9 @@ export function QrCode({ text, label }: { text: string; label: string }) {
   const [svg, setSvg] = useState<string | null>(null);
   useEffect(() => {
     let alive = true;
-    QRCode.toString([{ data: text, mode: "alphanumeric" }], {
+    // PayVault codes fit alphanumeric mode; links (stall stickers) need byte mode.
+    const data = /^[0-9A-Z $%*+\-./:]*$/.test(text) ? [{ data: text, mode: "alphanumeric" as const }] : text;
+    QRCode.toString(data, {
       type: "svg",
       errorCorrectionLevel: "M",
       margin: 2,

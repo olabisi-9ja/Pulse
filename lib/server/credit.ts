@@ -17,15 +17,20 @@ export async function merchantStats(tx: Db, user: AppUser): Promise<MerchantStat
   // Sale day is the payer's signed time, clamped between its vault's issue time and sync time, so a
   // set-back clock can only shift a sale within one short-lived vault.
   // ponytail: one person with a second account can still pay herself; KYC per account limits that.
+  // Online sales (USSD, tap) use server time, so they need no clamp.
   const [r] = await tx<{ trading_days: number; takings: number; customers: number }[]>`
-    select count(distinct greatest(a.issued_at, least(p.device_time, p.received_at))::date)::int as trading_days,
-      coalesce(sum(p.amount), 0)::bigint as takings,
-      count(distinct p.payer_user_id)::int as customers
-    from pv.payments p join pv.allowances a on a.id = p.allowance_id
-    where p.merchant_user_id = ${user.id} and p.status = 'settled'
-      and p.payer_user_id is distinct from ${user.id}
-      and p.amount >= ${minSale}
-      and p.received_at > now() - interval '30 days'`;
+    with sales as (
+      select greatest(a.issued_at, least(p.device_time, p.received_at))::date as day, p.amount, p.payer_user_id as payer
+      from pv.payments p join pv.allowances a on a.id = p.allowance_id
+      where p.merchant_user_id = ${user.id} and p.status = 'settled' and p.received_at > now() - interval '30 days'
+      union all
+      select t.created_at::date, t.amount, t.user_id
+      from pv.cashafrica_transactions t
+      where t.merchant_user_id = ${user.id} and t.status = 'completed' and t.created_at > now() - interval '30 days'
+    )
+    select count(distinct day)::int as trading_days, coalesce(sum(amount), 0)::bigint as takings,
+      count(distinct payer)::int as customers
+    from sales where payer is distinct from ${user.id} and amount >= ${minSale}`;
   return { tradingDays: r.trading_days, takings: Number(r.takings), customers: r.customers };
 }
 

@@ -1,5 +1,6 @@
 import "server-only";
 /** Partners, users, merchants and devices. */
+import { randomBytes as nodeRandomBytes, randomInt, scryptSync, timingSafeEqual } from "node:crypto";
 import { randomBytes } from "@payvault/protocol";
 import { bytes, type Db } from "./db";
 import { packFor } from "./policy";
@@ -44,6 +45,11 @@ export type AppUser = {
   kyc_tier: "tier0" | "tier1" | "tier2";
   merchant_id: Uint8Array | null;
   merchant_name: string | null;
+  /** E.164 number linked for USSD and SMS. */
+  phone: string | null;
+  ussd_pin_hash: string | null;
+  /** 8-digit code to pay this trader from a keypad or a stall sticker. */
+  merchant_code: string | null;
   status: "active" | "frozen";
   created_at: Date;
 };
@@ -163,4 +169,57 @@ export async function devicesForUser(tx: Db, userId: string): Promise<DeviceSumm
     frozenAt: r.revoked_at?.toISOString() ?? null,
     vaultOpen: r.vault_open,
   }));
+}
+
+/** The trader's 8-digit keypad code, allocated on first use. */
+export async function merchantCode(tx: Db, userId: string): Promise<string> {
+  for (let i = 0; i < 5; i++) {
+    const code = String(10_000_000 + randomInt(90_000_000));
+    const [r] = await tx<{ merchant_code: string }[]>`
+      update pv.users set merchant_code = coalesce(merchant_code, ${code})
+      where id = ${userId} and merchant_id is not null
+        and not exists (select 1 from pv.users where merchant_code = ${code})
+      returning merchant_code`;
+    if (r) return r.merchant_code;
+    const [u] = await tx<{ merchant_code: string | null; merchant_id: unknown }[]>`select merchant_code, merchant_id from pv.users where id = ${userId}`;
+    if (!u?.merchant_id) throw new Error("Not a merchant");
+    if (u.merchant_code) return u.merchant_code;
+  }
+  throw new Error("Could not allocate merchant code");
+}
+
+export async function userByMerchantCode(tx: Db, code: string): Promise<AppUser | undefined> {
+  const [u] = await tx<AppUser[]>`select * from pv.users where merchant_code = ${code}`;
+  return u && normalize(u);
+}
+
+export async function userByPhone(tx: Db, phone: string): Promise<AppUser | undefined> {
+  const [u] = await tx<AppUser[]>`select * from pv.users where phone = ${phone}`;
+  return u && normalize(u);
+}
+
+/** "+234 801-234 5678" -> "+2348012345678", or null if it isn't an international number. */
+export function normalizePhone(raw: string): string | null {
+  const p = raw.replace(/[\s()-]/g, "");
+  return /^\+[0-9]{8,15}$/.test(p) ? p : null;
+}
+
+const hashPin = (pin: string, salt: Buffer) => scryptSync(pin, salt, 32);
+
+/** Links a phone for USSD/SMS with its own PIN (the app PIN never leaves the phone). */
+export async function linkPhone(tx: Db, userId: string, phone: string, pin: string): Promise<void> {
+  if (!/^[0-9]{4,6}$/.test(pin)) throw new Error("PIN must be 4 to 6 digits");
+  const salt = nodeRandomBytes(16);
+  const hash = `${salt.toString("hex")}:${hashPin(pin, salt).toString("hex")}`;
+  const [taken] = await tx`select 1 from pv.users where phone = ${phone} and id <> ${userId}`;
+  if (taken) throw new Error("That number is linked to another account");
+  await tx`update pv.users set phone = ${phone}, ussd_pin_hash = ${hash} where id = ${userId}`;
+}
+
+export function checkUssdPin(user: AppUser, pin: string): boolean {
+  if (!user.ussd_pin_hash) return false;
+  const [salt, hash] = user.ussd_pin_hash.split(":");
+  const got = hashPin(pin, Buffer.from(salt, "hex"));
+  const want = Buffer.from(hash, "hex");
+  return got.length === want.length && timingSafeEqual(got, want);
 }

@@ -5,7 +5,7 @@ import { toBase64Url, toHex } from "@payvault/protocol";
 import { allowancesForUser, revocationsSince } from "./allowances";
 import { creditSummary, loansForUser, merchantStats } from "./credit";
 import type { Db } from "./db";
-import { type AppUser, partnerById } from "./identity";
+import { type AppUser, merchantCode, partnerById } from "./identity";
 import { publicIssuerKeys } from "./issuer";
 import { maxFunded } from "./policy";
 import { activity, balances } from "./money";
@@ -41,7 +41,10 @@ export async function appSnapshot(tx: Db, user: AppUser) {
       currency: user.currency,
       locale: user.locale,
       kycTier: user.kyc_tier,
-      merchant: user.merchant_id ? { id: toHex(user.merchant_id), name: user.merchant_name ?? "" } : null,
+      merchant: user.merchant_id
+        ? { id: toHex(user.merchant_id), name: user.merchant_name ?? "", code: await merchantCode(tx, user.id) }
+        : null,
+      phone: user.phone,
     },
     partner: {
       name: partner?.name ?? "",

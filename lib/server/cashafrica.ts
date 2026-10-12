@@ -76,7 +76,7 @@ export async function getOrProvisionPan(tx: Db, user: AppUser): Promise<CashTapP
   return toPan(row);
 }
 
-export type TapTransport = "nfc" | "cashscan" | "tap_simulate";
+export type TapTransport = "nfc" | "cashscan" | "tap_simulate" | "ussd";
 
 export type TapResult = {
   ref: string;

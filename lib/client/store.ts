@@ -68,6 +68,8 @@ export const useApp = create<State & Actions>((set, get) => ({
   },
 
   async init(userId) {
+    // Unsynced payments live in IndexedDB; ask the browser not to evict it under storage pressure.
+    void navigator.storage?.persist?.().catch(() => {});
     const cached = await kv.get<{ data: AppSnapshot; at: number }>(snapKey(userId));
     set({
       userId,

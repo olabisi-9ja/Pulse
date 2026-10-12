@@ -133,14 +133,12 @@ export type Device = { id: string; user_id: string; public_key: Uint8Array; labe
 
 export async function registerDevice(tx: Db, userId: string, publicKey: Uint8Array, label: string): Promise<Device> {
   if (publicKey.length !== 33) throw new Error("Invalid device key");
-  const [existing] = await tx<Device[]>`select * from pv.devices where public_key = ${publicKey}`;
-  if (existing) {
-    if (existing.user_id !== userId) throw new Error("Device key belongs to another user");
-    return { ...existing, public_key: bytes(existing.public_key) };
-  }
-  const [d] = await tx<Device[]>`
+  // Insert-or-read in one statement: two concurrent registrations of the same key must not collide.
+  await tx`
     insert into pv.devices (user_id, public_key, label) values (${userId}, ${publicKey}, ${label.slice(0, 60)})
-    returning *`;
+    on conflict (public_key) do nothing`;
+  const [d] = await tx<Device[]>`select * from pv.devices where public_key = ${publicKey}`;
+  if (d.user_id !== userId) throw new Error("Device key belongs to another user");
   return { ...d, public_key: bytes(d.public_key) };
 }
 

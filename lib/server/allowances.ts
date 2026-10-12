@@ -103,6 +103,8 @@ export async function issueForUser(
     perTxLimit?: number;
     maxPayments?: number;
     ttlHours?: number;
+    /** Server-internal (demo seeding): backdates the vault. Never taken from a request body. */
+    issuedAt?: number;
   },
 ): Promise<AllowanceCert> {
   const user = await userById(tx, input.userId);
@@ -134,7 +136,7 @@ export async function issueForUser(
   }
 
   const issuer = await activeIssuer(tx, partner.id);
-  const now = Math.floor(Date.now() / 1000);
+  const now = input.issuedAt ?? Math.floor(Date.now() / 1000);
   const cert = await issueAllowance(issuer.privateKey, {
     issuerKid: issuer.kid,
     devicePub: device.public_key,

@@ -17,7 +17,8 @@ import {
 } from "@payvault/protocol";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { closeWithStatement, freezeDevice, issueForUser, sweepExpired } from "./allowances";
-import { creditSummary, loansForUser, repayFromWallet } from "./credit";
+import { creditSummary, loansForUser, merchantStats, repayFromWallet } from "./credit";
+import { seedDemoTrader } from "./demo";
 import { db, type Sql } from "./db";
 import { createUser, enableMerchant, registerDevice, submitKyc, userById } from "./identity";
 import { balances, sandboxTopUp } from "./money";
@@ -203,4 +204,16 @@ describe.skipIf(!enabled)("settlement flows", () => {
     const [still] = await sql`select status from pv.allowances where id = ${cert.allowanceId}`;
     expect(still.status).toBe("revoked");
   });
+
+  it("seeds a demo trader whose three weeks of offline takings unlock credit", async () => {
+    const trader = await newUser("NG");
+    const res = await seedDemoTrader(sql, trader.id);
+    expect(res.tradingDays).toBe(18); // 21 days, every 7th off
+    const after = (await userById(sql, trader.id))!;
+    const stats = await merchantStats(sql, after);
+    expect(stats.customers).toBe(6);
+    expect(res.sales).toBeGreaterThan(36);
+    expect((await creditSummary(sql, after)).credit_limit).toBeGreaterThan(0);
+    await expect(seedDemoTrader(sql, trader.id)).rejects.toMatchObject({ code: "already_seeded" });
+  }, 60_000);
 });

@@ -144,6 +144,16 @@ const app: AppMessages = {
       merchant_cap: "Trop de paiements en attente de synchronisation. Trouvez du réseau pour synchroniser, puis réessayez.",
     },
   },
+  business: {
+    title: "Votre commerce",
+    tradingDays: "Jours de vente",
+    sales: "Ventes, 30 jours",
+    customers: "Clients",
+    unlocked: "Découvert débloqué",
+    hint: "Chaque jour d'encaissement construit votre crédit. Score {score}/100.",
+    verify: "Vérifiez votre pièce d'identité dans Coffre pour transformer vos ventes en crédit.",
+    seed: "Charger 3 semaines de ventes de démo",
+  },
   vault: {
     title: "Coffre hors ligne",
     remaining: "Disponible hors ligne",

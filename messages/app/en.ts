@@ -142,6 +142,16 @@ const app = {
       merchant_cap: "Too many payments waiting to sync. Get signal to sync, then try again.",
     },
   },
+  business: {
+    title: "Your business",
+    tradingDays: "Trading days",
+    sales: "Sales, 30 days",
+    customers: "Customers",
+    unlocked: "Overdraft unlocked",
+    hint: "Every day you take payments builds your credit. Score {score}/100.",
+    verify: "Verify your ID in Vault to turn your sales into credit.",
+    seed: "Load 3 weeks of demo sales",
+  },
   vault: {
     title: "Offline Vault",
     remaining: "Available offline",

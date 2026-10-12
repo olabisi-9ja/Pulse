@@ -8,27 +8,36 @@ import { emit } from "./events";
 
 export type CreditProfile = { user_id: string; credit_limit: number; score: number; status: "active" | "frozen" };
 
-export async function refreshCreditProfile(tx: Db, user: AppUser): Promise<CreditProfile> {
-  // A sale counts toward trading days only above 1% of the per-payment limit (filters dust).
+/** A trader's last 30 days, as counted for credit: the alternative data behind the Business card. */
+export type MerchantStats = { tradingDays: number; takings: number; customers: number };
+
+export async function merchantStats(tx: Db, user: AppUser): Promise<MerchantStats> {
+  // A sale counts only above 1% of the per-payment limit (filters dust) and from someone else.
   const minSale = Math.max(1, Math.floor(packFor(user.country).offlineLimits.perTransaction / 100));
-  const [h] = await tx<
-    { on_time: number; late: number; overdue: number; fraud: number; settled: number; trading_days: number }[]
-  >`
+  // Sale day is the payer's signed time, clamped between its vault's issue time and sync time, so a
+  // set-back clock can only shift a sale within one short-lived vault.
+  // ponytail: one person with a second account can still pay herself; KYC per account limits that.
+  const [r] = await tx<{ trading_days: number; takings: number; customers: number }[]>`
+    select count(distinct greatest(a.issued_at, least(p.device_time, p.received_at))::date)::int as trading_days,
+      coalesce(sum(p.amount), 0)::bigint as takings,
+      count(distinct p.payer_user_id)::int as customers
+    from pv.payments p join pv.allowances a on a.id = p.allowance_id
+    where p.merchant_user_id = ${user.id} and p.status = 'settled'
+      and p.payer_user_id is distinct from ${user.id}
+      and p.amount >= ${minSale}
+      and p.received_at > now() - interval '30 days'`;
+  return { tradingDays: r.trading_days, takings: Number(r.takings), customers: r.customers };
+}
+
+export async function refreshCreditProfile(tx: Db, user: AppUser): Promise<CreditProfile> {
+  const [h] = await tx<{ on_time: number; late: number; overdue: number; fraud: number; settled: number }[]>`
     select
       (select count(*)::int from pv.loans where user_id = ${user.id} and status = 'repaid' and updated_at <= due_at) as on_time,
       (select count(*)::int from pv.loans where user_id = ${user.id} and status = 'repaid' and updated_at > due_at) as late,
       (select count(*)::int from pv.loans where user_id = ${user.id} and (status = 'overdue' or (status = 'open' and due_at < now()))) as overdue,
       (select count(*)::int from pv.fraud_cases f join pv.allowances a on a.id = f.allowance_id where a.user_id = ${user.id}) as fraud,
-      (select count(*)::int from pv.payments where payer_user_id = ${user.id}) as settled,
-      -- Sale day is the payer's signed time, clamped between its vault's issue time and sync time, so a
-      -- set-back clock can only shift a sale within one short-lived vault. Self-payments and dust don't count.
-      -- ponytail: one person with a second account can still pay herself; KYC per account limits that.
-      (select count(distinct greatest(a.issued_at, least(p.device_time, p.received_at))::date)::int
-        from pv.payments p join pv.allowances a on a.id = p.allowance_id
-        where p.merchant_user_id = ${user.id} and p.status = 'settled'
-          and p.payer_user_id is distinct from ${user.id}
-          and p.amount >= ${minSale}
-          and p.received_at > now() - interval '30 days') as trading_days`;
+      (select count(*)::int from pv.payments where payer_user_id = ${user.id}) as settled`;
+  const { tradingDays } = await merchantStats(tx, user);
   const ageDays = Math.floor((Date.now() - new Date(user.created_at).getTime()) / 86_400_000);
   const d = creditDecision(packFor(user.country), {
     tier: user.kyc_tier,
@@ -38,7 +47,7 @@ export async function refreshCreditProfile(tx: Db, user: AppUser): Promise<Credi
     openOverdue: h.overdue,
     fraudCases: h.fraud,
     settledPayments: h.settled,
-    tradingDays: h.trading_days,
+    tradingDays,
   });
   const status = d.reason === "fraud" ? "frozen" : "active";
   const [p] = await tx<CreditProfile[]>`

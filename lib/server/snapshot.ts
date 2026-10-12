@@ -3,7 +3,7 @@ import "server-only";
 import { getCountryPack } from "@payvault/countries";
 import { toBase64Url, toHex } from "@payvault/protocol";
 import { allowancesForUser, revocationsSince } from "./allowances";
-import { creditSummary, loansForUser } from "./credit";
+import { creditSummary, loansForUser, merchantStats } from "./credit";
 import type { Db } from "./db";
 import { type AppUser, partnerById } from "./identity";
 import { publicIssuerKeys } from "./issuer";
@@ -21,7 +21,7 @@ export async function networkSnapshot(tx: Db, since = new Date(Date.now() - 30 *
 
 export async function appSnapshot(tx: Db, user: AppUser) {
   const pack = getCountryPack(user.country)!;
-  const [partner, bal, credit, allowances, loans, feed, network, rates] = await Promise.all([
+  const [partner, bal, credit, allowances, loans, feed, network, rates, business] = await Promise.all([
     partnerById(tx, user.partner_id),
     balances(tx, user),
     creditSummary(tx, user),
@@ -30,6 +30,7 @@ export async function appSnapshot(tx: Db, user: AppUser) {
     activity(tx, user, 40),
     networkSnapshot(tx),
     getRates(),
+    user.merchant_id ? merchantStats(tx, user) : null,
   ]);
   return {
     user: {
@@ -92,6 +93,7 @@ export async function appSnapshot(tx: Db, user: AppUser) {
     activity: feed,
     network,
     fx: { ...rates, currencies: DISPLAY_CURRENCIES },
+    business,
   };
 }
 

@@ -1,12 +1,13 @@
 "use client";
-import { ArrowDownLeft, ArrowUpRight, Eye, EyeOff, Radio, ScanLine } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Eye, EyeOff, Radio, ScanLine, Store } from "lucide-react";
 import { useState } from "react";
-import { money, shortDate } from "@/lib/client/money";
+import { api, ApiError, NetworkError } from "@/lib/client/api";
+import { minorUnitsOf, money, shortDate } from "@/lib/client/money";
 import { vaultSummary } from "@/lib/client/offline";
 import { useApp } from "@/lib/client/store";
 import { useI18n } from "./I18n";
 import { Initials, type Tab, TxRow, useApprox, useRows } from "./parts";
-import { Card, SectionHead, StatusPill } from "./ui";
+import { Button, Card, Notice, SectionHead, StatusPill } from "./ui";
 
 export function HomeScreen({
   onPay,
@@ -87,6 +88,8 @@ export function HomeScreen({
         </div>
       </section>
 
+      <BusinessCard hidden={hidden} />
+
       <section className="space-y-3">
         <SectionHead title={m.home.vault} />
         <Card>
@@ -142,4 +145,76 @@ function PillAction({ children, icon, onClick }: { children: React.ReactNode; ic
       {children}
     </button>
   );
+}
+
+/**
+ * For traders: the last 30 days of takings that count toward credit (Track 3 pitch).
+ * In the sandbox it can load three weeks of demo sales.
+ */
+function BusinessCard({ hidden }: { hidden: boolean }) {
+  const { m, t, locale } = useI18n();
+  const snapshot = useApp((s) => s.snapshot);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const b = snapshot?.business;
+  if (!snapshot || !b) return null;
+  const cur = snapshot.user.currency;
+  const show = (v: number) => (hidden ? "••••" : money(v, cur, locale));
+  const canSeed = snapshot.partner.sandbox && b.tradingDays < 5;
+
+  const seed = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await api("/api/app/demo/seed", {}, 60_000);
+      await useApp.getState().refresh();
+    } catch (err) {
+      setError(err instanceof NetworkError ? m.common.needsNetwork : err instanceof ApiError ? err.message : m.common.genericError);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="space-y-3">
+      <SectionHead title={m.business.title} />
+      <Card className="space-y-4">
+        <dl className="grid grid-cols-3 gap-2 text-center">
+          <Stat label={m.business.tradingDays} value={`${b.tradingDays}/30`} />
+          <Stat label={m.business.sales} value={hidden ? "••••" : compact(b.takings, cur, locale)} />
+          <Stat label={m.business.customers} value={String(b.customers)} />
+        </dl>
+        <div className="flex items-center justify-between gap-3 rounded-[20px] bg-card-2 px-4 py-3.5">
+          <span className="flex items-center gap-2 text-sm text-muted">
+            <Store className="h-4 w-4" /> {m.business.unlocked}
+          </span>
+          <span className="tabular font-medium text-ink">{show(snapshot.credit.limit)}</span>
+        </div>
+        <p className="text-[13px] text-muted">
+          {snapshot.credit.reason === "kyc_required" ? m.business.verify : t(m.business.hint, { score: snapshot.credit.score })}
+        </p>
+        {error && <Notice tone="danger">{error}</Notice>}
+        {canSeed && (
+          <Button variant="secondary" className="w-full" loading={busy} onClick={() => void seed()}>
+            {m.business.seed}
+          </Button>
+        )}
+      </Card>
+    </section>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0 rounded-[20px] bg-card-2 px-2 py-3">
+      <dd className="tabular truncate text-[15px] font-medium text-ink">{value}</dd>
+      <dt className="mt-0.5 text-[12px] text-muted">{label}</dt>
+    </div>
+  );
+}
+
+/** "₦92K": fits a narrow stat tile. */
+function compact(minor: number, currency: string, locale: string): string {
+  const major = minor / 10 ** minorUnitsOf(currency);
+  return new Intl.NumberFormat(locale, { style: "currency", currency, currencyDisplay: "narrowSymbol", notation: "compact", maximumFractionDigits: 0 }).format(major);
 }

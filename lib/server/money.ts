@@ -118,8 +118,8 @@ export async function activity(tx: Db, user: AppUser, limit = 50): Promise<Activ
     limit ${limit}`;
   const paymentRefs = rows.filter((r) => r.kind.startsWith("offline_payment") && r.ref).map((r) => Buffer.from(r.ref!, "hex"));
   const payments = paymentRefs.length
-    ? await tx<{ id: Buffer; seq: number; from_credit: number; status: string; merchant_name: string | null; payer_name: string | null }[]>`
-        select p.id, p.seq, p.from_credit, p.status, m.merchant_name, u.display_name as payer_name
+    ? await tx<{ id: Buffer; seq: number; from_credit: number; status: string; sold_at: Date; merchant_name: string | null; payer_name: string | null }[]>`
+        select p.id, p.seq, p.from_credit, p.status, least(p.device_time, p.received_at) as sold_at, m.merchant_name, u.display_name as payer_name
         from pv.payments p
         left join pv.users m on m.id = p.merchant_user_id
         left join pv.users u on u.id = p.payer_user_id
@@ -142,7 +142,8 @@ export async function activity(tx: Db, user: AppUser, limit = 50): Promise<Activ
       currency: r.currency,
       memo: r.memo,
       ref: r.ref,
-      at: r.created_at.toISOString(),
+      // Offline payments show when the sale happened, not when it synced.
+      at: (pay?.sold_at ?? r.created_at).toISOString(),
       counterparty: pay ? (r.account_kind === "merchant" ? pay.payer_name : pay.merchant_name) : r.ref ? names.get(r.ref) ?? null : null,
       offline: pay ? { seq: pay.seq, fromCredit: pay.from_credit, status: pay.status } : null,
     };

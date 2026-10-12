@@ -12,7 +12,7 @@ RUN pnpm install --frozen-lockfile
 FROM deps AS build
 COPY . .
 # Baked into static pages (sitemap, metadata); set to the public URL of this deployment.
-ARG NEXT_PUBLIC_SITE_URL=https://payvault-phi.vercel.app
+ARG NEXT_PUBLIC_SITE_URL=https://payvault.rumptycloud.app
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL NEXT_OUTPUT=standalone NEXT_TELEMETRY_DISABLED=1
 RUN pnpm build
 # The migration script runs outside the Next bundle and needs the postgres driver (no deps).

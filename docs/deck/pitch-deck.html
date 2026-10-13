@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PayVault Pitch Deck</title>
+<style>
+  /* 16:9 slides, one per printed page. Render with: chromium --print-to-pdf (see docs/deck/README.md). */
+  @font-face { font-family: "Inter Tight"; src: url("../../node_modules/@fontsource-variable/inter-tight/files/inter-tight-latin-wght-normal.woff2") format("woff2"); font-weight: 100 900; }
+  @font-face { font-family: "Inter"; src: url("../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2") format("woff2"); font-weight: 100 900; }
+  @font-face { font-family: "Montserrat"; src: url("../../node_modules/@fontsource-variable/montserrat/files/montserrat-latin-wght-normal.woff2") format("woff2"); font-weight: 100 900; }
+
+  :root {
+    --navy: #14365a; --navy-deep: #0b1f36; --green: #046b4f; --mint: #2fb386; --green-soft: #e3f1ec;
+    --ink: #10161d; --muted: #5b6672; --line: #e1e6ec; --paper: #ffffff; --soft: #f4f6f8;
+    --warn-soft: #fbf1df; --warn: #8a5a10;
+    --display: "Inter Tight", "Inter", sans-serif; --body: "Inter", sans-serif; --brand: "Montserrat", sans-serif;
+  }
+  @page { size: 1280px 720px; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font: 20px/1.45 var(--body); color: var(--ink); background: #ccc; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .slide { width: 1280px; height: 720px; position: relative; overflow: hidden; background: var(--paper); page-break-after: always; break-after: page; padding: 64px 80px; display: flex; flex-direction: column; }
+  .slide:last-child { page-break-after: auto; break-after: auto; }
+  .dark { background: var(--navy); color: #fff; }
+  .deep { background: var(--navy-deep); color: #fff; }
+
+  .kicker { font: 600 15px/1 var(--display); text-transform: uppercase; letter-spacing: .14em; color: var(--green); margin-bottom: 18px; }
+  .dark .kicker, .deep .kicker { color: var(--mint); }
+  h1 { font: 700 72px/1.02 var(--display); letter-spacing: -0.03em; margin: 0; }
+  h2 { font: 700 46px/1.08 var(--display); letter-spacing: -0.025em; margin: 0 0 28px; max-width: 22ch; }
+  h3 { font: 650 23px/1.25 var(--display); margin: 0 0 8px; letter-spacing: -0.01em; }
+  p { margin: 0; }
+  .lead { font-size: 24px; line-height: 1.45; color: var(--muted); max-width: 46ch; }
+  .dark .lead, .deep .lead { color: #c4d3e3; }
+  .g { color: var(--green); } .dark .g, .deep .g { color: var(--mint); }
+  .muted { color: var(--muted); }
+
+  .foot { position: absolute; left: 80px; right: 80px; bottom: 30px; display: flex; justify-content: space-between; font: 500 13px/1 var(--body); color: var(--muted); }
+  .dark .foot, .deep .foot { color: #8fa6bf; }
+  .wm { font: 800 15px/1 var(--brand); letter-spacing: .02em; color: var(--navy); }
+  .wm span { font-weight: 500; }
+  .dark .wm, .deep .wm { color: #fff; }
+
+  .grid { display: grid; gap: 22px; }
+  .g2 { grid-template-columns: 1fr 1fr; } .g3 { grid-template-columns: repeat(3, 1fr); } .g4 { grid-template-columns: repeat(4, 1fr); }
+  .card { background: var(--soft); border-radius: 22px; padding: 26px 28px; }
+  .card p { font-size: 18px; color: var(--muted); }
+  .dark .card { background: rgba(255,255,255,.07); } .dark .card p { color: #c4d3e3; }
+  .num { font: 700 15px/1 var(--display); color: var(--green); background: var(--green-soft); width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 16px; }
+  .dark .num { background: rgba(47,179,134,.18); color: var(--mint); }
+  .photo { position: absolute; top: 0; bottom: 0; right: 0; width: 44%; background-size: cover; background-position: center; }
+  .photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--navy) 0%, rgba(20,54,90,0) 28%); }
+  .photo.light::after { background: linear-gradient(90deg, #fff 0%, rgba(255,255,255,0) 22%); }
+  ul.clean { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+  ul.clean li { padding-left: 30px; position: relative; font-size: 21px; }
+  ul.clean li::before { content: ""; position: absolute; left: 0; top: 11px; width: 12px; height: 12px; border-radius: 50%; background: var(--green); }
+  .dark ul.clean li::before, .deep ul.clean li::before { background: var(--mint); }
+  .pill { display: inline-block; font: 600 14px/1 var(--display); padding: 9px 14px; border-radius: 999px; background: var(--green-soft); color: var(--green); }
+  .dark .pill { background: rgba(47,179,134,.18); color: var(--mint); }
+  .note { font-size: 14px; color: var(--muted); margin-top: auto; padding-bottom: 28px; }
+  .dark .note { color: #8fa6bf; }
+</style>
+</head>
+<body>
+
+<!-- 1. Title -->
+<section class="slide dark">
+  <div class="photo" style="background-image:url('../../public/photos/trader.jpg')"></div>
+  <div style="position:relative; max-width:640px; display:flex; flex-direction:column; height:100%">
+    <div style="display:flex; align-items:center; gap:14px">
+      <img src="../../public/brand/payvault-mark-dark.svg" width="54" height="56" alt="">
+      <span class="wm" style="font-size:24px">PAY<span>VAULT</span></span>
+    </div>
+    <div style="margin-top:auto">
+      <div class="kicker">Smart SME Financing and Growth Platform</div>
+      <h1>No signal.<br><span class="g">Still paid.</span></h1>
+      <p class="lead" style="margin-top:26px">Offline payments that turn a market trader's daily sales into the credit history a bank can lend against.</p>
+    </div>
+    <p style="margin-top:40px; font-size:16px; color:#8fa6bf">Live demo: payvault.rumptycloud.app</p>
+  </div>
+</section>
+
+<!-- 2. Problem -->
+<section class="slide">
+  <div class="photo light" style="background-image:url('../../public/photos/stall.jpg'); width:38%"></div>
+  <div style="max-width:700px">
+    <div class="kicker">The problem</div>
+    <h2>Africa's traders are creditworthy but invisible.</h2>
+    <ul class="clean">
+      <li><b>Payments stop when the signal stops.</b> <span class="muted">In markets with weak networks, transfers fail, so sales fall back to cash.</span></li>
+      <li><b>Cash leaves no record.</b> <span class="muted">Banks can't see a trader's real income, however steady it is.</span></li>
+      <li><b>No record, no credit.</b> <span class="muted">Women-led micro-businesses are refused loans or pushed to costly informal lenders.</span></li>
+      <li><b>Growth stalls.</b> <span class="muted">On a slow day she can't restock, and a missed day is lost income.</span></li>
+    </ul>
+  </div>
+  <div class="foot"><span class="wm">PAY<span>VAULT</span></span><span>2</span></div>
+</section>
+
+<!-- 3. Target users -->
+<section class="slide">
+  <div class="kicker">Target users</div>
+  <h2>Built for the trader. Sold to the institutions that serve her.</h2>
+  <div class="grid g3" style="margin-top:6px">
+    <div class="card"><div class="num">1</div><h3>Market traders</h3><p>Women-led micro and small businesses: market stalls, kiosks, food sellers, agents. Smartphone or basic phone.</p></div>
+    <div class="card"><div class="num">2</div><h3>Their customers</h3><p>Shoppers who want to pay digitally even where data is patchy, including on basic phones via USSD.</p></div>
+    <div class="card"><div class="num">3</div><h3>Partners (who pay)</h3><p>Banks, microfinance banks, mobile money operators and fintechs. They hold the licences and funds; PayVault is the layer underneath.</p></div>
+  </div>
+  <p class="note">Starting market: Nigeria. Designed for 15 African markets in English and French.</p>
+  <div class="foot"><span class="wm">PAY<span>VAULT</span></span><span>3</span></div>
+</section>
+
+<!-- 4. Solution -->
+<section class="slide dark">
+  <div class="kicker">The solution</div>
+  <h2>PayVault: payments that work offline, and sales that become credit.</h2>
+  <div class="grid g3">
+    <div class="card"><h3>Pays offline</h3><p>The customer's phone signs a payment with no network. The trader's phone verifies it on the spot. It settles automatically when any phone reconnects.</p></div>
+    <div class="card"><h3>Sales become credit</h3><p>Every settled sale counts as a trading day. A steady month of trading lifts her score and unlocks an overdraft from the partner bank.</p></div>
+    <div class="card"><h3>Works on any phone</h3><p>Web app for smartphones; USSD menu, SMS confirmations and a printed stall sticker (QR / NFC) for everyone else.</p></div>
+  </div>
+  <div class="foot"><span class="wm">PAY<span>VAULT</span></span><span>4</span></div>
+</section>
+
+<!-- 5. How it works -->
+<section class="slide">
+  <div class="kicker">How a sale works</div>
+  <h2>From a stall with no signal to a loan offer.</h2>
+  <div class="grid g4">
+    <div class="card"><div class="num">1</div><h3>Load the vault</h3><p>Once online, the customer moves money into an offline vault on her phone, plus an optional overdraft.</p></div>
+    <div class="card"><div class="num">2</div><h3>Pay with no signal</h3><p>She scans the trader's code and enters her PIN. The phone signs the payment; the trader's phone verifies it in under a second.</p></div>
+    <div class="card"><div class="num">3</div><h3>Settle automatically</h3><p>When either phone, or any nearby PayVault phone, gets signal, the payment settles and the trader gets an SMS.</p></div>
+    <div class="card"><div class="num">4</div><h3>Unlock credit</h3><p>Settled sales build her trading history. The partner bank sees verified income and offers an overdraft.</p></div>
+  </div>
+  <div class="foot"><span class="wm">PAY<span>VAULT</span></span><span>5</span></div>
+</section>
+
+<!-- 6. Innovation -->
+<section class="slide">
+  <div class="kicker">Innovation</div>
+  <h2>What's new about PayVault.</h2>
+  <div class="grid g2" style="gap:18px 40px">
+    <div><h3><span class="g">Offline</span> overdraft</h3><p class="muted">Pay-later credit that works with no network, inside the same signed vault as the customer's own money.</p></div>
+    <div><h3>Offline sales as <span class="g">credit data</span></h3><p class="muted">Trading days and takings, collected even without signal, become alternative data for lending decisions.</p></div>
+    <div><h3><span class="g">Cryptographic</span> trust</h3><p class="muted">Every payment is signed on the phone (ECDSA P-256) and hash-chained, so tampering and double-spends are detectable.</p></div>
+    <div><h3>Delivery <span class="g">by any route</span></h3><p class="muted">A payment reaches the bank through the trader's phone, the customer's phone, a nearby phone relaying it by QR, or SMS.</p></div>
+    <div><h3><span class="g">Any phone</span></h3><p class="muted">Smartphone web app, USSD, SMS and printed stall stickers: no app store, no new hardware.</p></div>
+    <div><h3>Pan-African <span class="g">by design</span></h3><p class="muted">Country rules (currency, limits, ID types, rails) are configuration, not code. 15 markets set up, English and French.</p></div>
+  </div>
+  <div class="foot"><span class="wm">PAY<span>VAULT</span></span><span>6</span></div>
+</section>
+
+<!-- 7. Trust -->
+<section class="slide deep">
+  <div class="kicker">Why it's safe to pay offline</div>
+  <h2>We don't claim double-spending is impossible. We make it bounded, detected and recovered.</h2>
+  <div class="grid g3">
+    <div class="card" style="background:rgba(255,255,255,.07)"><h3 class="g">Bounded</h3><p style="color:#c4d3e3">Small vault caps, per-payment and per-trader limits set per country. The worst case is a known, small amount.</p></div>
+    <div class="card" style="background:rgba(255,255,255,.07)"><h3 class="g">Detected</h3><p style="color:#c4d3e3">Payments are numbered and hash-chained. A cloned phone shows up as a "fork" the moment payments sync.</p></div>
+    <div class="card" style="background:rgba(255,255,255,.07)"><h3 class="g">Recovered</h3><p style="color:#c4d3e3">The trader is paid in full from a risk pool; the loss is recovered from the ID-verified holder. Lost phones can be frozen.</p></div>
+  </div>
+  <div class="foot"><span class="wm">PAY<span>VAULT</span></span><span>7</span></div>
+</section>
+
+<!-- 8. Impact -->
+<section class="slide">
+  <div class="photo light" style="background-image:url('../../public/photos/shop.jpg'); width:34%"></div>
+  <div style="max-width:760px">
+    <div class="kicker">Impact</div>
+    <h2>More sales, a credit history, and fairer loans.</h2>
+    <div class="grid g3" style="gap:16px">
+      <div><h3>Traders</h3><p class="muted" style="font-size:18px">Never lose a digital sale to bad network. Build a verifiable record. Access an overdraft to restock.</p></div>
+      <div><h3>Customers</h3><p class="muted" style="font-size:18px">Pay digitally anywhere, on any phone, with small pay-later when short.</p></div>
+      <div><h3>Partners</h3><p class="muted" style="font-size:18px">New, lower-risk SME lending backed by real sales data, plus transaction volume that used to be cash.</p></div>
+    </div>
+    <div style="margin-top:34px">
+      <p class="kicker" style="margin-bottom:12px">What the pilot will measure</p>
+      <div style="display:flex; flex-wrap:wrap; gap:10px">
+        <span class="pill">Sales captured offline</span><span class="pill">Settlement rate</span><span class="pill">Time to settle</span>
+        <span class="pill">Fraud loss vs. volume</span><span class="pill">Traders reaching credit</span><span class="pill">Repayment rate</span><span class="pill">Women-led share</span>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span class="wm">PAY<span>VAULT</span></span><span>8</span></div>
+</section>
+
+<!-- 9. Business model -->
+<section class="slide">
+  <div class="kicker">Business model</div>
+  <h2>B2B infrastructure, white-labelled into our partners' apps.</h2>
+  <div class="grid g4">
+    <div class="card"><h3>Transaction fee</h3><p>Small fee on each settled offline payment.</p></div>
+    <div class="card"><h3>Credit share</h3><p>Share of overdraft fees on credit PayVault data unlocks.</p></div>
+    <div class="card"><h3>Platform licence</h3><p>Per partner and per country, with integration support.</p></div>
+    <div class="card"><h3>Risk pool</h3><p>Optional guarantee premium covering offline fraud losses.</p></div>
+  </div>
+  <p class="note">PayVault never holds customer funds. Licensed partners are the lender and custodian of record.</p>
+  <div class="foot"><span class="wm">PAY<span>VAULT</span></span><span>9</span></div>
+</section>
+
+<!-- 10. Implementation -->
+<section class="slide">
+  <div class="kicker">Implementation approach</div>
+  <h2>From working prototype to live pilot.</h2>
+  <div class="grid g4" style="gap:18px">
+    <div class="card" style="background:var(--green-soft)"><span class="pill" style="background:#fff">Done</span><h3 style="margin-top:14px">Phase 0: Prototype</h3><p>Live wallet, merchant mode, USSD, partner console, API and docs. Automated tests on payments, fraud and credit.</p></div>
+    <div class="card"><span class="pill">0–3 months</span><h3 style="margin-top:14px">Phase 1: Pilot</h3><p>One partner bank, MFB or mobile money operator and about 50 traders from one market association.</p></div>
+    <div class="card"><span class="pill">3–6 months</span><h3 style="margin-top:14px">Phase 2: Harden</h3><p>Android SDK, phone sign-in, independent security audit, hardware-secured keys, CBN regulatory sandbox.</p></div>
+    <div class="card"><span class="pill">6+ months</span><h3 style="margin-top:14px">Phase 3: Scale</h3><p>More partners and markets via country packs; cross-border settlement through PAPSS.</p></div>
+  </div>
+  <p style="margin-top:26px; font-size:18px"><b>Integration points:</b> <span class="muted">partner core banking or wallet ledger (REST API + signed webhooks), KYC (NIN / BVN), SMS and USSD aggregator (Africa's Talking).</span></p>
+  <div class="foot"><span class="wm">PAY<span>VAULT</span></span><span>10</span></div>
+</section>
+
+<!-- 11. Technology -->
+<section class="slide">
+  <div class="kicker">Technology</div>
+  <h2>Built with proven, open technology.</h2>
+  <div class="grid g3" style="gap:16px">
+    <div class="card"><h3>App</h3><p>Next.js / React Progressive Web App, TypeScript, service workers and IndexedDB for offline use.</p></div>
+    <div class="card"><h3>Security</h3><p>WebCrypto ECDSA P-256 signatures, non-extractable device keys, hash-chained payments, encrypted issuer keys.</p></div>
+    <div class="card"><h3>Payments</h3><p>Compact signed payment protocol over QR codes, PostgreSQL double-entry ledger and reconciliation.</p></div>
+    <div class="card"><h3>Credit</h3><p>Rules-based scoring on alternative data (trading days, sales, repayments); machine learning once pilot data exists.</p></div>
+    <div class="card"><h3>Integration</h3><p>REST APIs, HMAC-signed webhooks, Africa's Talking USSD and SMS.</p></div>
+    <div class="card"><h3>Cloud</h3><p>Docker, hosted in Lagos (RumptyCloud), with Vercel for the web front end.</p></div>
+  </div>
+  <div class="foot"><span class="wm">PAY<span>VAULT</span></span><span>11</span></div>
+</section>
+
+<!-- 12. Close -->
+<section class="slide dark">
+  <div class="photo" style="background-image:url('../../public/photos/agent.jpg')"></div>
+  <div style="position:relative; max-width:640px; display:flex; flex-direction:column; height:100%">
+    <div class="kicker">Try it today</div>
+    <h1 style="font-size:60px">Every trading day becomes <span class="g">credit history.</span></h1>
+    <p class="lead" style="margin-top:24px">We're looking for a partner bank or mobile money operator and a market association to run the first pilot.</p>
+    <div style="margin-top:auto; display:grid; gap:10px; font-size:19px">
+      <div><span style="color:#8fa6bf">Live demo</span>&nbsp;&nbsp;payvault.rumptycloud.app</div>
+      <div style="font-size:14px; color:#8fa6bf">Demo uses test money only. Country limits are illustrative until agreed with partners and regulators.</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px; margin-top:28px">
+      <img src="../../public/brand/payvault-mark-dark.svg" width="40" height="42" alt="">
+      <span class="wm" style="font-size:20px">PAY<span>VAULT</span></span>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

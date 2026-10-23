@@ -6,7 +6,7 @@ import { CountryPicker } from "@/components/console/CountryPicker";
 import { Card, Field, PageHeader, inputCls } from "@/components/console/ui";
 import { requireIdentityOrRedirect } from "@/lib/console/context";
 import { isLocale } from "@/lib/i18n";
-import { partnerMemberships } from "@/lib/server/auth";
+import { isAdmin, partnerMemberships } from "@/lib/server/auth";
 import { getConsoleMessages } from "@/messages/console";
 
 export const metadata: Metadata = { title: "Set up your organisation" };
@@ -18,14 +18,10 @@ export default async function OnboardingPage({ params }: PageProps<"/[locale]/co
   const memberships = await partnerMemberships(identity.id);
   const t = getConsoleMessages(locale);
   const o = t.onboarding;
-  const isAdmin = (process.env.PV_ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean)
-    .includes(identity.email.toLowerCase());
+  const admin = isAdmin(identity);
   const done = `/${locale}/console`;
 
-  if (memberships.length > 0 && !isAdmin) redirect(done);
+  if (memberships.length > 0 && !admin) redirect(done);
 
   return (
     <>
@@ -84,7 +80,7 @@ export default async function OnboardingPage({ params }: PageProps<"/[locale]/co
           </ApiForm>
         </Card>
 
-        {isAdmin && (
+        {admin && (
           <Card title={o.sandboxTitle}>
             <p className="mb-4 text-sm text-muted">{o.sandboxBody}</p>
             <ApiForm endpoint="/api/console/partners/sandbox" submitLabel={o.sandboxButton} pendingLabel={t.common.saving} redirectTo={done} variant="secondary" />

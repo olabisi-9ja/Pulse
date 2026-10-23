@@ -9,6 +9,7 @@ import { sweepExpired } from "./allowances";
 import { markOverdue } from "./credit";
 import { db, type Db, type Sql } from "./db";
 import { deliverEvents } from "./events";
+import { pruneAuth } from "./phoneauth";
 import { pruneRateLimits } from "./ratelimit";
 
 export async function runMaintenance(sql: Sql) {
@@ -16,7 +17,8 @@ export async function runMaintenance(sql: Sql) {
   const overdue = await sql.begin((tx) => markOverdue(tx));
   const webhooks = await deliverEvents(sql);
   const rateLimitsPruned = await pruneRateLimits(sql);
-  return { expired, overdue, webhooks, rateLimitsPruned };
+  const authPruned = await pruneAuth(sql);
+  return { expired, overdue, webhooks, rateLimitsPruned, authPruned };
 }
 
 /** Claims the job if it hasn't run within `everyMinutes`; only one instance wins. */

@@ -4,7 +4,7 @@ import { toHex } from "@payvault/protocol";
 import { ServiceError } from "./allowances";
 import { repayFromWallet } from "./credit";
 import { bytes, type Db } from "./db";
-import { type AppUser, partnerById, userByEmail, userById } from "./identity";
+import { type AppUser, partnerById, userByEmailOrPhone, userById } from "./identity";
 import { accountId, balanceOf, postJournal, transfer } from "./ledger";
 import { packFor } from "./policy";
 
@@ -37,11 +37,11 @@ export async function sandboxTopUp(tx: Db, userId: string, amount: number): Prom
 }
 
 /** Online transfer to another PayVault user of the same currency. */
-export async function sendToUser(tx: Db, fromId: string, toEmail: string, amount: number, note = ""): Promise<void> {
+export async function sendToUser(tx: Db, fromId: string, recipient: string, amount: number, note = ""): Promise<void> {
   checkAmount(amount);
   const from = await mustUser(tx, fromId);
-  const to = await userByEmail(tx, toEmail.trim());
-  if (!to) throw new ServiceError("recipient_not_found", "No PayVault user with that email");
+  const to = await userByEmailOrPhone(tx, recipient.trim());
+  if (!to) throw new ServiceError("recipient_not_found", "No PayVault user with that email or phone");
   if (to.id === from.id) throw new ServiceError("self_transfer", "You can't send money to yourself");
   if (to.currency !== from.currency) throw new ServiceError("currency_mismatch", "Recipient uses another currency");
   const src = await accountId(tx, from.partner_id, "wallet", from.currency, from.id);

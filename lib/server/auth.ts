@@ -1,24 +1,27 @@
 import "server-only";
 /**
- * Identity comes from Supabase Auth (email OTP / magic link). Without Supabase
- * configured, development builds fall back to a local email sign-in so the
- * product can be run end to end on a laptop. Production refuses that fallback
- * unless PV_DEMO_AUTH=1 (pitch/demo deployments with sandbox money only:
- * anyone can sign in as any email).
+ * Identity comes from phone sign-in (SMS code, lib/server/phoneauth.ts), or from
+ * Supabase Auth (email OTP) when Supabase is configured. Phone sign-in needs
+ * Africa's Talking (AT_USERNAME/AT_API_KEY) in production; in development the
+ * code is printed to the server log instead of texted.
  */
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { db } from "./db";
 import { type AppUser, userById } from "./identity";
+import { SESSION_COOKIE, sessionByToken } from "./phoneauth";
 
-export type Identity = { id: string; email: string };
+export type Identity = { id: string; email: string | null; phone: string | null };
 
 export const supabaseConfigured = () =>
   !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
 
-export const demoAuth = () => process.env.PV_DEMO_AUTH === "1";
+/** Sandbox demo data (seeded sales) on a deployed build. Sandbox money only. */
+export const demoMode = () => process.env.PV_DEMO_AUTH === "1";
 
-export const devAuthAllowed = () => !supabaseConfigured() && (process.env.NODE_ENV !== "production" || demoAuth());
+export const smsConfigured = () => !!(process.env.AT_USERNAME && process.env.AT_API_KEY);
+
+export const phoneAuthAllowed = () => !supabaseConfigured() && (smsConfigured() || process.env.NODE_ENV !== "production");
 
 export async function supabaseServer() {
   const store = await cookies();
@@ -36,26 +39,21 @@ export async function supabaseServer() {
   });
 }
 
-export const DEV_COOKIE = "pv_dev_email";
-
-/** Deterministic UUID for a dev email, so the same email maps to the same user. */
-export async function devUserId(email: string): Promise<string> {
-  const h = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(email.toLowerCase())));
-  h[6] = (h[6] & 0x0f) | 0x50;
-  h[8] = (h[8] & 0x3f) | 0x80;
-  const hex = [...h.slice(0, 16)].map((b) => b.toString(16).padStart(2, "0")).join("");
-  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
-}
-
 export async function currentIdentity(): Promise<Identity | null> {
   if (supabaseConfigured()) {
     const supabase = await supabaseServer();
     const { data } = await supabase.auth.getUser();
-    return data.user?.email ? { id: data.user.id, email: data.user.email } : null;
+    return data.user?.email ? { id: data.user.id, email: data.user.email, phone: null } : null;
   }
-  if (!devAuthAllowed()) return null;
-  const email = (await cookies()).get(DEV_COOKIE)?.value;
-  return email ? { id: await devUserId(email), email } : null;
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  const s = token ? await sessionByToken(db(), token) : null;
+  return s ? { id: s.userId, email: s.email, phone: s.phone } : null;
+}
+
+/** PV_ADMIN_EMAILS lists administrator emails and/or phone numbers. */
+export function isAdmin(identity: Identity): boolean {
+  const admins = (process.env.PV_ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+  return [identity.email?.toLowerCase(), identity.phone].some((x) => !!x && admins.includes(x));
 }
 
 export class AuthError extends Error {

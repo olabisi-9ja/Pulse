@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Standalone doc tooling (pitch deck generator), not app code.
+    "docs/**",
   ]),
 ]);
 

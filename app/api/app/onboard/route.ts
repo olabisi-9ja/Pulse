@@ -14,6 +14,6 @@ const Body = z.object({
 export const POST = handle(async (req: Request) => {
   const identity = await requireIdentity();
   const body = await parseBody(req, Body);
-  const user = await db().begin((tx) => createUser(tx, { id: identity.id, email: identity.email, ...body }));
+  const user = await db().begin((tx) => createUser(tx, { id: identity.id, email: identity.email, phone: identity.phone, ...body }));
   return json({ ok: true, userId: user.id });
 });

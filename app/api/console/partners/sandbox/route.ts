@@ -1,18 +1,14 @@
-import { requireIdentity } from "@/lib/server/auth";
+import { isAdmin, requireIdentity } from "@/lib/server/auth";
 import { db } from "@/lib/server/db";
 import { handle, json } from "@/lib/server/http";
 import { sandboxPartner } from "@/lib/server/identity";
 import { ServiceError } from "@/lib/server/allowances";
 
-/** Lets emails listed in PV_ADMIN_EMAILS join the shared sandbox partner as owner. */
+/** Lets emails or phones listed in PV_ADMIN_EMAILS join the shared sandbox partner as owner. */
 export const POST = handle(async () => {
   const identity = await requireIdentity();
-  const admins = (process.env.PV_ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
-  if (!admins.includes(identity.email.toLowerCase())) {
-    throw new ServiceError("forbidden", "This email is not on the administrator list", 403);
+  if (!isAdmin(identity)) {
+    throw new ServiceError("forbidden", "You are not on the administrator list", 403);
   }
   const id = await db().begin(async (tx) => {
     const p = await sandboxPartner(tx);

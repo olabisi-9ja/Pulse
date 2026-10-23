@@ -1,4 +1,4 @@
-import { devAuthAllowed, supabaseConfigured } from "@/lib/server/auth";
+import { phoneAuthAllowed, supabaseConfigured } from "@/lib/server/auth";
 import { json } from "@/lib/server/http";
 
 /**
@@ -12,5 +12,5 @@ export function GET() {
       supabase: { url: process.env.NEXT_PUBLIC_SUPABASE_URL, key: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY },
     });
   }
-  return json({ mode: devAuthAllowed() ? "dev" : "unavailable" });
+  return json({ mode: phoneAuthAllowed() ? "phone" : "unavailable" });
 }

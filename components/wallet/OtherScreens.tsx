@@ -125,7 +125,7 @@ export function ProfileScreen({ locale, onSignOut }: { locale: "en" | "fr"; onSi
     <div className="space-y-4 px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-6">
       <h1 className="text-[22px] font-medium tracking-tight text-ink">{m.profile.title}</h1>
       <Card className="divide-y divide-line py-1">
-        {row(m.profile.email, <span className="break-all">{u.email}</span>)}
+        {u.email ? row(m.profile.email, <span className="break-all">{u.email}</span>) : row(m.phone.number, u.phone)}
         {row(m.profile.country, `${u.country} · ${u.currency}`)}
         {row(m.profile.verification, m.vault.tier[u.kycTier])}
         {row(
@@ -413,13 +413,13 @@ export function AddSheet({ open, onClose, toast, onLoadVault }: { open: boolean;
               });
             else
               void run(async () => {
-                await api("/api/app/transfer", { email, amount: minor, note });
+                await api("/api/app/transfer", { to: email, amount: minor, note });
                 return t(m.add.sent, { amount: money(minor, cur, locale), email });
               });
           }}
         >
           {mode === "send" && (
-            <Field label={m.add.recipient} type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Field label={m.add.recipient} autoComplete="off" required value={email} onChange={(e) => setEmail(e.target.value)} />
           )}
           <Field label={m.add.amount} inputMode="decimal" required value={amount} onChange={(e) => setAmount(e.target.value)} hint={cur} />
           {mode === "send" && <Field label={`${m.add.note} (${m.common.optional})`} maxLength={80} value={note} onChange={(e) => setNote(e.target.value)} />}

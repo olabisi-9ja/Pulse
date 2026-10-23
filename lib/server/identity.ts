@@ -36,7 +36,7 @@ export async function partnerById(tx: Db, id: string): Promise<Partner | undefin
 
 export type AppUser = {
   id: string;
-  email: string;
+  email: string | null;
   partner_id: string;
   display_name: string;
   country: string;
@@ -68,6 +68,12 @@ export async function userByMerchantId(tx: Db, merchantId: Uint8Array): Promise<
   return u && normalize(u);
 }
 
+/** Looks a user up by email or by phone number (any common format). */
+export async function userByEmailOrPhone(tx: Db, to: string): Promise<AppUser | undefined> {
+  const phone = normalizePhone(to);
+  return phone ? userByPhone(tx, phone) : userByEmail(tx, to);
+}
+
 export async function userByEmail(tx: Db, email: string): Promise<AppUser | undefined> {
   const [u] = await tx<AppUser[]>`select * from pv.users where lower(email) = lower(${email})`;
   return u && normalize(u);
@@ -75,13 +81,13 @@ export async function userByEmail(tx: Db, email: string): Promise<AppUser | unde
 
 export async function createUser(
   tx: Db,
-  input: { id: string; email: string; displayName: string; country: string; locale: "en" | "fr"; partnerId?: string },
+  input: { id: string; email: string | null; phone?: string | null; displayName: string; country: string; locale: "en" | "fr"; partnerId?: string },
 ): Promise<AppUser> {
   const pack = packFor(input.country);
   const partnerId = input.partnerId ?? (await sandboxPartner(tx)).id;
   const [u] = await tx<AppUser[]>`
-    insert into pv.users (id, email, partner_id, display_name, country, currency, locale)
-    values (${input.id}, ${input.email}, ${partnerId}, ${input.displayName.trim().slice(0, 60)},
+    insert into pv.users (id, email, phone, partner_id, display_name, country, currency, locale)
+    values (${input.id}, ${input.email}, ${input.phone ?? null}, ${partnerId}, ${input.displayName.trim().slice(0, 60)},
             ${pack.code}, ${pack.currency.code}, ${input.locale})
     on conflict (id) do update set display_name = excluded.display_name
     returning *`;

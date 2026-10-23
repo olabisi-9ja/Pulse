@@ -177,7 +177,7 @@ export async function listAllowances(
     ${q ? s`and (encode(a.id, 'hex') like ${like(q.toLowerCase())} escape '\\' or a.external_ref ilike ${like(q)} escape '\\')` : s``}`;
   const [{ n }] = await s<{ n: number }[]>`select count(*)::int as n from pv.allowances a where ${where}`;
   const rows = await s<AllowanceListRow[]>`
-    select encode(a.id, 'hex') as id, a.external_ref, coalesce(nullif(u.display_name, ''), u.email) as holder,
+    select encode(a.id, 'hex') as id, a.external_ref, coalesce(nullif(u.display_name, ''), u.email, u.phone) as holder,
            a.currency, a.country, a.funded, a.credit, a.settled_funded, a.settled_credit, a.payments_count,
            a.expires_at, a.status
     from pv.allowances a left join pv.users u on u.id = a.user_id
@@ -246,7 +246,7 @@ export async function allowanceDetail(partnerId: string, idHex: string) {
   if (!/^[0-9a-f]{32}$/i.test(idHex)) return null;
   const s = sql();
   const [a] = await s<AllowanceDetail[]>`
-    select encode(a.id, 'hex') as id, a.external_ref, coalesce(nullif(u.display_name, ''), u.email) as holder,
+    select encode(a.id, 'hex') as id, a.external_ref, coalesce(nullif(u.display_name, ''), u.email, u.phone) as holder,
            encode(a.device_public_key, 'hex') as device_public_key, a.issuer_kid, a.country, a.currency, a.funded,
            a.credit, a.per_tx_limit, a.max_payments, a.issued_at, a.expires_at, a.status, a.settled_funded,
            a.settled_credit, a.settled_loss, a.payments_count, a.declared_seq, a.declared_cumulative, a.refunded,
@@ -348,7 +348,7 @@ export async function creditData(partnerId: string, status: string | undefined, 
   const [rows, totals, partner] = await Promise.all([
     s<LoanRow[]>`
       select l.id::text as id, encode(l.allowance_id, 'hex') as allowance_id,
-             coalesce(nullif(u.display_name, ''), u.email) as holder, l.currency, l.principal, l.fee, l.repaid,
+             coalesce(nullif(u.display_name, ''), u.email, u.phone) as holder, l.currency, l.principal, l.fee, l.repaid,
              l.due_at, l.status
       from pv.loans l left join pv.users u on u.id = l.user_id
       where ${where} order by l.created_at desc limit ${PAGE_SIZE} offset ${(page - 1) * PAGE_SIZE}`,
@@ -380,10 +380,10 @@ export async function listUsers(partnerId: string, f: { q?: string; page: number
   const s = sql();
   const q = f.q?.trim();
   const where = s`u.partner_id = ${partnerId}
-    ${q ? s`and (u.email ilike ${like(q)} escape '\\' or u.display_name ilike ${like(q)} escape '\\')` : s``}`;
+    ${q ? s`and (u.email ilike ${like(q)} escape '\\' or u.phone ilike ${like(q)} escape '\\' or u.display_name ilike ${like(q)} escape '\\')` : s``}`;
   const [{ n }] = await s<{ n: number }[]>`select count(*)::int as n from pv.users u where ${where}`;
   const rows = await s<UserRow[]>`
-    select u.id::text as id, u.email, u.display_name, u.country, u.kyc_tier, u.merchant_name,
+    select u.id::text as id, coalesce(u.email, u.phone) as email, u.display_name, u.country, u.kyc_tier, u.merchant_name,
            (u.merchant_id is not null) as is_merchant, u.status, u.created_at
     from pv.users u where ${where} order by u.created_at desc limit ${PAGE_SIZE} offset ${(f.page - 1) * PAGE_SIZE}`;
   return paged(rows, n, f.page);
@@ -416,7 +416,7 @@ export async function settingsData(partnerId: string) {
     s<{ id: string; slug: string; name: string; kind: string; countries: string[]; ledger_mode: string }[]>`
       select id::text as id, slug, name, kind, countries, ledger_mode from pv.partners where id = ${partnerId}`,
     s<{ user_id: string; role: string; created_at: Date; email: string | null; display_name: string | null }[]>`
-      select m.user_id::text as user_id, m.role, m.created_at, u.email, u.display_name
+      select m.user_id::text as user_id, m.role, m.created_at, coalesce(u.email, u.phone) as email, u.display_name
       from pv.partner_members m left join pv.users u on u.id = m.user_id
       where m.partner_id = ${partnerId} order by m.created_at`,
     s<{ n: number }[]>`select count(*)::int as n from pv.payments where partner_id = ${partnerId}`,

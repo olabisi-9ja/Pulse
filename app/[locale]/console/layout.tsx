@@ -30,7 +30,7 @@ export default async function ConsoleLayout({ children, params }: LayoutProps<"/
         t={t.nav}
         memberships={memberships.map((m) => ({ partnerId: m.partnerId, name: m.partnerName, role: m.role }))}
         fallbackId={fallback?.partnerId ?? ""}
-        email={identity.email}
+        email={identity.email ?? identity.phone ?? ""}
         roleLabels={t.labels.role}
       >
         {children}

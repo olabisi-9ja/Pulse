@@ -1,5 +1,5 @@
 "use client";
-import { CheckCircle2, CreditCard, Radio, ShieldCheck, Smartphone, Zap } from "lucide-react";
+import { CheckCircle2, CreditCard, Radio, Smartphone, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { money, parseMajor } from "@/lib/client/money";
 import { checkPin } from "@/lib/client/security";
@@ -22,7 +22,7 @@ export function CashTapSheet({
   initialMerchantId?: string;
   initialAmount?: number;
 }) {
-  const { m, locale } = useI18n();
+  const { m, t, locale } = useI18n();
   const snapshot = useApp((s) => s.snapshot);
   const userId = useApp((s) => s.userId)!;
 
@@ -60,11 +60,11 @@ export function CashTapSheet({
     setError(null);
     const minor = parseMajor(amountInput, currency);
     if (!minor || minor <= 0) {
-      setError("Please enter a valid payment amount.");
+      setError(m.cashtap.badAmount);
       return;
     }
     if (!merchantInput.trim()) {
-      setError("Please specify the recipient or merchant ID.");
+      setError(m.cashtap.noRecipient);
       return;
     }
     setMode("pin");
@@ -76,7 +76,7 @@ export function CashTapSheet({
     const check = await checkPin(userId, pin);
     if (!check.ok) {
       setBusy(false);
-      setPinError(check.reason === "locked" ? m.pin.locked : "Incorrect PIN. Try again.");
+      setPinError(check.reason === "locked" ? m.pin.locked : t(m.pin.wrong, { n: check.attemptsLeft ?? 0 }));
       return;
     }
 
@@ -107,7 +107,7 @@ export function CashTapSheet({
       setMode("success");
       void useApp.getState().refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Tap payment failed");
+      setError(err instanceof Error ? err.message : m.cashtap.failed);
       setMode("pay");
     } finally {
       setBusy(false);
@@ -125,14 +125,14 @@ export function CashTapSheet({
   };
 
   return (
-    <Sheet open={open} onClose={close} title="CashTap • Contactless">
+    <Sheet open={open} onClose={close} title={m.cashtap.title}>
       {mode === "card" && (
         <div className="space-y-6">
           {/* Virtual Contactless Card */}
           <div className="relative overflow-hidden rounded-[26px] bg-gradient-to-tr from-[#0F2027] via-[#203A43] to-[#2C5364] p-6 text-white shadow-xl">
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-white/80">
-                <Radio className="h-4 w-4 animate-pulse text-[#00E5FF]" /> Contactless
+                <Radio className="h-4 w-4 animate-pulse text-[#00E5FF]" />
               </span>
               <span className="text-xs font-bold tracking-widest text-[#00E5FF]">CASHTAP</span>
             </div>
@@ -146,33 +146,21 @@ export function CashTapSheet({
 
             <div className="flex items-end justify-between text-xs">
               <div>
-                <p className="text-[10px] text-white/60 uppercase">Cardholder</p>
-                <p className="font-medium text-white/95">{snapshot?.user.displayName || "PayVault User"}</p>
+                <p className="text-[10px] text-white/60 uppercase">{m.cashtap.cardholder}</p>
+                <p className="font-medium text-white/95">{snapshot?.user.displayName}</p>
               </div>
               <div>
-                <p className="text-[10px] text-white/60 uppercase">Expires</p>
+                <p className="text-[10px] text-white/60 uppercase">{m.cashtap.expires}</p>
                 <p className="font-mono font-medium text-white/95">{card?.expiry ?? "--/--"}</p>
               </div>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-line bg-card p-4 text-sm text-muted">
-            <div className="flex items-start gap-3">
-              <ShieldCheck className="h-5 w-5 shrink-0 text-green" />
-              <div>
-                <p className="font-medium text-ink">Powered by CashAfrica Infrastructure</p>
-                <p className="mt-0.5 text-xs">
-                  {nfcAvailable
-                    ? "Web NFC is enabled on your device. Hold your phone near a contactless terminal to pay."
-                    : "Tap-to-Pay is active with instant tokenized settlement."}
-                </p>
-              </div>
-            </div>
-          </div>
+          <p className="text-center text-sm text-muted">{m.cashtap.hint}</p>
 
           <div className="space-y-3">
             <Button className="w-full gap-2" onClick={handleStartPay}>
-              <Zap className="h-4 w-4" /> Tap to Pay Merchant
+              <Zap className="h-4 w-4" /> {m.cashtap.start}
             </Button>
             <Button variant="ghost" className="w-full" onClick={close}>
               {m.common.close}
@@ -185,14 +173,9 @@ export function CashTapSheet({
         <form onSubmit={handleProceedToPin} className="space-y-5">
           {error && <Notice tone="danger">{error}</Notice>}
 
-          <div className="rounded-2xl bg-card p-4 text-center">
-            <p className="text-xs text-muted uppercase tracking-wider">Contactless Tap-to-Pay</p>
-            <p className="mt-1 text-sm font-medium text-ink">Enter payment details to authorize tap</p>
-          </div>
 
           <Field
-            label="Merchant / Recipient ID or Email"
-            placeholder="e.g. merchant hex ID, email or UUID"
+            label={m.cashtap.recipient}
             required
             value={merchantInput}
             onChange={(e) => setMerchantInput(e.target.value)}
@@ -240,10 +223,8 @@ export function CashTapSheet({
           </div>
 
           <div>
-            <h3 className="text-lg font-medium text-ink">Ready to Tap</h3>
-            <p className="mt-1 text-sm text-muted">
-              Hold your device near the merchant terminal or phone.
-            </p>
+            <h3 className="text-lg font-medium text-ink">{m.cashtap.ready}</h3>
+            <p className="mt-1 text-sm text-muted">{m.cashtap.hold}</p>
             <p className="mt-3 text-2xl font-semibold text-ink tabular">
               {money(parseMajor(amountInput, currency) ?? 0, currency, locale)}
             </p>
@@ -251,7 +232,7 @@ export function CashTapSheet({
 
           <div className="space-y-3">
             <Button className="w-full gap-2" loading={busy} onClick={() => void triggerTapCompletion()}>
-              <Radio className="h-4 w-4" /> Tap Phone Now
+              <Radio className="h-4 w-4" /> {m.cashtap.tapNow}
             </Button>
             <Button variant="ghost" className="w-full" disabled={busy} onClick={() => setMode("pay")}>
               {m.common.cancel}
@@ -264,16 +245,13 @@ export function CashTapSheet({
         <div className="space-y-6 py-2 text-center">
           <CheckCircle2 className="mx-auto h-16 w-16 text-green animate-in zoom-in-75 duration-300" />
           <div>
-            <h3 className="text-xl font-medium text-ink">Tap Payment Approved</h3>
+            <h3 className="text-xl font-medium text-ink">{m.cashtap.sent}</h3>
             <p className="mt-2 text-3xl font-semibold tabular text-ink">
               {money(txResult.amount, txResult.currency, locale)}
             </p>
-            <p className="mt-2 text-xs font-mono text-muted">Ref: {txResult.ref}</p>
+            <p className="mt-2 text-xs font-mono text-muted">{t(m.cashtap.ref, { ref: txResult.ref })}</p>
           </div>
 
-          <Notice tone="success">
-            Contactless payment settled via CashAfrica CashTap infrastructure.
-          </Notice>
 
           <Button className="w-full" onClick={close}>
             {m.common.done}

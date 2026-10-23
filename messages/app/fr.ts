@@ -279,6 +279,22 @@ const app: AppMessages = {
     showInRough: "À titre indicatif. Les paiements restent en {currency}. Taux approximatifs : connectez-vous pour les mettre à jour.",
     noPinHint: "Les paiements hors ligne jusqu'à ce montant ne demandent pas le code. Laissez vide pour toujours le demander.",
   },
+  cashtap: {
+    title: "CashTap",
+    cardholder: "Titulaire",
+    expires: "Expire",
+    hint: "Paie un commerçant instantanément. Nécessite internet.",
+    start: "Payer un commerçant",
+    recipient: "ID ou e-mail du commerçant",
+    badAmount: "Saisissez un montant valide.",
+    noRecipient: "Indiquez le commerçant.",
+    ready: "Prêt à payer",
+    hold: "Approchez votre téléphone de celui du commerçant.",
+    tapNow: "Payer maintenant",
+    sent: "Paiement envoyé",
+    ref: "Réf : {ref}",
+    failed: "Échec du paiement. Réessayez.",
+  },
 };
 
 export default app;

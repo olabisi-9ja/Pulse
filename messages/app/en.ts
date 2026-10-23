@@ -277,6 +277,22 @@ const app = {
     showInRough: "For reference only. Payments stay in {currency}. Approximate rates: connect to update.",
     noPinHint: "Offline payments at or below this amount skip the PIN. Leave empty to always ask.",
   },
+  cashtap: {
+    title: "CashTap",
+    cardholder: "Cardholder",
+    expires: "Expires",
+    hint: "Pays a trader instantly. Needs internet.",
+    start: "Pay a trader",
+    recipient: "Trader ID or email",
+    badAmount: "Enter a valid amount.",
+    noRecipient: "Enter the trader.",
+    ready: "Ready to tap",
+    hold: "Hold your phone near the trader's phone.",
+    tapNow: "Tap now",
+    sent: "Payment sent",
+    ref: "Ref: {ref}",
+    failed: "Payment failed. Try again.",
+  },
 };
 
 export default app;
